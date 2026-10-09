@@ -891,6 +891,31 @@
         font-size: 1.15rem
       }
     }
+
+    .sm {
+      display: none
+    }
+
+    @media(max-width:640px) {
+      .lg {
+        display: none
+      }
+
+      .sm {
+        display: inline
+      }
+    }
+
+    .erow-t {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%
+    }
+
+    .pri {
+      font-size: 1.1rem
+    }
   </style>
 </head>
 
@@ -949,7 +974,7 @@
     function render() {
       if (!S.user) return landing();
       if (!S.couple) return onboarding();
-      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); dashboard(); return homeWidgets();
+      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); dashboard(); return homeWidgets();
     }
     function landing() {
       const signup = S.authMode === "signup", forgot = S.authMode === "forgot";
@@ -1086,6 +1111,20 @@
       }
       else if (a === "prefl") {const r = await sb.rpc("set_reflection", {pid: b.dataset.id, txt: $("#pr").value}); if (r.error) {$("#perr").textContent = msg(r.error); return } await persp(); popen(b.dataset.id); toast("Reflection saved")}
       else if (a === "pdel") {if (confirm("Delete this Two Perspectives, including both answers?")) {const r = await sb.from("perspectives").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); persp()} }
+      else if (a === "pltab") {S.pt = b.dataset.k; plPaint()}
+      else if (a === "plv") {S.cv = b.dataset.k; plBody()}
+      else if (a === "pday") {S.cday = b.dataset.k; plBody()}
+      else if (a === "mcal") {S.cmo = new Date(S.cmo.getFullYear(), S.cmo.getMonth() + +b.dataset.d, 1); S.cday = ""; plBody()}
+      else if (a === "bflt") {S.bf = b.dataset.k; plBody()}
+      else if (a === "eopen") {eview(b.dataset.id, b.dataset.d)}
+      else if (a === "eedit") {$("#dlg").open && $("#dlg").close(); eedit(b.dataset.id)}
+      else if (a === "estat") {const r = await sb.from("events").update({status: b.dataset.v}).eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); S.page = "plans"; plans()}
+      else if (a === "edel") {if (confirm("Delete this event?")) {const r = await sb.from("events").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); S.page = "plans"; plans()} }
+      else if (a === "ememo") {const e = S.ev.find(x => x.id === b.dataset.id); $("#dlg").close(); editor(null, {title: e.title, memory_date: b.dataset.d, location: e.location, category: MAPC[e.kind], story: [e.notes, e.itinerary].filter(Boolean).join("\n\n"), link: e.repeat_yearly ? null : {t: "events", id: e.id, f: {status: "done"}}})}
+      else if (a === "bedit") {bedit(b.dataset.id)}
+      else if (a === "bdone" || a === "bfav") {const x = S.bk.find(i => i.id === b.dataset.id), r = await sb.from("bucket_items").update(a === "bdone" ? {done: !x.done} : {favourite: !x.favourite}).eq("id", x.id); if (r.error) return toast(msg(r.error)); await loadPlans(); plPaint()}
+      else if (a === "bmemo") {const x = S.bk.find(i => i.id === b.dataset.id); editor(null, {title: x.title, story: x.notes, category: "Dates", link: {t: "bucket_items", id: x.id, f: {done: true}}})}
+      else if (a === "bdel") {if (confirm("Delete this idea?")) {const r = await sb.from("bucket_items").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); await loadPlans(); plPaint()} }
       else if (a === "zclose") {$("#lb").close()}
       else if (a === "anotm") {S.ti = Math.floor(Math.random() * S.mems.filter(m => !m.archived).length); drawWid()}
       else if (a === "newmem") {editor(null)}
@@ -1127,7 +1166,7 @@
     /* ---------- Memory Diary (2a) ---------- */
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
-    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button><button data-act="nav" data-p="timeline" class="${S.page === "timeline" ? "on" : ""}">Timeline</button><button data-act="nav" data-p="persp" class="${S.page === "persp" ? "on" : ""}">Perspectives</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
+    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button><button data-act="nav" data-p="plans" class="${S.page === "plans" ? "on" : ""}">Plans</button><button data-act="nav" data-p="timeline" class="${S.page === "timeline" ? "on" : ""}">Timeline</button><button data-act="nav" data-p="persp" class="${S.page === "persp" ? "on" : ""}"><span class="lg">Perspectives</span><span class="sm">Duo</span></button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
       const r = await sb.storage.from("memories").createSignedUrls(need, 3600); (r.data || []).forEach(x => {if (x.signedUrl) S.urls[x.path] = x.signedUrl})
@@ -1168,14 +1207,15 @@
   ${S.memErr ? `<p class="err">${esc(msg(S.memErr))} Did you run schema_2a.sql?</p>` : ""}<div id="res" style="margin-top:12px"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; drawRes()
     }
     async function diary() {app.innerHTML = topbar() + `<h1>Memory Diary</h1><p class="muted">Loading…</p>`; await loadMems(); paint()}
-    async function homeWidgets() {await loadMems(); drawWid()}
+    async function loadEv() {const r = await sb.from("events").select("*").eq("couple_id", S.couple.id); S.ev = r.data || []}
+    async function homeWidgets() {await Promise.all([loadMems(), loadEv()]); drawWid()}
     function drawWid() {
       const el = $("#wid"); if (!el) return; const mm = S.mems.filter(m => !m.archived), t = new Date(), md = `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
       if (S.ti == null || S.ti >= mm.length) S.ti = Math.floor(Math.random() * mm.length);
       const tm = mm[S.ti], oth = mm.filter(m => m.memory_date.slice(5) === md && +m.memory_date.slice(0, 4) < t.getFullYear()), rec = [...mm].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
       el.innerHTML = `<div class="grid"><div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
   <div class="card"><h3>On this day</h3>${oth.length ? oth.slice(0, 3).map(mrow).join("") : `<p class="muted">Nothing from this date in past years yet.</p>`}</div>
-  <div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div></div></div></div>
+  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => o.e.auto || o.e.repeat_yearly || o.e.status === "planned").slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div><div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div></div></div></div>
   ${rec.length ? `<h3 style="margin-top:1em">Recently added</h3><div class="hs">${rec.map(mcard).join("")}</div>` : ""}`
     }
     document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.flt; if (!k) return; S[k] = e.target.value; drawRes()});
@@ -1186,16 +1226,16 @@
     let tx = 0; document.addEventListener("touchstart", e => {tx = e.touches[0].clientX}, {passive: true});
     document.addEventListener("touchend", e => {const lb = $("#lb"); if (!lb || !lb.open || $("#st")?.classList.contains("z")) return; const dx = e.changedTouches[0].clientX - tx, n = S.cur.photos.length; if (Math.abs(dx) > 60 && n > 1) zoom((S.zi + (dx < 0 ? 1 : n - 1)) % n)});
     function shrink(file) {return new Promise((res, rej) => {const img = new Image(), u = URL.createObjectURL(file); img.onload = () => {const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob(b => b ? res(b) : rej(new Error("Could not process " + file.name)), "image/jpeg", .85)}; img.onerror = () => rej(new Error(file.name + " isn't a readable image")); img.src = u})}
-    async function editor(m) {
+    async function editor(m, pre) {
       await ensureDlg(); const keep = [...(m?.photos || [])]; await signed(keep);
       const thumbs = () => $("#th").innerHTML = keep.map((p, i) => `<div><img src="${S.urls[p] || ""}" alt=""><button type="button" data-act="rmph" data-i="${i}" aria-label="Remove photo">×</button></div>`).join("");
       window.__keep = keep; window.__thumbs = thumbs;
       dialog(`<h3>${m ? "Edit memory" : "New memory"}</h3>
-  <label for="mt">Title</label><input id="mt" maxlength="200" value="${esc(m?.title || "")}">
-  <label for="md">Date</label><input id="md" type="date" value="${m?.memory_date || new Date().toISOString().slice(0, 10)}">
-  <label for="ml">Location</label><input id="ml" value="${esc(m?.location || "")}">
-  <label for="mc">Category</label><select id="mc">${CATS.map(c => `<option ${c === (m?.category || CATS[0]) ? "selected" : ""}>${c}</option>`).join("")}</select>
-  <label for="ms">Story</label><textarea id="ms" rows="4">${esc(m?.story || "")}</textarea>
+  <label for="mt">Title</label><input id="mt" maxlength="200" value="${esc((m || pre)?.title || "")}">
+  <label for="md">Date</label><input id="md" type="date" value="${(m || pre)?.memory_date || new Date().toLocaleDateString("sv")}">
+  <label for="ml">Location</label><input id="ml" value="${esc((m || pre)?.location || "")}">
+  <label for="mc">Category</label><select id="mc">${CATS.map(c => `<option ${c === ((m || pre)?.category || CATS[0]) ? "selected" : ""}>${c}</option>`).join("")}</select>
+  <label for="ms">Story</label><textarea id="ms" rows="4">${esc((m || pre)?.story || "")}</textarea>
   <label for="mg">Tags (comma separated)</label><input id="mg" value="${esc((m?.tags || []).join(", "))}">
   <label for="mp">Photos (up to 8, JPG/PNG/WebP)</label><input id="mp" type="file" accept="image/jpeg,image/png,image/webp" multiple><div class="thumbs" id="th" style="margin-top:.5em"></div>`,
         async () => {
@@ -1217,7 +1257,7 @@
           const r = m ? await sb.from("memories").update(row).eq("id", id) : await sb.from("memories").insert({...row, id, couple_id: S.couple.id});
           if (r.error) return msg(r.error);
           if (m) {const gone = (m.photos || []).filter(p => !paths.includes(p)); if (gone.length) await sb.storage.from("memories").remove(gone)}
-          S.page = "diary"; render(); toast("Memory saved")
+          if (pre?.link) {await sb.from(pre.link.t).update({memory_id: id, ...pre.link.f}).eq("id", pre.link.id)} S.page = "diary"; render(); toast("Memory saved")
         });
       thumbs();
     }
@@ -1294,6 +1334,76 @@
       d.innerHTML = `<h2>${esc(p.title)}</h2>${p.prompt ? `<p class="muted">${esc(p.prompt)}</p>` : ""}` + (rev ? `<div class="grid">${[["You", mine], [nm, oth]].map(([n, a]) => `<div class="card"><h3>${esc(n)}</h3><p style="white-space:pre-wrap">${a ? esc(a.body) : "No answer."}</p></div>`).join("")}</div><h3 style="margin-top:1em">Our reflection</h3><label for="pr">Something you both took from it</label><textarea id="pr" rows="3">${esc(p.reflection || "")}</textarea><div class="err" id="perr" role="alert"></div><button class="btn alt" data-act="prefl" data-id="${id}">Save reflection</button>`
         : `<label for="pa">Your version</label><textarea id="pa" rows="6" maxlength="8000">${esc(mine?.body || "")}</textarea><div class="err" id="perr" role="alert"></div><button class="btn" data-act="psave" data-id="${id}">${mine ? "Update my version" : "Submit my version"}</button><p class="muted">${mine ? "Saved. Waiting for your partner. You can edit until it's revealed." : "Your partner can't see this until the reveal."}${p.reveal_mode === "date" && p.reveal_at ? ` Reveals on ${new Date(p.reveal_at).toLocaleDateString()}.` : ""}</p>`)
         + `<div class="row" style="margin-top:.8em">${p.created_by === S.user.id ? `<button class="btn danger" data-act="pdel" data-id="${id}">Delete</button>` : ""}<button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+    }
+
+
+    /* ---------- Plans: calendar, planner, bucket list (3) ---------- */
+    const EK = ["Date", "Birthday", "Anniversary", "Trip", "Holiday", "Activity", "Other"], BC = ["Travel", "Food", "Adventure", "Cozy", "Learn together", "Other"], MAPC = {Date: "Dates", Trip: "Trips and Holidays", Holiday: "Trips and Holidays", Birthday: "Celebrations", Anniversary: "Celebrations"};
+    S.ev = []; S.bk = []; S.pt = "cal"; S.cv = "month"; S.cmo = new Date(); S.cday = ""; S.bf = "all";
+    const todayIso = () => new Date().toLocaleDateString("sv");
+    const dd = d => Math.round((new Date(d + "T00:00") - new Date(todayIso() + "T00:00")) / 864e5);
+    const cdn = d => {const n = dd(d); return n === 0 ? "Today" : n === 1 ? "Tomorrow" : n > 0 ? `In ${n} days` : `${-n} days ago`};
+    function occs(from, to) {
+      const out = [], fy = +from.slice(0, 4), ty = +to.slice(0, 4), add = (e, d) => {if (d >= from && d <= to) out.push({e, d})};
+      S.ev.forEach(e => {if (e.repeat_yearly) {for (let y = Math.max(fy, +e.start_date.slice(0, 4)); y <= ty; y++)add(e, y + e.start_date.slice(4))} else add(e, e.start_date)});
+      const c = S.couple;[[c.start_date, "Our anniversary"], [c.anniversary, "Anniversary"]].forEach(([d, t], i) => {if (!d || (i === 1 && d === c.start_date)) return; for (let y = Math.max(fy, +d.slice(0, 4) + 1); y <= ty; y++)add({auto: 1, title: t, kind: "Anniversary", id: "auto" + i}, y + d.slice(4))});
+      return out.sort((a, b) => a.d.localeCompare(b.d) || (a.e.start_time || "").localeCompare(b.e.start_time || ""))
+    }
+    function erow(o) {
+      const e = o.e, rem = !e.auto && e.reminder_days != null && dd(o.d) >= 0 && dd(o.d) <= e.reminder_days, x = e.status === "cancelled" || e.status === "done";
+      return `<button class="ri" data-act="${e.auto ? "nav" : "eopen"}" data-p="plans" data-id="${e.id}" data-d="${o.d}"><div style="flex:1"><strong ${x ? 'style="text-decoration:line-through"' : ""}>${esc(e.title)}</strong><br><span class="muted">${fdt(o.d)}${e.start_time ? " · " + e.start_time.slice(0, 5) : ""} · ${esc(e.kind)}${e.status === "done" ? " · done" : ""}</span></div><span class="muted">${cdn(o.d)}</span>${rem ? '<span class="pill">Reminder</span>' : ""}</button>`
+    }
+    async function loadPlans() {const [e, b] = await Promise.all([sb.from("events").select("*").eq("couple_id", S.couple.id), sb.from("bucket_items").select("*").eq("couple_id", S.couple.id), loadMems()]); S.ev = e.data || []; S.bk = b.data || []; S.plErr = e.error || b.error}
+    async function plans() {app.innerHTML = topbar() + `<h1>Plans</h1><p class="muted">Loading…</p>`; await loadPlans(); plPaint()}
+    function plPaint() {app.innerHTML = topbar() + `<h1>Plans</h1><div class="chips" role="group" aria-label="Section">${[["cal", "Calendar"], ["bk", "Bucket list"]].map(([k, l]) => `<button data-act="pltab" data-k="${k}" class="${S.pt === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.plErr ? `<p class="err">${esc(msg(S.plErr))} Did you run schema_3.sql?</p>` : ""}<div id="plb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; plBody()}
+    function plBody() {
+      const el = $("#plb"); if (!el) return;
+      if (S.pt === "bk") {
+        const pr = {High: 0, Medium: 1, Low: 2}, l = S.bk.filter(b => S.bf === "all" || (S.bf === "todo" && !b.done) || (S.bf === "done" && b.done) || (S.bf === "fav" && b.favourite)).sort((a, b) => a.done - b.done || pr[a.priority] - pr[b.priority]);
+        el.innerHTML = `<div class="row"><button class="btn" data-act="bedit" data-id="">Add an idea</button></div><div class="chips">${[["all", "All"], ["todo", "To do"], ["done", "Done"], ["fav", "Favourites"]].map(([k, t]) => `<button data-act="bflt" data-k="${k}" class="${S.bf === k ? "on" : ""}">${t}</button>`).join("")}</div>
+    ${l.map(b => `<div class="card" style="margin-bottom:10px"><div class="erow-t"><h3 style="margin:0;${b.done ? "text-decoration:line-through" : ""}">${b.favourite ? "♥ " : ""}${esc(b.title)}</h3><span class="tag">${esc(b.priority)}</span></div><p class="muted">${esc(b.category)}${b.budget != null ? " · about $" + b.budget : ""}</p>${b.notes ? `<p>${esc(b.notes)}</p>` : ""}<div class="row"><button class="btn alt" data-act="bdone" data-id="${b.id}">${b.done ? "Mark not done" : "Mark done"}</button><button class="btn ghost" data-act="bfav" data-id="${b.id}">${b.favourite ? "Unfavourite" : "Favourite"}</button><button class="btn ghost" data-act="bedit" data-id="${b.id}">Edit</button>${b.done && !b.memory_id ? `<button class="btn ghost" data-act="bmemo" data-id="${b.id}">Make it a memory</button>` : ""}${b.memory_id && S.mems.some(m => m.id === b.memory_id) ? `<button class="btn ghost" data-act="open" data-id="${b.memory_id}">Open memory</button>` : ""}</div></div>`).join("") || `<div class="card"><p class="muted">Add things you want to do together, big or small.</p></div>`}`; return
+      }
+      const y = S.cmo.getFullYear(), mo = S.cmo.getMonth(), head = `<div class="row"><button class="btn" data-act="eedit" data-id="">Add an event</button><div class="chips" style="margin:0">${[["month", "Month"], ["agenda", "Agenda"]].map(([k, t]) => `<button data-act="plv" data-k="${k}" class="${S.cv === k ? "on" : ""}">${t}</button>`).join("")}</div></div>`;
+      if (S.cv === "agenda") {
+        const t0 = todayIso(), l = occs(t0, new Date(Date.now() + 365 * 864e5).toLocaleDateString("sv")).filter(o => o.e.auto || o.e.repeat_yearly || o.e.status !== "cancelled"); let h = "", last = ""; l.forEach(o => {const k = new Date(o.d + "T00:00").toLocaleDateString(undefined, {month: "long", year: "numeric"}); if (k !== last) {h += `<h2 class="tlh">${k}</h2>`; last = k} h += erow(o)});
+        el.innerHTML = head + (h || `<div class="card" style="margin-top:12px"><p class="muted">Nothing coming up. Add a date, birthday or trip.</p></div>`); return
+      }
+      const first = new Date(y, mo, 1).getDay(), n = new Date(y, mo + 1, 0).getDate(), by = {}; occs(iso(y, mo, 1), iso(y, mo, n)).forEach(o => (by[o.d] ??= []).push(o));
+      let cells = ""; for (let i = 0; i < first; i++)cells += "<div></div>";
+      for (let d = 1; d <= n; d++) {const k = iso(y, mo, d), c = by[k]; cells += c ? `<button class="cd has ${S.cday === k ? "sel" : ""}" data-act="pday" data-k="${k}" aria-label="${c.length} events on ${k}">${d}<i>${c.length}</i></button>` : `<div class="cd" ${k === todayIso() ? 'style="outline:2px solid var(--blue)"' : ""}>${d}</div>`}
+      el.innerHTML = head + `<div class="row" style="justify-content:space-between;margin-top:12px"><button class="btn ghost" data-act="mcal" data-d="-1" aria-label="Previous month">‹</button><h2 style="margin:0">${S.cmo.toLocaleDateString(undefined, {month: "long", year: "numeric"})}</h2><button class="btn ghost" data-act="mcal" data-d="1" aria-label="Next month">›</button></div><div class="cg">${"SMTWTFS".split("").map(c => `<b>${c}</b>`).join("")}${cells}</div>${by[S.cday] ? `<h3 style="margin-top:1em">${fdt(S.cday)}</h3>` + by[S.cday].map(erow).join("") : ""}`
+    }
+    const iso = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    function eview(id, d) {
+      const e = S.ev.find(x => x.id === id); if (!e) return; const dl = $("#dlg"), ln = (l, v, pre) => v ? `<p><span class="muted">${l}</span><br><span ${pre ? 'style="white-space:pre-wrap"' : ""}>${esc(v)}</span></p>` : "";
+      dl.innerHTML = `<h2>${esc(e.title)}</h2><p><span class="tag">${esc(e.kind)}</span>${e.status !== "planned" && !e.repeat_yearly ? `<span class="pill">${e.status}</span>` : ""}</p><p class="muted">${fdt(d)}${e.start_time ? " · " + e.start_time.slice(0, 5) : ""} · ${cdn(d)}${e.repeat_yearly ? " · repeats every year" : ""}</p>
+  ${ln("Where", e.location)}${e.budget != null ? ln("Estimated budget", "$" + e.budget) : ""}${ln("Notes", e.notes, 1)}${ln("Itinerary", e.itinerary, 1)}${ln("Things to bring", e.bring, 1)}${ln("Reservation", e.reservation, 1)}${ln("Links", e.links, 1)}${e.reminder_days != null ? ln("Reminder", e.reminder_days + " day(s) before") : ""}
+  <div class="row">${e.repeat_yearly ? "" : (e.status === "done" ? `<button class="btn alt" data-act="estat" data-id="${id}" data-v="planned">Mark not done</button>` : `<button class="btn alt" data-act="estat" data-id="${id}" data-v="done">Mark done</button>`)}${!e.repeat_yearly && e.status !== "cancelled" ? `<button class="btn ghost" data-act="estat" data-id="${id}" data-v="cancelled">Cancel event</button>` : !e.repeat_yearly ? `<button class="btn ghost" data-act="estat" data-id="${id}" data-v="planned">Restore</button>` : ""}${e.memory_id && S.mems.some(m => m.id === e.memory_id) ? `<button class="btn ghost" data-act="open" data-id="${e.memory_id}">Open memory</button>` : `<button class="btn ghost" data-act="ememo" data-id="${id}" data-d="${d}">Create a memory</button>`}<button class="btn ghost" data-act="eedit" data-id="${id}">Edit</button><button class="btn danger" data-act="edel" data-id="${id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; dl.showModal()
+    }
+    function eedit(id) {
+      const e = S.ev.find(x => x.id === id), v = (k) => esc(e?.[k] ?? ""), ta = (i, l, k, r = 2) => `<label for="${i}">${l}</label><textarea id="${i}" rows="${r}">${v(k)}</textarea>`;
+      dialog(`<h3>${e ? "Edit event" : "Add an event"}</h3><label for="et">Title</label><input id="et" maxlength="200" value="${v("title")}" placeholder="Mia's birthday"><label for="ek">Type</label><select id="ek">${EK.map(k => `<option ${k === (e?.kind || "Date") ? "selected" : ""}>${k}</option>`).join("")}</select>
+  <label for="ed">Date</label><input id="ed" type="date" value="${e?.start_date || S.cday || todayIso()}"><label for="ei">Time (optional)</label><input id="ei" type="time" value="${e?.start_time?.slice(0, 5) || ""}">
+  <label style="display:flex;gap:8px;align-items:center"><input id="er" type="checkbox" style="width:auto;min-height:0" ${e?.repeat_yearly ? "checked" : ""}> Repeats every year (birthdays, anniversaries)</label>
+  <label for="el">Location</label><input id="el" value="${v("location")}"><label for="eb">Estimated budget</label><input id="eb" type="number" min="0" step="0.01" value="${v("budget")}">
+  ${ta("en", "Notes", "notes")}${ta("eit", "Itinerary", "itinerary")}${ta("ebr", "Things to bring", "bring")}${ta("ers", "Reservation details", "reservation")}${ta("elk", "Related links", "links")}
+  <label for="erm">Remind me</label><select id="erm">${[["", "No reminder"], [1, "1 day before"], [3, "3 days before"], [7, "1 week before"], [14, "2 weeks before"]].map(([k, t]) => `<option value="${k}" ${String(e?.reminder_days ?? "") === String(k) ? "selected" : ""}>${t}</option>`).join("")}</select>`,
+        async () => {
+          const title = $("#et").value.trim(); if (!title) return "Give the event a title."; if (!$("#ed").value) return "Pick a date."; const t = x => $("#" + x).value.trim() || null;
+          const row = {title, kind: $("#ek").value, start_date: $("#ed").value, start_time: $("#ei").value || null, repeat_yearly: $("#er").checked, location: t("el"), budget: $("#eb").value === "" ? null : +$("#eb").value, notes: t("en"), itinerary: t("eit"), bring: t("ebr"), reservation: t("ers"), links: t("elk"), reminder_days: $("#erm").value === "" ? null : +$("#erm").value};
+          const r = e ? await sb.from("events").update(row).eq("id", e.id) : await sb.from("events").insert({...row, couple_id: S.couple.id});
+          if (r.error) return msg(r.error); S.page = "plans"; await plans(); toast("Saved")
+        });
+      $("#ek").onchange = () => {if (!e) $("#er").checked = ["Birthday", "Anniversary"].includes($("#ek").value)}
+    }
+    function bedit(id) {
+      const b = S.bk.find(x => x.id === id);
+      dialog(`<h3>${b ? "Edit idea" : "Add an idea"}</h3><label for="bt">What do you want to do?</label><input id="bt" maxlength="200" value="${esc(b?.title || "")}"><label for="bc">Category</label><select id="bc">${BC.map(k => `<option ${k === (b?.category || "Other") ? "selected" : ""}>${k}</option>`).join("")}</select><label for="bp">Priority</label><select id="bp">${["High", "Medium", "Low"].map(k => `<option ${k === (b?.priority || "Medium") ? "selected" : ""}>${k}</option>`).join("")}</select><label for="bb">Estimated budget (optional)</label><input id="bb" type="number" min="0" step="0.01" value="${b?.budget ?? ""}"><label for="bn">Notes</label><textarea id="bn" rows="3">${esc(b?.notes || "")}</textarea>${b ? `<p><button type="button" class="btn danger" data-act="bdel" data-id="${b.id}">Delete this idea</button></p>` : ""}`,
+        async () => {
+          const title = $("#bt").value.trim(); if (!title) return "Write the idea first."; const row = {title, category: $("#bc").value, priority: $("#bp").value, budget: $("#bb").value === "" ? null : +$("#bb").value, notes: $("#bn").value.trim() || null};
+          const r = b ? await sb.from("bucket_items").update(row).eq("id", b.id) : await sb.from("bucket_items").insert({...row, couple_id: S.couple.id});
+          if (r.error) return msg(r.error); await loadPlans(); plPaint(); toast("Saved")
+        })
     }
 
     /* boot */
