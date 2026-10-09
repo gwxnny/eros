@@ -625,29 +625,6 @@
       background: var(--rose)
     }
 
-    dialog#lb {
-      padding: 0;
-      border: 0;
-      background: transparent;
-      width: auto;
-      max-width: 96vw;
-      max-height: 96vh;
-      overflow: visible
-    }
-
-    dialog#lb::backdrop {
-      background: rgba(0, 0, 0, .88)
-    }
-
-    #lb img {
-      display: block;
-      max-width: 96vw;
-      max-height: 90vh;
-      object-fit: contain;
-      cursor: zoom-out;
-      border-radius: 8px
-    }
-
     .ri {
       display: flex;
       gap: 12px;
@@ -761,6 +738,159 @@
       color: var(--text);
       line-height: 1
     }
+
+    dialog#lb {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      max-width: none;
+      height: 100dvh;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: rgba(20, 17, 22, .95);
+      color: #F7F0F3;
+      overflow: hidden
+    }
+
+    dialog#lb::backdrop {
+      background: transparent
+    }
+
+    #lb .bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: calc(56px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 70px 0 18px;
+      display: flex;
+      align-items: center;
+      font-size: 1.3rem;
+      z-index: 1
+    }
+
+    #lb .st {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(56px + env(safe-area-inset-top, 0px));
+      bottom: 96px;
+      overflow: auto;
+      display: flex
+    }
+
+    #lb .st img {
+      margin: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      cursor: zoom-in;
+      border-radius: 6px
+    }
+
+    #lb .st.z img {
+      max-width: none;
+      max-height: none;
+      width: 200%;
+      cursor: zoom-out
+    }
+
+    #lb .tn {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 96px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+      overflow-x: auto
+    }
+
+    #lb .tn button {
+      width: 56px;
+      height: 56px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 0;
+      background: var(--pink) center/cover;
+      cursor: pointer;
+      opacity: .55;
+      flex: none
+    }
+
+    #lb .tn button.on {
+      opacity: 1;
+      border-color: var(--pink)
+    }
+
+    #lb .ar {
+      background: rgba(255, 255, 255, .16);
+      color: #fff
+    }
+
+    #lb .zx {
+      background: rgba(255, 255, 255, .16);
+      color: #fff;
+      top: calc(6px + env(safe-area-inset-top, 0px))
+    }
+
+    @media(prefers-reduced-motion:no-preference) {
+      #lb .st img {
+        animation: lbi .25s
+      }
+
+      @keyframes lbi {
+        from {
+          opacity: 0;
+          transform: scale(.98)
+        }
+
+        to {
+          opacity: 1
+        }
+      }
+    }
+
+    .tli {
+      position: relative;
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px
+    }
+
+    .tli::before {
+      content: "";
+      position: absolute;
+      left: -22px;
+      top: 20px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--rose)
+    }
+
+    .tli.auto::before {
+      background: var(--blue)
+    }
+
+    .tli h3 {
+      margin: .2em 0
+    }
+
+    @media(max-width:640px) {
+      .nav button {
+        padding: .2em .55em;
+        font-size: 1.15rem
+      }
+    }
   </style>
 </head>
 
@@ -819,7 +949,7 @@
     function render() {
       if (!S.user) return landing();
       if (!S.couple) return onboarding();
-      if (S.page === "diary") return diary(); dashboard(); return homeWidgets();
+      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); dashboard(); return homeWidgets();
     }
     function landing() {
       const signup = S.authMode === "signup", forgot = S.authMode === "forgot";
@@ -942,6 +1072,20 @@
       else if (a === "slide") {const c = $("#car"); c.scrollBy({left: +b.dataset.d * c.clientWidth, behavior: "smooth"})}
       else if (a === "zoom") {zoom(+b.dataset.i)}
       else if (a === "zstep") {const n = S.cur.photos.length; zoom((S.zi + +b.dataset.d + n) % n)}
+      else if (a === "ztog") {$("#st").classList.toggle("z")}
+      else if (a === "zjump") {zoom(+b.dataset.i)}
+      else if (a === "ttog") {S.tlm = !S.tlm; tlPaint()}
+      else if (a === "tedit") {tedit(b.dataset.id)}
+      else if (a === "tdel") {if (confirm("Delete this moment?")) {const r = await sb.from("timeline_entries").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); timeline()} }
+      else if (a === "padd") {padd()}
+      else if (a === "popen") {popen(b.dataset.id)}
+      else if (a === "psave") {
+        const v = $("#pa").value.trim(); if (!v) {$("#perr").textContent = "Write your version first."; return } b.disabled = true;
+        const r = await sb.from("perspective_answers").upsert({perspective_id: b.dataset.id, user_id: S.user.id, body: v}, {onConflict: "perspective_id,user_id"});
+        if (r.error) {$("#perr").textContent = msg(r.error); b.disabled = false; return } await persp(); popen(b.dataset.id); toast("Saved")
+      }
+      else if (a === "prefl") {const r = await sb.rpc("set_reflection", {pid: b.dataset.id, txt: $("#pr").value}); if (r.error) {$("#perr").textContent = msg(r.error); return } await persp(); popen(b.dataset.id); toast("Reflection saved")}
+      else if (a === "pdel") {if (confirm("Delete this Two Perspectives, including both answers?")) {const r = await sb.from("perspectives").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); persp()} }
       else if (a === "zclose") {$("#lb").close()}
       else if (a === "anotm") {S.ti = Math.floor(Math.random() * S.mems.filter(m => !m.archived).length); drawWid()}
       else if (a === "newmem") {editor(null)}
@@ -983,7 +1127,7 @@
     /* ---------- Memory Diary (2a) ---------- */
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
-    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
+    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button><button data-act="nav" data-p="timeline" class="${S.page === "timeline" ? "on" : ""}">Timeline</button><button data-act="nav" data-p="persp" class="${S.page === "persp" ? "on" : ""}">Perspectives</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
       const r = await sb.storage.from("memories").createSignedUrls(need, 3600); (r.data || []).forEach(x => {if (x.signedUrl) S.urls[x.path] = x.signedUrl})
@@ -1037,7 +1181,10 @@
     document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.flt; if (!k) return; S[k] = e.target.value; drawRes()});
     document.addEventListener("toggle", e => {if (e.target.id === "fd") S.fo = e.target.open}, true);
     document.addEventListener("scroll", e => {if (e.target.id === "car") {const i = Math.round(e.target.scrollLeft / e.target.clientWidth); document.querySelectorAll("#dots i").forEach((d, j) => d.classList.toggle("on", j === i))} }, true);
-    function zoom(i) {S.zi = i; const m = S.cur, n = m.photos.length, lb = $("#lb"); lb.innerHTML = `<img src="${S.urls[m.photos[i]] || ""}" alt="Photo ${i + 1} of ${n} from ${esc(m.title)}" data-act="zclose">${n > 1 ? `<button class="ar l" data-act="zstep" data-d="-1" aria-label="Previous photo">‹</button><button class="ar r" data-act="zstep" data-d="1" aria-label="Next photo">›</button>` : ""}<button class="zx" data-act="zclose" aria-label="Close">×</button>`; if (!lb.open) lb.showModal()}
+    function zoom(i) {S.zi = i; const m = S.cur, n = m.photos.length, lb = $("#lb"); lb.innerHTML = `<div class="bar">${n > 1 ? `${i + 1} / ${n} · ` : ""}${esc(m.title)}</div><div class="st" id="st"><img src="${S.urls[m.photos[i]] || ""}" alt="Photo ${i + 1} of ${n} from ${esc(m.title)}. Select to zoom." data-act="ztog"></div>${n > 1 ? `<button class="ar l" data-act="zstep" data-d="-1" aria-label="Previous photo">‹</button><button class="ar r" data-act="zstep" data-d="1" aria-label="Next photo">›</button><div class="tn">${m.photos.map((p, j) => `<button data-act="zjump" data-i="${j}" class="${j === i ? "on" : ""}" aria-label="Photo ${j + 1}" style="background-image:url('${S.urls[p] || ""}')"></button>`).join("")}</div>` : ""}<button class="zx" data-act="zclose" aria-label="Close">×</button>`; if (!lb.open) lb.showModal()}
+    document.addEventListener("keydown", e => {const lb = $("#lb"); if (!lb || !lb.open || !S.cur) return; const n = S.cur.photos.length; if (e.key === "ArrowRight") zoom((S.zi + 1) % n); if (e.key === "ArrowLeft") zoom((S.zi + n - 1) % n)});
+    let tx = 0; document.addEventListener("touchstart", e => {tx = e.touches[0].clientX}, {passive: true});
+    document.addEventListener("touchend", e => {const lb = $("#lb"); if (!lb || !lb.open || $("#st")?.classList.contains("z")) return; const dx = e.changedTouches[0].clientX - tx, n = S.cur.photos.length; if (Math.abs(dx) > 60 && n > 1) zoom((S.zi + (dx < 0 ? 1 : n - 1)) % n)});
     function shrink(file) {return new Promise((res, rej) => {const img = new Image(), u = URL.createObjectURL(file); img.onload = () => {const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob(b => b ? res(b) : rej(new Error("Could not process " + file.name)), "image/jpeg", .85)}; img.onerror = () => rej(new Error(file.name + " isn't a readable image")); img.src = u})}
     async function editor(m) {
       await ensureDlg(); const keep = [...(m?.photos || [])]; await signed(keep);
@@ -1084,6 +1231,70 @@
   <div class="row"><button class="btn alt" data-act="fav" data-id="${m.id}">${m.favourite ? "Unfavourite" : "Favourite"}</button><button class="btn ghost" data-act="edit1" data-id="${m.id}">Edit</button><button class="btn ghost" data-act="arch" data-id="${m.id}">${m.archived ? "Restore" : "Archive"}</button><button class="btn danger" data-act="del" data-id="${m.id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
     }
     async function openMem(id) {await signed(S.mems.find(x => x.id === id).photos); viewMem(S.mems.find(x => x.id === id))}
+
+
+    /* ---------- Timeline (2c) ---------- */
+    const KINDS = ["First meeting", "First date", "Relationship start", "Anniversary", "Birthday", "Trip", "Special occasion", "Gift", "Milestone", "Everyday"];
+    S.tlm = false; S.tl = []; S.ps = []; S.pc = {};
+    async function timeline() {
+      app.innerHTML = topbar() + `<h1>Our timeline</h1><p class="muted">Loading…</p>`;
+      const [t] = await Promise.all([sb.from("timeline_entries").select("*").eq("couple_id", S.couple.id), loadMems()]); S.tl = t.data || []; S.tlErr = t.error; tlPaint()
+    }
+    function tlItems() {
+      const it = S.tl.map(e => ({d: e.entry_date, t: e.title, k: e.kind, n: e.note, id: e.id, mem: e.memory_id, e: 1})), sd = S.couple.start_date, today = new Date().toLocaleDateString("sv");
+      if (sd) {
+        if (!S.tl.some(e => e.kind === "Relationship start")) it.push({d: sd, t: "Our story begins", k: "Relationship start", n: "From your start date."});
+        const y0 = +sd.slice(0, 4); for (let y = y0 + 1; y <= +today.slice(0, 4); y++) {const d = y + sd.slice(4); if (d <= today) it.push({d, t: `${y - y0} year${y - y0 > 1 ? "s" : ""} together`, k: "Anniversary"})}
+      }
+      if (S.tlm) S.mems.filter(m => !m.archived).forEach(m => it.push({d: m.memory_date, t: m.title, k: "Diary memory", mem: m.id}));
+      return it.sort((a, b) => a.d.localeCompare(b.d))
+    }
+    function tlPaint() {
+      const it = tlItems(), yrs = [...new Set(it.map(x => x.d.slice(0, 4)))];
+      const rec = y => {const mm = S.mems.filter(m => !m.archived && m.memory_date.startsWith(y)); return `${it.filter(x => x.d.startsWith(y)).length} moments · ${mm.length} diary memories · ${mm.reduce((n, m) => n + m.photos.length, 0)} photos`};
+      let h = "", last = ""; it.forEach(x => {
+        const y = x.d.slice(0, 4); if (y !== last) {h += `<h2 class="tlh" id="y${y}">${y}</h2><p class="muted">${rec(y)}</p>`; last = y}
+        h += `<div class="tli ${x.e ? "" : "auto"}"><span class="muted">${fdt(x.d)}</span> <span class="tag">${esc(x.k)}</span><h3>${esc(x.t)}</h3>${x.n ? `<p>${esc(x.n)}</p>` : ""}<div class="row">${x.mem && S.mems.some(m => m.id === x.mem) ? `<button class="btn ghost" data-act="open" data-id="${x.mem}">Open memory</button>` : ""}${x.e ? `<button class="btn ghost" data-act="tedit" data-id="${x.id}">Edit</button>` : ""}</div></div>`
+      });
+      app.innerHTML = topbar() + `<h1>Our timeline</h1><div class="row"><button class="btn" data-act="tedit" data-id="">Add a moment</button><div class="chips" style="margin:0"><button data-act="ttog" class="${S.tlm ? "on" : ""}">Show diary memories</button></div>${yrs.length > 1 ? `<select id="jy" aria-label="Jump to year" style="width:auto"><option value="">Jump to year</option>${yrs.map(y => `<option>${y}</option>`).join("")}</select>` : ""}</div>${S.tlErr ? `<p class="err">${esc(msg(S.tlErr))} Did you run schema_2c.sql?</p>` : ""}<div class="tl" style="margin-top:12px">${h || `<div class="card"><p class="muted">Add your first moment, like the day you met.</p></div>`}</div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`
+    }
+    document.addEventListener("change", e => {if (e.target.id === "jy" && e.target.value) document.getElementById("y" + e.target.value)?.scrollIntoView({behavior: "smooth"})});
+    function tedit(id) {
+      const e = S.tl.find(x => x.id === id), ms = S.mems.filter(m => !m.archived);
+      dialog(`<h3>${e ? "Edit moment" : "Add a moment"}</h3><label for="tt">Title</label><input id="tt" maxlength="200" value="${esc(e?.title || "")}"><label for="td">Date</label><input id="td" type="date" value="${e?.entry_date || new Date().toLocaleDateString("sv")}"><label for="tk">Type</label><select id="tk">${KINDS.map(k => `<option ${k === (e?.kind || "Milestone") ? "selected" : ""}>${k}</option>`).join("")}</select><label for="tn">Note</label><textarea id="tn" rows="3">${esc(e?.note || "")}</textarea><label for="tm">Link to a diary memory</label><select id="tm"><option value="">None</option>${ms.map(m => `<option value="${m.id}" ${e?.memory_id === m.id ? "selected" : ""}>${esc(m.title)} (${fdt(m.memory_date)})</option>`).join("")}</select>${e ? `<p><button type="button" class="btn danger" data-act="tdel" data-id="${e.id}">Delete this moment</button></p>` : ""}`,
+        async () => {
+          const title = $("#tt").value.trim(); if (!title) return "Give this moment a title."; if (!$("#td").value) return "Pick a date.";
+          const row = {title, entry_date: $("#td").value, kind: $("#tk").value, note: $("#tn").value.trim() || null, memory_id: $("#tm").value || null};
+          const r = e ? await sb.from("timeline_entries").update(row).eq("id", e.id) : await sb.from("timeline_entries").insert({...row, couple_id: S.couple.id});
+          if (r.error) return msg(r.error); await timeline(); toast("Saved")
+        })
+    }
+    /* ---------- Two Perspectives (2c) ---------- */
+    async function persp() {
+      app.innerHTML = topbar() + `<h1>Two Perspectives</h1><p class="muted">Loading…</p>`;
+      const [p, c] = await Promise.all([sb.from("perspectives").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}), sb.rpc("perspective_counts")]);
+      S.ps = p.data || []; S.pe = p.error; S.pc = {}; (c.data || []).forEach(x => S.pc[x.pid] = x); paintP()
+    }
+    const isRev = p => (S.pc[p.id]?.n >= 2) || (p.reveal_mode === "date" && p.reveal_at && new Date(p.reveal_at) <= new Date());
+    function paintP() {
+      app.innerHTML = topbar() + `<h1>Two Perspectives</h1><p class="muted">You each write your own version of a moment. Neither of you sees the other's until you've both answered, or the reveal date arrives.</p><button class="btn" data-act="padd">Start a new one</button>${S.pe ? `<p class="err">${esc(msg(S.pe))} Did you run schema_2c.sql?</p>` : ""}
+  <div class="grid" style="margin-top:12px">${S.ps.map(p => {const c = S.pc[p.id] || {}, st = isRev(p) ? "Revealed" : c.mine ? "Waiting for partner" : "Your turn"; return `<button class="card mem" data-act="popen" data-id="${p.id}" style="height:auto"><div class="pad"><h3>${esc(p.title)}</h3><p class="muted">${esc(p.prompt || "")}</p><span class="tag">${st}</span></div></button>`}).join("") || `<div class="card"><p class="muted">Nothing yet. Pick a moment you both remember and see how differently you tell it.</p></div>`}</div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`
+    }
+    function padd() {
+      dialog(`<h3>New Two Perspectives</h3><label for="pt">What moment is it about?</label><input id="pt" maxlength="200" placeholder="Our first date"><label for="pp">Prompt (optional)</label><input id="pp" value="Write down how you remember it."><label for="pm">Reveal</label><select id="pm"><option value="both">When we've both answered</option><option value="date">On a date</option></select><label for="pd">Reveal date (for "On a date")</label><input id="pd" type="date">`,
+        async () => {
+          const t = $("#pt").value.trim(); if (!t) return "Name the moment."; const mode = $("#pm").value, dv = $("#pd").value; if (mode === "date" && !dv) return "Pick a reveal date.";
+          const r = await sb.from("perspectives").insert({couple_id: S.couple.id, title: t, prompt: $("#pp").value.trim() || null, reveal_mode: mode, reveal_at: mode === "date" ? new Date(dv + "T00:00").toISOString() : null}).select().single();
+          if (r.error) return msg(r.error); await persp(); popen(r.data.id)
+        })
+    }
+    async function popen(id) {
+      const p = S.ps.find(x => x.id === id), r = await sb.from("perspective_answers").select("*").eq("perspective_id", id); if (r.error) return toast(msg(r.error));
+      const mine = r.data.find(a => a.user_id === S.user.id), oth = r.data.find(a => a.user_id !== S.user.id), rev = !!oth || (p.reveal_mode === "date" && p.reveal_at && new Date(p.reveal_at) <= new Date()), nm = S.members.find(x => oth && x.id === oth.user_id)?.display_name || "Your partner", d = $("#dlg");
+      d.innerHTML = `<h2>${esc(p.title)}</h2>${p.prompt ? `<p class="muted">${esc(p.prompt)}</p>` : ""}` + (rev ? `<div class="grid">${[["You", mine], [nm, oth]].map(([n, a]) => `<div class="card"><h3>${esc(n)}</h3><p style="white-space:pre-wrap">${a ? esc(a.body) : "No answer."}</p></div>`).join("")}</div><h3 style="margin-top:1em">Our reflection</h3><label for="pr">Something you both took from it</label><textarea id="pr" rows="3">${esc(p.reflection || "")}</textarea><div class="err" id="perr" role="alert"></div><button class="btn alt" data-act="prefl" data-id="${id}">Save reflection</button>`
+        : `<label for="pa">Your version</label><textarea id="pa" rows="6" maxlength="8000">${esc(mine?.body || "")}</textarea><div class="err" id="perr" role="alert"></div><button class="btn" data-act="psave" data-id="${id}">${mine ? "Update my version" : "Submit my version"}</button><p class="muted">${mine ? "Saved. Waiting for your partner. You can edit until it's revealed." : "Your partner can't see this until the reveal."}${p.reveal_mode === "date" && p.reveal_at ? ` Reveals on ${new Date(p.reveal_at).toLocaleDateString()}.` : ""}</p>`)
+        + `<div class="row" style="margin-top:.8em">${p.created_by === S.user.id ? `<button class="btn danger" data-act="pdel" data-id="${id}">Delete</button>` : ""}<button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+    }
 
     /* boot */
     sb.auth.onAuthStateChange(async (evt) => {
