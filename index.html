@@ -374,18 +374,45 @@
       overflow: hidden;
       cursor: pointer;
       text-align: left;
-      width: 100%
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column
     }
 
-    .mem .ph {
+    .ph {
       aspect-ratio: 4/3;
-      background: var(--bg2);
-      background-size: cover;
-      background-position: center
+      width: 100%;
+      flex: none;
+      background: var(--pink) center/cover no-repeat
     }
 
     .mem .pad {
-      padding: 12px 16px 16px
+      padding: 12px 16px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-start
+    }
+
+    .mem h3,
+    .mem p {
+      margin: 0;
+      width: 100%;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1
+    }
+
+    .mem p {
+      -webkit-line-clamp: 2;
+      min-height: 2.3em
+    }
+
+    .mem .tag {
+      margin-top: auto
     }
 
     .tag {
@@ -418,22 +445,6 @@
       background: var(--blue);
       color: #33444F;
       border-color: var(--blue)
-    }
-
-    .car {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      gap: 8px;
-      margin-bottom: .6em
-    }
-
-    .car img {
-      scroll-snap-align: center;
-      max-width: 100%;
-      max-height: 50vh;
-      border-radius: 14px;
-      flex: none
     }
 
     textarea,
@@ -486,6 +497,269 @@
       cursor: pointer;
       background: var(--rose);
       color: var(--on-accent)
+    }
+
+    dialog {
+      width: min(94vw, 560px);
+      max-height: 90vh;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--card);
+      color: var(--text)
+    }
+
+    .mgrid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+      align-items: stretch
+    }
+
+    .fab {
+      position: fixed;
+      left: 16px;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 0;
+      background: var(--rose);
+      color: var(--on-accent);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      z-index: 6;
+      display: grid;
+      place-items: center
+    }
+
+    @media(max-width:640px) {
+      .fab {
+        bottom: calc(88px + env(safe-area-inset-bottom, 0px))
+      }
+    }
+
+    .cw {
+      position: relative;
+      margin-bottom: .6em
+    }
+
+    .car {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      border-radius: 14px;
+      scrollbar-width: none
+    }
+
+    .car::-webkit-scrollbar {
+      display: none
+    }
+
+    .sl {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      height: min(45vh, 420px);
+      background: var(--bg2)
+    }
+
+    .sl img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: zoom-in;
+      display: block
+    }
+
+    .ar,
+    .zx {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(255, 255, 255, .88);
+      color: #40383A;
+      font-size: 1.8rem;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 2
+    }
+
+    .ar {
+      top: 50%;
+      transform: translateY(-50%)
+    }
+
+    .ar.l {
+      left: 8px
+    }
+
+    .ar.r {
+      right: 8px
+    }
+
+    .zx {
+      top: 8px;
+      right: 8px
+    }
+
+    .dots {
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 6px
+    }
+
+    .dots i {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .75);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .25)
+    }
+
+    .dots i.on {
+      background: var(--rose)
+    }
+
+    dialog#lb {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      width: auto;
+      max-width: 96vw;
+      max-height: 96vh;
+      overflow: visible
+    }
+
+    dialog#lb::backdrop {
+      background: rgba(0, 0, 0, .88)
+    }
+
+    #lb img {
+      display: block;
+      max-width: 96vw;
+      max-height: 90vh;
+      object-fit: contain;
+      cursor: zoom-out;
+      border-radius: 8px
+    }
+
+    .ri {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      min-height: 64px
+    }
+
+    .ri .th {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      flex: none;
+      background: var(--pink) center/cover
+    }
+
+    .tl {
+      border-left: 3px solid var(--blue);
+      padding-left: 14px
+    }
+
+    .tlh {
+      margin-top: .8em
+    }
+
+    .cg {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+      margin-top: .6em
+    }
+
+    .cg b {
+      color: var(--text2)
+    }
+
+    .cd {
+      min-height: 46px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text2);
+      border: 0;
+      background: none;
+      font-size: 1.2rem
+    }
+
+    .cd.has {
+      background: var(--pink);
+      color: #6B4650;
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    [data-theme=dark] .cd.has {
+      background: #4a3a44;
+      color: var(--pink)
+    }
+
+    .cd.sel {
+      outline: 2px solid var(--rose)
+    }
+
+    .cd i {
+      font-size: .85rem;
+      font-style: normal;
+      line-height: 1
+    }
+
+    .hs {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px
+    }
+
+    .hs .mem {
+      width: 220px;
+      flex: none
+    }
+
+    summary {
+      cursor: pointer;
+      list-style: none
+    }
+
+    .stats {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap
+    }
+
+    .stats div {
+      font-size: 1.2rem;
+      color: var(--text2)
+    }
+
+    .stats b {
+      display: block;
+      font-size: 2.6rem;
+      color: var(--text);
+      line-height: 1
     }
   </style>
 </head>
@@ -545,7 +819,7 @@
     function render() {
       if (!S.user) return landing();
       if (!S.couple) return onboarding();
-      return S.page === "diary" ? diary() : dashboard();
+      if (S.page === "diary") return diary(); dashboard(); return homeWidgets();
     }
     function landing() {
       const signup = S.authMode === "signup", forgot = S.authMode === "forgot";
@@ -643,8 +917,8 @@
     <p style="margin-top:.8em"><button class="btn danger" data-act="leave">${paired ? "Disconnect from partner" : "Delete this space"}</button></p>
    </div>
   </div>
-  <p class="muted" style="margin-top:1.2em">Memory Diary, Calendar, Places, Keepsakes and Photobooth arrive in the next phases.</p>
-  <dialog id="dlg" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);max-width:min(92vw,420px)"></dialog>`;
+  <div id="wid" style="margin-top:14px"></div><p class="muted" style="margin-top:1.2em">Calendar, Places, Keepsakes and Photobooth arrive in the next phases.</p>
+  <dialog id="dlg" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);"></dialog>`;
       $("#prof").onsubmit = async ev => {
         ev.preventDefault(); const r = await sb.from("profiles").update({display_name: $("#dn").value.trim()}).eq("id", S.user.id);
         if (r.error) return toast(msg(r.error)); await load(); render(); toast("Saved")
@@ -660,20 +934,29 @@
       const b = ev.target.closest("[data-act]"); if (!b) return; const a = b.dataset.act;
       if (a === "theme") toggleTheme();
       else if (a === "nav") {S.page = b.dataset.p; render()}
-      else if (a === "filt") {S.f = b.dataset.k; diary()}
+      else if (a === "filt") {S.f = b.dataset.k; paint()}
+      else if (a === "view") {S.v = b.dataset.k; paint()}
+      else if (a === "clr") {Object.assign(S, {q: "", fc: "", ft: "", fl: "", fd1: "", fd2: "", fb: "", cd: ""}); paint()}
+      else if (a === "day") {S.cd = b.dataset.k; drawRes()}
+      else if (a === "cal") {S.cm = new Date(S.cm.getFullYear(), S.cm.getMonth() + +b.dataset.d, 1); S.cd = ""; drawRes()}
+      else if (a === "slide") {const c = $("#car"); c.scrollBy({left: +b.dataset.d * c.clientWidth, behavior: "smooth"})}
+      else if (a === "zoom") {zoom(+b.dataset.i)}
+      else if (a === "zstep") {const n = S.cur.photos.length; zoom((S.zi + +b.dataset.d + n) % n)}
+      else if (a === "zclose") {$("#lb").close()}
+      else if (a === "anotm") {S.ti = Math.floor(Math.random() * S.mems.filter(m => !m.archived).length); drawWid()}
       else if (a === "newmem") {editor(null)}
       else if (a === "open") {openMem(b.dataset.id)}
       else if (a === "rmph") {window.__keep.splice(+b.dataset.i, 1); window.__thumbs()}
       else if (a === "edit1") {const m = S.mems.find(x => x.id === b.dataset.id); $("#dlg").close(); editor(m)}
       else if (a === "fav" || a === "arch") {
         const m = S.mems.find(x => x.id === b.dataset.id), f = a === "fav" ? {favourite: !m.favourite} : {archived: !m.archived};
-        const r = await sb.from("memories").update(f).eq("id", m.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); diary()
+        const r = await sb.from("memories").update(f).eq("id", m.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); S.page = "diary"; diary()
       }
       else if (a === "del") {
         const m = S.mems.find(x => x.id === b.dataset.id); $("#dlg").close();
         dialog(`<h3>Delete "${esc(m.title)}"?</h3><p class="muted">The memory and its photos will be removed for both of you. This can't be undone.</p>`, async () => {
           const r = await sb.from("memories").delete().eq("id", m.id); if (r.error) return msg(r.error);
-          if (m.photos.length) await sb.storage.from("memories").remove(m.photos); diary(); toast("Memory deleted")
+          if (m.photos.length) await sb.storage.from("memories").remove(m.photos); S.page = "diary"; diary(); toast("Memory deleted")
         })
       }
       else if (a === "mode") {S.authMode = b.dataset.m; landing()}
@@ -700,7 +983,7 @@
     /* ---------- Memory Diary (2a) ---------- */
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
-    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button><button data-act="newmem">+ Memory</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div>`}
+    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
       const r = await sb.storage.from("memories").createSignedUrls(need, 3600); (r.data || []).forEach(x => {if (x.signedUrl) S.urls[x.path] = x.signedUrl})
@@ -709,17 +992,52 @@
       const r = await sb.from("memories").select("*").eq("couple_id", S.couple.id).order("memory_date", {ascending: false}).order("created_at", {ascending: false});
       S.mems = r.data || []; S.memErr = r.error; await signed(S.mems.map(m => m.photos[0]).filter(Boolean))
     }
-    async function diary() {
-      app.innerHTML = topbar() + `<h1>Memory Diary</h1><p class="muted">Loading…</p><dialog id="dlg" class="wide" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text)"></dialog>`;
-      await loadMems();
-      const list = S.mems.filter(m => S.f === "archived" ? m.archived : !m.archived && (S.f !== "fav" || m.favourite));
-      app.innerHTML = topbar() + `<h1>Memory Diary</h1>
-  <div class="chips" role="group" aria-label="Filter">${[["all", "All"], ["fav", "Favourites"], ["archived", "Archived"]].map(([k, l]) => `<button data-act="filt" data-k="${k}" class="${S.f === k ? "on" : ""}">${l}</button>`).join("")}</div>
-  ${S.memErr ? `<p class="err">${esc(msg(S.memErr))} Did you run schema_2a.sql?</p>` : ""}
-  ${list.length ? `<div class="grid">${list.map(m => {const u = S.urls[m.photos[0]]; return `<button class="card mem" data-act="open" data-id="${m.id}"><div class="ph" ${u ? `style="background-image:url('${u}')"` : ""} role="img" aria-label="${u ? "Photo for " + esc(m.title) : "No photo"}"></div><div class="pad"><h3>${m.favourite ? "♥ " : ""}${esc(m.title)}</h3><p class="muted">${new Date(m.memory_date + "T00:00").toLocaleDateString(undefined, {day: "numeric", month: "short", year: "numeric"})}${m.location ? " · " + esc(m.location) : ""}</p><span class="tag">${esc(m.category)}</span></div></button>`}).join("")}</div>`
-          : `<div class="card"><h3>${S.f === "all" ? "Your diary is empty" : "Nothing here yet"}</h3><p class="muted">Capture a moment, even a small one.</p><button class="btn" data-act="newmem">Add your first memory</button></div>`}
-  <dialog id="dlg" class="wide" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text)"></dialog>`;
+    S.v = "grid"; S.q = ""; S.fc = ""; S.ft = ""; S.fl = ""; S.fd1 = ""; S.fd2 = ""; S.fb = ""; S.cm = new Date(); S.cd = ""; S.fo = false;
+    const fdt = s => new Date(s + "T00:00").toLocaleDateString(undefined, {day: "numeric", month: "short", year: "numeric"});
+    const th = m => {const u = S.urls[m.photos[0]]; return u ? `style="background-image:url('${u}')"` : ""};
+    const mcard = m => `<button class="card mem" data-act="open" data-id="${m.id}"><div class="ph" ${th(m)} role="img" aria-label="${m.photos.length ? "Photo for " + esc(m.title) : "No photo"}"></div><div class="pad"><h3>${m.favourite ? "♥ " : ""}${esc(m.title)}</h3><p class="muted">${fdt(m.memory_date)}${m.location ? " · " + esc(m.location) : ""}</p><span class="tag">${esc(m.category)}</span></div></button>`;
+    const mrow = m => `<button class="ri" data-act="open" data-id="${m.id}"><div class="th" ${th(m)}></div><div><strong>${m.favourite ? "♥ " : ""}${esc(m.title)}</strong><br><span class="muted">${fdt(m.memory_date)} · ${esc(m.category)}</span></div></button>`;
+    function filt() {const q = S.q.toLowerCase().trim(); return S.mems.filter(m => (S.f === "archived" ? m.archived : !m.archived) && (S.f !== "fav" || m.favourite) && (!q || [m.title, m.story, m.location, m.tags.join(" ")].join(" ").toLowerCase().includes(q)) && (!S.fc || m.category === S.fc) && (!S.ft || m.tags.includes(S.ft)) && (!S.fl || m.location === S.fl) && (!S.fd1 || m.memory_date >= S.fd1) && (!S.fd2 || m.memory_date <= S.fd2) && (!S.fb || (S.fb === "me" ? m.created_by === S.user.id : m.created_by !== S.user.id)))}
+    function drawRes() {
+      const l = filt(), el = $("#res"); if (!el) return;
+      if (!l.length) {el.innerHTML = `<div class="card"><h3>${S.mems.length ? "No memories match" : "Your diary is empty"}</h3><p class="muted">${S.mems.length ? "Try a different search or clear the filters." : "Capture a moment, even a small one."}</p>${S.mems.length ? `<button class="btn alt" data-act="clr">Clear filters</button>` : `<button class="btn" data-act="newmem">Add your first memory</button>`}</div>`; return }
+      if (S.v === "grid") el.innerHTML = `<div class="mgrid">${l.map(mcard).join("")}</div>`;
+      else if (S.v === "list") el.innerHTML = l.map(mrow).join("");
+      else if (S.v === "timeline") {let h = "", last = ""; l.forEach(m => {const k = new Date(m.memory_date + "T00:00").toLocaleDateString(undefined, {month: "long", year: "numeric"}); if (k !== last) {h += `<h2 class="tlh">${k}</h2>`; last = k} h += mrow(m)}); el.innerHTML = `<div class="tl">${h}</div>`}
+      else {
+        const y = S.cm.getFullYear(), mo = S.cm.getMonth(), first = new Date(y, mo, 1).getDay(), n = new Date(y, mo + 1, 0).getDate(), by = {}; l.forEach(m => (by[m.memory_date] ??= []).push(m));
+        let cells = ""; for (let i = 0; i < first; i++)cells += "<div></div>";
+        for (let d = 1; d <= n; d++) {const k = `${y}-${String(mo + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`, c = by[k]; cells += c ? `<button class="cd has ${S.cd === k ? "sel" : ""}" data-act="day" data-k="${k}" aria-label="${c.length} memories on ${k}">${d}<i>${c.length}</i></button>` : `<div class="cd">${d}</div>`}
+        const sel = by[S.cd] || [];
+        el.innerHTML = `<div class="row" style="justify-content:space-between"><button class="btn ghost" data-act="cal" data-d="-1" aria-label="Previous month">‹</button><h2 style="margin:0">${S.cm.toLocaleDateString(undefined, {month: "long", year: "numeric"})}</h2><button class="btn ghost" data-act="cal" data-d="1" aria-label="Next month">›</button></div><div class="cg">${"SMTWTFS".split("").map(c => `<b>${c}</b>`).join("")}${cells}</div>${sel.length ? `<h3 style="margin-top:1em">${fdt(S.cd)}</h3>` + sel.map(mrow).join("") : ""}`
+      }
     }
+    function paint() {
+      const mm = S.mems.filter(m => !m.archived), cats = [...new Set([...CATS, ...S.mems.map(m => m.category)])], tags = [...new Set(mm.flatMap(m => m.tags))].sort(), locs = [...new Set(mm.map(m => m.location).filter(Boolean))].sort();
+      const sel = (k, l, o) => `<div><label for="s${k}">${l}</label><select id="s${k}" data-flt="${k}"><option value="">Any</option>${o.map(x => `<option ${S[k] === x ? "selected" : ""}>${esc(x)}</option>`).join("")}</select></div>`;
+      const ch = (act, key, cur, arr) => arr.map(([k, l]) => `<button data-act="${act}" data-k="${k}" class="${cur === k ? "on" : ""}">${l}</button>`).join("");
+      app.innerHTML = topbar() + `<h1>Memory Diary</h1>
+  <input type="search" data-flt="q" placeholder="Search memories" aria-label="Search memories" value="${esc(S.q)}">
+  <div class="chips" role="group" aria-label="Show">${ch("filt", "f", S.f, [["all", "All"], ["fav", "Favourites"], ["archived", "Archived"]])}</div>
+  <div class="chips" role="group" aria-label="View">${ch("view", "v", S.v, [["grid", "Grid"], ["timeline", "Timeline"], ["list", "List"], ["calendar", "Calendar"]])}</div>
+  <details id="fd" ${S.fo ? "open" : ""}><summary class="btn ghost" style="display:inline-flex;align-items:center">Filters</summary><div class="grid" style="margin:.6em 0">${sel("fc", "Category", cats)}${sel("ft", "Tag", tags)}${sel("fl", "Location", locs)}<div><label for="sfd1">From</label><input id="sfd1" type="date" data-flt="fd1" value="${S.fd1}"></div><div><label for="sfd2">To</label><input id="sfd2" type="date" data-flt="fd2" value="${S.fd2}"></div><div><label for="sfb">Created by</label><select id="sfb" data-flt="fb"><option value="">Anyone</option><option value="me" ${S.fb === "me" ? "selected" : ""}>Me</option><option value="p" ${S.fb === "p" ? "selected" : ""}>My partner</option></select></div></div><button class="btn ghost" data-act="clr">Clear filters</button></details>
+  ${S.memErr ? `<p class="err">${esc(msg(S.memErr))} Did you run schema_2a.sql?</p>` : ""}<div id="res" style="margin-top:12px"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; drawRes()
+    }
+    async function diary() {app.innerHTML = topbar() + `<h1>Memory Diary</h1><p class="muted">Loading…</p>`; await loadMems(); paint()}
+    async function homeWidgets() {await loadMems(); drawWid()}
+    function drawWid() {
+      const el = $("#wid"); if (!el) return; const mm = S.mems.filter(m => !m.archived), t = new Date(), md = `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+      if (S.ti == null || S.ti >= mm.length) S.ti = Math.floor(Math.random() * mm.length);
+      const tm = mm[S.ti], oth = mm.filter(m => m.memory_date.slice(5) === md && +m.memory_date.slice(0, 4) < t.getFullYear()), rec = [...mm].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
+      el.innerHTML = `<div class="grid"><div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
+  <div class="card"><h3>On this day</h3>${oth.length ? oth.slice(0, 3).map(mrow).join("") : `<p class="muted">Nothing from this date in past years yet.</p>`}</div>
+  <div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div></div></div></div>
+  ${rec.length ? `<h3 style="margin-top:1em">Recently added</h3><div class="hs">${rec.map(mcard).join("")}</div>` : ""}`
+    }
+    document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.flt; if (!k) return; S[k] = e.target.value; drawRes()});
+    document.addEventListener("toggle", e => {if (e.target.id === "fd") S.fo = e.target.open}, true);
+    document.addEventListener("scroll", e => {if (e.target.id === "car") {const i = Math.round(e.target.scrollLeft / e.target.clientWidth); document.querySelectorAll("#dots i").forEach((d, j) => d.classList.toggle("on", j === i))} }, true);
+    function zoom(i) {S.zi = i; const m = S.cur, n = m.photos.length, lb = $("#lb"); lb.innerHTML = `<img src="${S.urls[m.photos[i]] || ""}" alt="Photo ${i + 1} of ${n} from ${esc(m.title)}" data-act="zclose">${n > 1 ? `<button class="ar l" data-act="zstep" data-d="-1" aria-label="Previous photo">‹</button><button class="ar r" data-act="zstep" data-d="1" aria-label="Next photo">›</button>` : ""}<button class="zx" data-act="zclose" aria-label="Close">×</button>`; if (!lb.open) lb.showModal()}
     function shrink(file) {return new Promise((res, rej) => {const img = new Image(), u = URL.createObjectURL(file); img.onload = () => {const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob(b => b ? res(b) : rej(new Error("Could not process " + file.name)), "image/jpeg", .85)}; img.onerror = () => rej(new Error(file.name + " isn't a readable image")); img.src = u})}
     async function editor(m) {
       await ensureDlg(); const keep = [...(m?.photos || [])]; await signed(keep);
@@ -758,8 +1076,8 @@
     }
     async function ensureDlg() {if (!S.couple) return; if (S.page !== "diary") {S.page = "diary"; await diary()} }
     function viewMem(m) {
-      const d = $("#dlg");
-      d.innerHTML = `${m.photos.length ? `<div class="car">${m.photos.map(p => `<img src="${S.urls[p] || ""}" alt="Photo from ${esc(m.title)}">`).join("")}</div>` : ""}
+      const d = $("#dlg"), n = m.photos.length; S.cur = m;
+      d.innerHTML = `${n ? `<div class="cw"><div class="car" id="car">${m.photos.map((p, i) => `<div class="sl"><img src="${S.urls[p] || ""}" alt="Photo ${i + 1} of ${n} from ${esc(m.title)}. Select to enlarge." data-act="zoom" data-i="${i}"></div>`).join("")}</div>${n > 1 ? `<button class="ar l" data-act="slide" data-d="-1" aria-label="Previous photo">‹</button><button class="ar r" data-act="slide" data-d="1" aria-label="Next photo">›</button><div class="dots" id="dots">${m.photos.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("")}</div>` : ""}</div>` : ""}
   <h2>${esc(m.title)}</h2><p class="muted">${new Date(m.memory_date + "T00:00").toLocaleDateString(undefined, {dateStyle: "long"})}${m.location ? " · " + esc(m.location) : ""}</p>
   <p><span class="tag">${esc(m.category)}</span>${m.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join("")}</p>
   ${m.story ? `<p style="white-space:pre-wrap">${esc(m.story)}</p>` : ""}
