@@ -7,6 +7,7 @@
   <title>Eros</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
   <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
     /* Adelia is a licensed font. Put your file at fonts/Adelia.woff2 (see README). Until then the wordmark uses the fallback stack below. */
@@ -916,6 +917,94 @@
     .pri {
       font-size: 1.1rem
     }
+
+    .top {
+      flex-wrap: wrap
+    }
+
+    .nav {
+      flex-wrap: wrap
+    }
+
+    .mb {
+      display: none
+    }
+
+    @media(max-width:640px) {
+      .dk {
+        display: none
+      }
+
+      .mb {
+        display: inline-block
+      }
+    }
+
+    .pin {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--rose);
+      color: var(--on-accent);
+      display: grid;
+      place-items: center;
+      border: 2px solid #fff;
+      box-shadow: var(--shadow);
+      font-size: 1.1rem
+    }
+
+    #stage {
+      position: relative;
+      width: min(100%, 480px);
+      aspect-ratio: 3/4;
+      margin: 12px auto;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: var(--shadow)
+    }
+
+    .si {
+      position: absolute;
+      cursor: grab;
+      touch-action: none;
+      background: #fff;
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .22)
+    }
+
+    .si img {
+      width: 100%;
+      display: block;
+      pointer-events: none
+    }
+
+    .si.sel {
+      outline: 2px dashed var(--rose)
+    }
+
+    .si.tx {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #40383A;
+      line-height: 1
+    }
+
+    #kcv {
+      max-width: 100%;
+      max-height: 48vh;
+      display: block;
+      margin: 8px auto;
+      border-radius: 8px;
+      background: var(--bg2)
+    }
+
+    input[type=range] {
+      padding: 0;
+      min-height: 30px
+    }
   </style>
 </head>
 
@@ -923,6 +1012,7 @@
   <div id="app" class="wrap">
     <p class="muted">Loading…</p>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script>
     const SUPABASE_URL = "https://hhsejvipqxtgswygwwcv.supabase.co";
@@ -974,7 +1064,7 @@
     function render() {
       if (!S.user) return landing();
       if (!S.couple) return onboarding();
-      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); dashboard(); return homeWidgets();
+      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); if (S.page === "places") return places(); if (S.page === "coll") return collection(); dashboard(); return homeWidgets();
     }
     function landing() {
       const signup = S.authMode === "signup", forgot = S.authMode === "forgot";
@@ -1088,7 +1178,9 @@
     document.addEventListener("click", async ev => {
       const b = ev.target.closest("[data-act]"); if (!b) return; const a = b.dataset.act;
       if (a === "theme") toggleTheme();
-      else if (a === "nav") {S.page = b.dataset.p; render()}
+      else if (a === "nav") {document.getElementById("mre")?.remove(); S.page = b.dataset.p; render()}
+      else if (a === "more") {const d = document.createElement("dialog"); d.id = "mre"; d.innerHTML = `<h3>More</h3>${NAVS.slice(3).map(([k, l]) => `<button class="btn ${S.page === k ? "" : "ghost"}" style="width:100%;margin-bottom:8px" data-act="nav" data-p="${k}">${l}</button>`).join("")}<button class="btn ghost" style="width:100%" data-act="mclose">Close</button>`; document.body.append(d); d.showModal()}
+      else if (a === "mclose") {document.getElementById("mre")?.remove()}
       else if (a === "filt") {S.f = b.dataset.k; paint()}
       else if (a === "view") {S.v = b.dataset.k; paint()}
       else if (a === "clr") {Object.assign(S, {q: "", fc: "", ft: "", fl: "", fd1: "", fd2: "", fb: "", cd: ""}); paint()}
@@ -1125,6 +1217,32 @@
       else if (a === "bdone" || a === "bfav") {const x = S.bk.find(i => i.id === b.dataset.id), r = await sb.from("bucket_items").update(a === "bdone" ? {done: !x.done} : {favourite: !x.favourite}).eq("id", x.id); if (r.error) return toast(msg(r.error)); await loadPlans(); plPaint()}
       else if (a === "bmemo") {const x = S.bk.find(i => i.id === b.dataset.id); editor(null, {title: x.title, story: x.notes, category: "Dates", link: {t: "bucket_items", id: x.id, f: {done: true}}})}
       else if (a === "bdel") {if (confirm("Delete this idea?")) {const r = await sb.from("bucket_items").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); await loadPlans(); plPaint()} }
+      else if (a === "pcf") {S.plf = b.dataset.k; plcPaint()}
+      else if (a === "pcview") {pcview(b.dataset.id)}
+      else if (a === "pcedit") {$("#dlg").open && $("#dlg").close(); pcedit(b.dataset.id)}
+      else if (a === "pcvisit") {const p = S.plc.find(x => x.id === b.dataset.id), t = todayIso(); if (p.visits.includes(t)) return toast("Already added for today"); const r = await sb.from("places").update({visits: [...p.visits, t], want_to_visit: false}).eq("id", p.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); await places(); toast("Visit added")}
+      else if (a === "pcdel") {if (confirm("Delete this place?")) {const r = await sb.from("places").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); places()} }
+      else if (a === "pcgeo") {
+        const q = $("#pa1").value.trim() || $("#pn1").value.trim(); if (!q) {$("#derr").textContent = "Type an address or place name first."; return } b.disabled = true;
+        try {const r = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(q)), j = await r.json(); if (!j.length) $("#derr").textContent = "Couldn't find that. Try a fuller address, or enter coordinates yourself."; else {$("#pla").value = (+j[0].lat).toFixed(6); $("#pln").value = (+j[0].lon).toFixed(6); $("#derr").textContent = "Found: " + j[0].display_name.slice(0, 80)} } catch (e) {$("#derr").textContent = "Address search is unavailable. Enter coordinates yourself."} b.disabled = false
+      }
+      else if (a === "cttab") {S.ct = b.dataset.k; S.sp = null; colPaint()}
+      else if (a === "kscan") {kscan()}
+      else if (a === "krot") {K.rot += +b.dataset.d; kdraw()}
+      else if (a === "kmode") {K.mode = b.dataset.v; $("#km0").classList.toggle("on", K.mode === "normal"); $("#km1").classList.toggle("on", K.mode === "doc"); kdraw()}
+      else if (a === "kocr") {kocr(b)}
+      else if (a === "kview") {kview(b.dataset.id)}
+      else if (a === "korig") {const k = S.kp.find(x => x.id === b.dataset.id); if (b.dataset.on) {$("#kimg").src = S.urls[k.edited_path]; b.textContent = "View original"; delete b.dataset.on} else {const r = await sb.storage.from("memories").createSignedUrl(k.original_path, 3600); if (r.error) return toast(msg(r.error)); $("#kimg").src = r.data.signedUrl; b.textContent = "View cleaned-up version"; b.dataset.on = "1"} }
+      else if (a === "kedit") {const k = S.kp.find(x => x.id === b.dataset.id); $("#dlg").close(); dialog(`<h3>Edit details</h3>` + kfields(k), async () => {const title = $("#kt").value.trim(); if (!title) return "Give it a title."; const r = await sb.from("keepsakes").update({title, item_date: $("#kd").value || null, occasion: $("#ko").value.trim() || null, category: $("#kc").value, caption: $("#kcap").value.trim() || null, ocr_text: $("#kx").value.trim() || null}).eq("id", k.id); if (r.error) return msg(r.error); await collection(); toast("Saved")})}
+      else if (a === "kdel") {if (confirm("Delete this keepsake and its photos?")) {const k = S.kp.find(x => x.id === b.dataset.id), r = await sb.from("keepsakes").delete().eq("id", k.id); if (r.error) return toast(msg(r.error)); await sb.storage.from("memories").remove([k.original_path, k.edited_path].filter(Boolean)); $("#dlg").close(); collection()} }
+      else if (a === "spnew") {dialog(`<h3>New scrapbook page</h3><label for="spt">Title</label><input id="spt" maxlength="200" placeholder="Seoul, spring 2026">`, async () => {const t = $("#spt").value.trim(); if (!t) return "Give the page a title."; const r = await sb.from("scrapbook_pages").insert({couple_id: S.couple.id, title: t}).select().single(); if (r.error) return msg(r.error); S.pgs.unshift(r.data); S.sp = r.data.id; S.sel = null; colBody()})}
+      else if (a === "spopen") {S.sp = b.dataset.id; S.sel = null; colBody()}
+      else if (a === "spback") {S.sp = null; S.sel = null; colBody()}
+      else if (a === "spadd") {if (!S.kp.length) return toast("Add a keepsake first"); dialog(`<h3>Add a keepsake</h3><label for="spk">Choose one</label><select id="spk">${S.kp.map(k => `<option value="${k.id}">${esc(k.title)}</option>`).join("")}</select>`, async () => {const g = S.pgs.find(x => x.id === S.sp); g.items.push({id: crypto.randomUUID(), k: $("#spk").value, x: rnd(8, 35), y: rnd(10, 40), w: 40, r: Math.round(rnd(-6, 6))}); await spSave(g); spPaint()})}
+      else if (a === "sptxt") {dialog(`<h3>Add text</h3><label for="spx">Caption</label><input id="spx" maxlength="80">`, async () => {const t = $("#spx").value.trim(); if (!t) return "Write something first."; const g = S.pgs.find(x => x.id === S.sp); g.items.push({id: crypto.randomUUID(), t, x: 8, y: 4, w: 70, r: 0}); await spSave(g); spPaint()})}
+      else if (a === "spsz" || a === "sprot" || a === "sprm") {const g = S.pgs.find(x => x.id === S.sp), it = g.items.find(x => x.id === S.sel); if (!it) return; if (a === "spsz") it.w = Math.min(90, Math.max(14, it.w + +b.dataset.d)); else if (a === "sprot") it.r = (it.r + 10) % 360; else {g.items = g.items.filter(x => x !== it); S.sel = null} await spSave(g); spPaint()}
+      else if (a === "spexp") {spExport()}
+      else if (a === "spdel") {if (confirm("Delete this scrapbook page?")) {const r = await sb.from("scrapbook_pages").delete().eq("id", S.sp); if (r.error) return toast(msg(r.error)); S.pgs = S.pgs.filter(x => x.id !== S.sp); S.sp = null; colBody()} }
       else if (a === "zclose") {$("#lb").close()}
       else if (a === "anotm") {S.ti = Math.floor(Math.random() * S.mems.filter(m => !m.archived).length); drawWid()}
       else if (a === "newmem") {editor(null)}
@@ -1166,7 +1284,8 @@
     /* ---------- Memory Diary (2a) ---------- */
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
-    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button><button data-act="nav" data-p="plans" class="${S.page === "plans" ? "on" : ""}">Plans</button><button data-act="nav" data-p="timeline" class="${S.page === "timeline" ? "on" : ""}">Timeline</button><button data-act="nav" data-p="persp" class="${S.page === "persp" ? "on" : ""}"><span class="lg">Perspectives</span><span class="sm">Duo</span></button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
+    const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["coll", "Collection"]];
+    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main">${NAVS.map(([k, l], i) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""} ${i > 2 ? "dk" : ""}">${l}</button>`).join("")}<button data-act="more" class="mb ${NAVS.slice(3).some(n => n[0] === S.page) ? "on" : ""}">More</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
       const r = await sb.storage.from("memories").createSignedUrls(need, 3600); (r.data || []).forEach(x => {if (x.signedUrl) S.urls[x.path] = x.signedUrl})
@@ -1208,14 +1327,15 @@
     }
     async function diary() {app.innerHTML = topbar() + `<h1>Memory Diary</h1><p class="muted">Loading…</p>`; await loadMems(); paint()}
     async function loadEv() {const r = await sb.from("events").select("*").eq("couple_id", S.couple.id); S.ev = r.data || []}
-    async function homeWidgets() {await Promise.all([loadMems(), loadEv()]); drawWid()}
+    async function loadCnt() {const q = t => sb.from(t).select("id", {count: "exact", head: true}).eq("couple_id", S.couple.id); const [a, b] = await Promise.all([q("places"), q("keepsakes")]); S.cnt = {p: a.count || 0, k: b.count || 0}}
+    async function homeWidgets() {await Promise.all([loadMems(), loadEv(), loadCnt()]); drawWid()}
     function drawWid() {
       const el = $("#wid"); if (!el) return; const mm = S.mems.filter(m => !m.archived), t = new Date(), md = `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
       if (S.ti == null || S.ti >= mm.length) S.ti = Math.floor(Math.random() * mm.length);
       const tm = mm[S.ti], oth = mm.filter(m => m.memory_date.slice(5) === md && +m.memory_date.slice(0, 4) < t.getFullYear()), rec = [...mm].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
       el.innerHTML = `<div class="grid"><div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
   <div class="card"><h3>On this day</h3>${oth.length ? oth.slice(0, 3).map(mrow).join("") : `<p class="muted">Nothing from this date in past years yet.</p>`}</div>
-  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => o.e.auto || o.e.repeat_yearly || o.e.status === "planned").slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div><div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div></div></div></div>
+  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => o.e.auto || o.e.repeat_yearly || o.e.status === "planned").slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div><div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div></div>
   ${rec.length ? `<h3 style="margin-top:1em">Recently added</h3><div class="hs">${rec.map(mcard).join("")}</div>` : ""}`
     }
     document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.flt; if (!k) return; S[k] = e.target.value; drawRes()});
@@ -1404,6 +1524,133 @@
           const r = b ? await sb.from("bucket_items").update(row).eq("id", b.id) : await sb.from("bucket_items").insert({...row, couple_id: S.couple.id});
           if (r.error) return msg(r.error); await loadPlans(); plPaint(); toast("Saved")
         })
+    }
+
+
+    /* ---------- Places (4) ---------- */
+    const PC = ["Restaurant or café", "Cinema", "Park", "Attraction", "Holiday destination", "First date spot", "Hangout", "Other"];
+    S.plc = []; S.plf = "all"; S.map = null;
+    async function places() {app.innerHTML = topbar() + `<h1>Our places</h1><p class="muted">Loading…</p>`; const r = await sb.from("places").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.plc = r.data || []; S.plcE = r.error; await loadMems(); plcPaint()}
+    function plcPaint() {
+      if (S.map) {S.map.remove(); S.map = null}
+      const l = S.plc.filter(p => S.plf === "all" || (S.plf === "fav" && p.favourite) || (S.plf === "multi" && p.visits.length > 1) || (S.plf === "want" && p.want_to_visit)), hasMap = !!window.L;
+      app.innerHTML = topbar() + `<h1>Our places</h1><div class="row"><button class="btn" data-act="pcedit" data-id="">Add a place</button></div><div class="chips">${[["all", "All"], ["fav", "Favourites"], ["multi", "Visited more than once"], ["want", "Want to visit"]].map(([k, t]) => `<button data-act="pcf" data-k="${k}" class="${S.plf === k ? "on" : ""}">${t}</button>`).join("")}</div>${S.plcE ? `<p class="err">${esc(msg(S.plcE))} Did you run schema_4.sql?</p>` : ""}
+  ${hasMap ? `<div id="map" style="height:320px;border-radius:18px;border:1px solid var(--line);margin-bottom:12px" role="region" aria-label="Map of saved places"></div>` : `<p class="muted">The map couldn't load, so here is your list.</p>`}
+  ${l.map(p => `<button class="ri" data-act="pcview" data-id="${p.id}"><div style="flex:1"><strong>${p.favourite ? "♥ " : ""}${esc(p.name)}</strong><br><span class="muted">${esc(p.category)}${p.address ? " · " + esc(p.address) : ""}</span></div><span class="muted">${p.want_to_visit ? "Want to visit" : p.visits.length ? p.visits.length + " visit" + (p.visits.length > 1 ? "s" : "") : ""}</span></button>`).join("") || `<div class="card"><p class="muted">Save the café, the cinema, the bench you always sit on.</p></div>`}<dialog id="dlg"></dialog><dialog id="lb"></dialog>`;
+      if (hasMap && $("#map")) {
+        const m = S.map = L.map("map").setView([20, 0], 2); L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom: 19, attribution: "© OpenStreetMap contributors"}).addTo(m);
+        const pts = l.filter(p => p.lat != null && p.lng != null); pts.forEach(p => L.marker([p.lat, p.lng], {icon: L.divIcon({className: "", html: `<div class="pin">${p.favourite ? "♥" : "●"}</div>`, iconSize: [30, 30], iconAnchor: [15, 15]}), title: p.name, keyboard: true}).addTo(m).on("click", () => pcview(p.id)));
+        if (pts.length > 1) m.fitBounds(pts.map(p => [p.lat, p.lng]), {padding: [30, 30]}); else if (pts.length) m.setView([pts[0].lat, pts[0].lng], 14)
+      }
+    }
+    function pcview(id) {
+      const p = S.plc.find(x => x.id === id), d = $("#dlg"), rel = S.mems.filter(m => !m.archived && m.location && m.location.toLowerCase().includes(p.name.toLowerCase()));
+      d.innerHTML = `<h2>${esc(p.name)}</h2><p><span class="tag">${esc(p.category)}</span>${p.want_to_visit ? '<span class="pill">Want to visit</span>' : ""}</p>${p.address ? `<p class="muted">${esc(p.address)}</p>` : ""}${p.notes ? `<p style="white-space:pre-wrap">${esc(p.notes)}</p>` : ""}
+  <h3>Visits</h3><p class="muted">${p.visits.length ? [...p.visits].sort().reverse().map(fdt).join(", ") : "No visits recorded yet."}</p>
+  ${rel.length ? `<h3>Related memories</h3>${rel.map(mrow).join("")}` : ""}
+  <div class="row"><button class="btn alt" data-act="pcvisit" data-id="${id}">Add a visit today</button><button class="btn ghost" data-act="pcedit" data-id="${id}">Edit</button><button class="btn danger" data-act="pcdel" data-id="${id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+    }
+    function pcedit(id) {
+      const p = S.plc.find(x => x.id === id), v = k => esc(p?.[k] ?? "");
+      dialog(`<h3>${p ? "Edit place" : "Add a place"}</h3><label for="pn1">Name</label><input id="pn1" maxlength="200" value="${v("name")}"><label for="pc1">Category</label><select id="pc1">${PC.map(k => `<option ${k === (p?.category || "Other") ? "selected" : ""}>${k}</option>`).join("")}</select>
+  <label for="pa1">Address</label><input id="pa1" value="${v("address")}"><p><button type="button" class="btn alt" data-act="pcgeo">Find on map</button></p>
+  <div class="row"><div style="flex:1"><label for="pla">Latitude</label><input id="pla" type="number" step="any" value="${v("lat")}"></div><div style="flex:1"><label for="pln">Longitude</label><input id="pln" type="number" step="any" value="${v("lng")}"></div></div>
+  <label for="pno">Notes</label><textarea id="pno" rows="3">${v("notes")}</textarea><label for="pv">Visit dates (YYYY-MM-DD, separated by commas)</label><input id="pv" value="${esc((p?.visits || []).join(", "))}">
+  <label style="display:flex;gap:8px;align-items:center"><input id="pfv" type="checkbox" style="width:auto;min-height:0" ${p?.favourite ? "checked" : ""}> Favourite</label><label style="display:flex;gap:8px;align-items:center"><input id="pwt" type="checkbox" style="width:auto;min-height:0" ${p?.want_to_visit ? "checked" : ""}> Want to visit (revisit list)</label>`,
+        async () => {
+          const name = $("#pn1").value.trim(); if (!name) return "Give the place a name."; const la = $("#pla").value, ln = $("#pln").value; if ((la === "") !== (ln === "")) return "Enter both latitude and longitude, or neither.";
+          if (la !== "" && (Math.abs(+la) > 90 || Math.abs(+ln) > 180)) return "Those coordinates aren't valid.";
+          const vs = $("#pv").value.split(",").map(x => x.trim()).filter(Boolean); if (vs.some(x => !/^\d{4}-\d{2}-\d{2}$/.test(x))) return "Write visit dates like 2026-03-14.";
+          const row = {name, category: $("#pc1").value, address: $("#pa1").value.trim() || null, lat: la === "" ? null : +la, lng: ln === "" ? null : +ln, notes: $("#pno").value.trim() || null, visits: vs, favourite: $("#pfv").checked, want_to_visit: $("#pwt").checked};
+          const r = p ? await sb.from("places").update(row).eq("id", p.id) : await sb.from("places").insert({...row, couple_id: S.couple.id});
+          if (r.error) return msg(r.error); S.page = "places"; await places(); toast("Saved")
+        })
+    }
+    /* ---------- Collection: keepsakes + scrapbook (4) ---------- */
+    const KC = ["Movie ticket", "Attraction ticket", "Receipt", "Handwritten note", "Letter", "Card", "Gift tag", "Wristband", "Printed photo", "Screenshot", "Other"], BGS = [["#FFFCFA", "Cream"], ["#F8E3E8", "Pink"], ["#C2DAE8", "Blue"], ["#EADFCB", "Kraft"], ["#FFFFFF", "White"]];
+    S.kp = []; S.pgs = []; S.ct = "kp"; S.kfc = ""; S.sp = null; S.sel = null; let K = null;
+    async function collection() {
+      app.innerHTML = topbar() + `<h1>Our collection</h1><p class="muted">Loading…</p>`;
+      const [k, g] = await Promise.all([sb.from("keepsakes").select("*").eq("couple_id", S.couple.id).order("item_date", {ascending: false, nullsFirst: false}), sb.from("scrapbook_pages").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false})]);
+      S.kp = k.data || []; S.pgs = g.data || []; S.kpE = k.error || g.error; await signed(S.kp.map(x => x.edited_path).filter(Boolean)); colPaint()
+    }
+    function colPaint() {app.innerHTML = topbar() + `<h1>Our collection</h1><div class="chips" role="group" aria-label="Section">${[["kp", "Keepsakes"], ["sb", "Scrapbook"]].map(([k, l]) => `<button data-act="cttab" data-k="${k}" class="${S.ct === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.kpE ? `<p class="err">${esc(msg(S.kpE))} Did you run schema_4.sql?</p>` : ""}<div id="colb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; colBody()}
+    function colBody() {
+      const el = $("#colb");
+      if (S.ct === "kp") {
+        const l = S.kp.filter(k => !S.kfc || k.category === S.kfc);
+        el.innerHTML = `<div class="row"><button class="btn" data-act="kscan">Add a keepsake</button><select id="kfc" aria-label="Filter by category" style="width:auto"><option value="">All types</option>${KC.map(c => `<option ${S.kfc === c ? "selected" : ""}>${c}</option>`).join("")}</select></div><div class="mgrid" style="margin-top:12px">${l.map(k => `<button class="card mem" data-act="kview" data-id="${k.id}"><div class="ph" style="background-image:url('${S.urls[k.edited_path] || ""}');background-size:contain;background-color:var(--bg2)" role="img" aria-label="${esc(k.title)}"></div><div class="pad"><h3>${esc(k.title)}</h3><p class="muted">${k.item_date ? fdt(k.item_date) : ""}${k.occasion ? " · " + esc(k.occasion) : ""}</p><span class="tag">${esc(k.category)}</span></div></button>`).join("") || `<div class="card"><p class="muted">Photograph a ticket, note or wristband to keep it forever.</p></div>`}</div>`; return
+      }
+      if (S.sp) {spPaint(); return }
+      el.innerHTML = `<button class="btn" data-act="spnew">New scrapbook page</button><div style="margin-top:12px">${S.pgs.map(g => `<button class="ri" data-act="spopen" data-id="${g.id}"><div style="flex:1"><strong>${esc(g.title)}</strong><br><span class="muted">${g.items.length} item${g.items.length === 1 ? "" : "s"}</span></div></button>`).join("") || `<div class="card"><p class="muted">Arrange your keepsakes on a page, like a real scrapbook.</p></div>`}</div>`
+    }
+    /* keepsake scanner */
+    function kbuild(K, maxDim) {
+      const im = K.img, r = ((K.rot % 360) + 360) % 360, sw = r % 180 ? im.height : im.width, sh = r % 180 ? im.width : im.height, c0 = document.createElement("canvas"); c0.width = sw; c0.height = sh; const x = c0.getContext("2d"); x.translate(sw / 2, sh / 2); x.rotate(r * Math.PI / 180); x.drawImage(im, -im.width / 2, -im.height / 2);
+      const cx = Math.round(sw * K.l / 100), cy = Math.round(sh * K.t / 100), cw = Math.max(8, Math.round(sw * (100 - K.l - K.r) / 100)), ch = Math.max(8, Math.round(sh * (100 - K.t - K.b) / 100)), k = Math.min(1, maxDim / Math.max(cw, ch)), c = document.createElement("canvas"); c.width = Math.max(1, Math.round(cw * k)); c.height = Math.max(1, Math.round(ch * k));
+      const g = c.getContext("2d"); g.drawImage(c0, cx, cy, cw, ch, 0, 0, c.width, c.height); const d = g.getImageData(0, 0, c.width, c.height), p = d.data, doc = K.mode === "doc"; let lo = 0, hi = 255;
+      if (doc) {const h = new Uint32Array(256), n = p.length / 4; for (let i = 0; i < p.length; i += 4)h[(p[i] * .3 + p[i + 1] * .59 + p[i + 2] * .11) | 0]++; let a = 0; for (lo = 0; lo < 255 && (a += h[lo]) < n * .02; lo++); a = 0; for (hi = 255; hi > 0 && (a += h[hi]) < n * .02; hi--); if (hi - lo < 20) {lo = 0; hi = 255} }
+      const cf = K.con / 100, off = (K.bri - 100) * 2.55; for (let i = 0; i < p.length; i += 4) {let R = p[i], G = p[i + 1], B = p[i + 2]; if (doc) {const y = ((R * .3 + G * .59 + B * .11) - lo) * 255 / (hi - lo); R = G = B = y} p[i] = (R - 128) * cf + 128 + off; p[i + 1] = (G - 128) * cf + 128 + off; p[i + 2] = (B - 128) * cf + 128 + off}
+      g.putImageData(d, 0, 0); return c
+    }
+    let kraf = 0; function kdraw() {if (!K || kraf) return; kraf = requestAnimationFrame(() => {kraf = 0; const c = kbuild(K, 700), cv = $("#kcv"); if (!cv) return; cv.width = c.width; cv.height = c.height; cv.getContext("2d").drawImage(c, 0, 0)})}
+    const kfields = k => `<label for="kt">Title</label><input id="kt" maxlength="200" value="${esc(k?.title || "")}"><label for="kd">Date</label><input id="kd" type="date" value="${k?.item_date || ""}"><label for="ko">Occasion (trip, birthday…)</label><input id="ko" value="${esc(k?.occasion || "")}"><label for="kc">Type</label><select id="kc">${KC.map(c => `<option ${c === (k?.category || "Other") ? "selected" : ""}>${c}</option>`).join("")}</select><label for="kcap">Caption</label><textarea id="kcap" rows="2">${esc(k?.caption || "")}</textarea><label for="kx">Text on the item (you can edit it)</label><textarea id="kx" rows="3">${esc(k?.ocr_text || "")}</textarea>`;
+    function kscan() {
+      K = null; dialog(`<h3>Add a keepsake</h3><div class="row"><label class="btn alt" style="margin:0;color:#33444F">Take a photo<input id="kf1" type="file" accept="image/*" capture="environment" hidden></label><label class="btn ghost" style="margin:0">Upload an image<input id="kf2" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>
+  <div id="ked" hidden><canvas id="kcv" aria-label="Preview of the cleaned-up keepsake"></canvas><div class="chips"><button type="button" data-act="krot" data-d="-90">Rotate left</button><button type="button" data-act="krot" data-d="90">Rotate right</button><button type="button" data-act="kmode" data-v="normal" id="km0" class="on">Original colours</button><button type="button" data-act="kmode" data-v="doc" id="km1">Clean document</button></div>
+  ${[["bri", "Brightness", 60, 140], ["con", "Contrast", 60, 160], ["t", "Trim top", 0, 45], ["b", "Trim bottom", 0, 45], ["l", "Trim left", 0, 45], ["r", "Trim right", 0, 45]].map(([k, l, a, b]) => `<label for="kk${k}">${l}</label><input id="kk${k}" type="range" min="${a}" max="${b}" value="${k === "bri" || k === "con" ? 100 : 0}" data-kk="${k}">`).join("")}
+  <p class="muted">Rotating, trimming and brightness are applied to a copy. Your original photo is saved untouched. Straightening a skewed photo isn't supported yet.</p><p><button type="button" class="btn alt" data-act="kocr">Read printed text</button></p></div>`+ kfields(null),
+        async () => {
+          if (!K) return "Take or upload a photo first."; const title = $("#kt").value.trim(); if (!title) return "Give the keepsake a title."; const id = crypto.randomUUID(), base = `${S.couple.id}/keepsakes/${id}`;
+          try {
+            $("#derr").textContent = "Saving…"; const eb = await new Promise(r => kbuild(K, 1600).toBlob(r, "image/jpeg", .9)), f = K.file, okType = /^image\/(jpeg|png|webp)$/.test(f.type) && f.size <= 9e6, ext = f.type.split("/")[1] || "jpg",
+              ob = okType ? f : await shrink(f), op = `${base}/original.${okType ? ext : "jpg"}`, ep = `${base}/edited.jpg`;
+            let u = await sb.storage.from("memories").upload(op, ob, {contentType: okType ? f.type : "image/jpeg"}); if (u.error) throw u.error;
+            u = await sb.storage.from("memories").upload(ep, eb, {contentType: "image/jpeg"}); if (u.error) throw u.error;
+            const r = await sb.from("keepsakes").insert({id, couple_id: S.couple.id, title, item_date: $("#kd").value || null, occasion: $("#ko").value.trim() || null, category: $("#kc").value, caption: $("#kcap").value.trim() || null, ocr_text: $("#kx").value.trim() || null, original_path: op, edited_path: ep}); if (r.error) throw r.error
+          } catch (e) {return "Couldn't save: " + msg(e)}
+          await collection(); toast("Keepsake saved")
+        })
+    }
+    document.addEventListener("change", e => {
+      const t = e.target; if (t.id === "kf1" || t.id === "kf2") {const f = t.files[0]; if (!f) return; if (!/^image\//.test(f.type)) return toast("Please choose an image."); const im = new Image(), u = URL.createObjectURL(f); im.onload = () => {K = {img: im, file: f, rot: 0, bri: 100, con: 100, t: 0, b: 0, l: 0, r: 0, mode: "normal"}; $("#ked").hidden = false; if (!$("#kt").value) $("#kt").value = f.name.replace(/\.[^.]+$/, ""); kdraw()}; im.onerror = () => toast("That image couldn't be read. Try a JPG or PNG."); im.src = u}
+      if (t.id === "kfc") {S.kfc = t.value; colBody()} if (t.id === "spbg") {const g = S.pgs.find(x => x.id === S.sp); g.bg = t.value; spSave(g); spPaint()}
+    });
+    document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.kk; if (k && K) {K[k] = +e.target.value; kdraw()} });
+    async function kocr(b) {
+      if (!K) return; const err = t => {$("#derr").textContent = t}; b.disabled = true; b.textContent = "Reading… (first time takes a moment)";
+      try {
+        if (!window.Tesseract) await new Promise((ok, no) => {const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"; sc.onload = ok; sc.onerror = no; document.head.append(sc)});
+        const r = await Tesseract.recognize(kbuild(K, 1600), "eng"); $("#kx").value = r.data.text.trim(); err(r.data.text.trim() ? "Check the text below and fix any mistakes." : "No printed text found.")
+      } catch (e) {err("Text reading couldn't load. You can type the text yourself.")}
+      b.disabled = false; b.textContent = "Read printed text"
+    }
+    function kview(id) {
+      const k = S.kp.find(x => x.id === id), d = $("#dlg"); d.innerHTML = `<img id="kimg" src="${S.urls[k.edited_path] || ""}" alt="${esc(k.title)}" style="width:100%;max-height:50vh;object-fit:contain;background:var(--bg2);border-radius:12px"><h2>${esc(k.title)}</h2><p class="muted">${k.item_date ? fdt(k.item_date) + " · " : ""}${esc(k.category)}${k.occasion ? " · " + esc(k.occasion) : ""}</p>${k.caption ? `<p>${esc(k.caption)}</p>` : ""}${k.ocr_text ? `<p class="muted" style="white-space:pre-wrap">${esc(k.ocr_text)}</p>` : ""}
+  <div class="row"><button class="btn alt" data-act="korig" data-id="${id}">View original</button><button class="btn ghost" data-act="kedit" data-id="${id}">Edit details</button><button class="btn danger" data-act="kdel" data-id="${id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+    }
+    /* scrapbook */
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    async function spSave(g) {const r = await sb.from("scrapbook_pages").update({items: g.items, bg: g.bg}).eq("id", g.id); if (r.error) toast(msg(r.error))}
+    function spPaint() {
+      const g = S.pgs.find(x => x.id === S.sp), el = $("#colb"); if (!g) {S.sp = null; return colBody()}
+      el.innerHTML = `<div class="row"><button class="btn ghost" data-act="spback">All pages</button><h2 style="margin:0">${esc(g.title)}</h2></div><div class="row" style="margin-top:8px"><button class="btn alt" data-act="spadd">Add keepsake</button><button class="btn ghost" data-act="sptxt">Add text</button><select id="spbg" aria-label="Paper colour" style="width:auto">${BGS.map(([c, n]) => `<option value="${c}" ${g.bg === c ? "selected" : ""}>${n} paper</option>`).join("")}</select><button class="btn ghost" data-act="spexp">Export image</button><button class="btn danger" data-act="spdel">Delete page</button></div>
+  <div id="stage" style="background:${g.bg}">${g.items.map(it => {const k = it.k && S.kp.find(x => x.id === it.k); if (it.k && !k) return ""; return `<div class="si ${it.t ? "tx" : ""} ${S.sel === it.id ? "sel" : ""}" data-i="${it.id}" style="left:${it.x}%;top:${it.y}%;width:${it.w}%;transform:rotate(${it.r}deg)">${it.t ? esc(it.t) : `<img src="${S.urls[k.edited_path] || ""}" alt="${esc(k.title)}" draggable="false">`}</div>`}).join("")}</div><div class="row" id="spsel" style="justify-content:center"></div><p class="muted" style="text-align:center">Drag items to arrange them. Tap one to resize or rotate.</p>`; spCtl()
+    }
+    function spCtl() {const e = $("#spsel"); if (e) e.innerHTML = S.sel ? `<button class="btn ghost" data-act="spsz" data-d="6">Larger</button><button class="btn ghost" data-act="spsz" data-d="-6">Smaller</button><button class="btn ghost" data-act="sprot">Rotate</button><button class="btn danger" data-act="sprm">Remove</button>` : ""}
+    document.addEventListener("pointerdown", e => {const el = e.target.closest && e.target.closest(".si"); if (!el) return; S.sel = el.dataset.i; document.querySelectorAll(".si").forEach(x => x.classList.toggle("sel", x === el)); spCtl(); const g = S.pgs.find(x => x.id === S.sp), it = g.items.find(x => x.id === S.sel), st = $("#stage").getBoundingClientRect(); S.drag = {el, it, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, w: st.width, h: st.height, g}; el.setPointerCapture(e.pointerId)});
+    document.addEventListener("pointermove", e => {const d = S.drag; if (!d) return; d.it.x = Math.min(95, Math.max(-5, d.ox + (e.clientX - d.sx) / d.w * 100)); d.it.y = Math.min(95, Math.max(-5, d.oy + (e.clientY - d.sy) / d.h * 100)); d.el.style.left = d.it.x + "%"; d.el.style.top = d.it.y + "%"});
+    document.addEventListener("pointerup", () => {const d = S.drag; if (!d) return; S.drag = null; spSave(d.g)});
+    const ldImg = u => new Promise((ok, no) => {const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => ok(i); i.onerror = no; i.src = u});
+    async function spExport() {
+      const g = S.pgs.find(x => x.id === S.sp), W = 900, H = 1200, pad = 7.5, c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); x.fillStyle = g.bg; x.fillRect(0, 0, W, H);
+      try {
+        for (const it of g.items) {
+          const w = it.w / 100 * W; x.save(); if (it.t) {x.font = "700 81px Dongle, sans-serif"; x.fillStyle = "#40383A"; x.textBaseline = "top"; let line = "", y = it.y / 100 * H; x.translate(it.x / 100 * W + w / 2, y); x.rotate(it.r * Math.PI / 180); x.translate(-w / 2, 0); for (const wd of it.t.split(" ")) {const t = line ? line + " " + wd : wd; if (x.measureText(t).width > w && line) {x.fillText(line, 0, 0); line = wd; x.translate(0, 72)} else line = t} x.fillText(line, 0, 0)}
+          else {const k = S.kp.find(q => q.id === it.k); if (!k) {x.restore(); continue} const im = await ldImg(S.urls[k.edited_path]), ih = (w - 2 * pad) * im.height / im.width, bh = ih + 2 * pad; x.translate(it.x / 100 * W + w / 2, it.y / 100 * H + bh / 2); x.rotate(it.r * Math.PI / 180); x.shadowColor = "rgba(0,0,0,.25)"; x.shadowBlur = 14; x.fillStyle = "#fff"; x.fillRect(-w / 2, -bh / 2, w, bh); x.shadowColor = "transparent"; x.drawImage(im, -w / 2 + pad, -bh / 2 + pad, w - 2 * pad, ih)} x.restore()
+        }
+        c.toBlob(b => {const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = (g.title || "scrapbook") + ".png"; a.click(); toast("Image saved")}, "image/png")
+      } catch (e) {toast("Couldn't export this page. Try again.")}
     }
 
     /* boot */
