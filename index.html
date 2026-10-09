@@ -5,15 +5,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Eros</title>
+  <link rel="icon" type="image/png" href="Assets/images/logo.png">
+  <link rel="apple-touch-icon" href="Assets/images/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
   <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    /* Adelia is a licensed font. Put your file at fonts/Adelia.woff2 (see README). Until then the wordmark uses the fallback stack below. */
+    /* Logo wordmark font: Tourmines. Keep the file at Assets/font/Tourmines.otf (folder names are case-sensitive on Netlify). */
     @font-face {
-      font-family: "Adelia";
-      src: url("fonts/Adelia.woff2") format("woff2");
+      font-family: "Tourmines";
+      src: url("Assets/font/Tourmines.otf") format("opentype");
       font-display: swap
     }
 
@@ -90,7 +92,7 @@
     }
 
     .logo {
-      font-family: "Adelia", "Snell Roundhand", "Brush Script MT", cursive;
+      font-family: "Tourmines", "Snell Roundhand", "Brush Script MT", cursive;
       font-size: 2.4rem;
       color: var(--rose);
       line-height: 1
@@ -1005,6 +1007,67 @@
       padding: 0;
       min-height: 30px
     }
+
+    .bsl {
+      width: 84px;
+      text-align: center
+    }
+
+    .bsl>button {
+      width: 84px;
+      height: 84px;
+      border: 2px dashed var(--line);
+      border-radius: 12px;
+      padding: 0;
+      background: var(--bg2);
+      overflow: hidden;
+      cursor: pointer;
+      font-size: 2rem;
+      color: var(--text2)
+    }
+
+    .bsl.on>button {
+      border-color: var(--rose);
+      border-style: solid
+    }
+
+    .bsl img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .bsl .mini {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px
+    }
+
+    .bsl .mini button {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--bg2);
+      cursor: pointer;
+      font-size: 1.3rem;
+      color: var(--text)
+    }
+
+    #bcv {
+      width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: var(--shadow)
+    }
+
+    .bg h3 {
+      margin-top: .8em
+    }
   </style>
 </head>
 
@@ -1064,7 +1127,7 @@
     function render() {
       if (!S.user) return landing();
       if (!S.couple) return onboarding();
-      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); if (S.page === "places") return places(); if (S.page === "coll") return collection(); dashboard(); return homeWidgets();
+      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); if (S.page === "places") return places(); if (S.page === "coll") return collection(); if (S.page === "booth") return booth(); dashboard(); return homeWidgets();
     }
     function landing() {
       const signup = S.authMode === "signup", forgot = S.authMode === "forgot";
@@ -1243,6 +1306,19 @@
       else if (a === "spsz" || a === "sprot" || a === "sprm") {const g = S.pgs.find(x => x.id === S.sp), it = g.items.find(x => x.id === S.sel); if (!it) return; if (a === "spsz") it.w = Math.min(90, Math.max(14, it.w + +b.dataset.d)); else if (a === "sprot") it.r = (it.r + 10) % 360; else {g.items = g.items.filter(x => x !== it); S.sel = null} await spSave(g); spPaint()}
       else if (a === "spexp") {spExport()}
       else if (a === "spdel") {if (confirm("Delete this scrapbook page?")) {const r = await sb.from("scrapbook_pages").delete().eq("id", S.sp); if (r.error) return toast(msg(r.error)); S.pgs = S.pgs.filter(x => x.id !== S.sp); S.sp = null; colBody()} }
+      else if (a === "bsel") {const i = +b.dataset.i; B.sel = B.sel === i ? null : i; bthumbs()}
+      else if (a === "bmv") {const i = +b.dataset.i, j = i + +b.dataset.d, n = BL[B.lay].n; if (j < 0 || j >= n) return;[B.ph[i], B.ph[j]] = [B.ph[j], B.ph[i]]; B.sel = null; bthumbs(); bq()}
+      else if (a === "brm") {B.ph[+b.dataset.i] = null; B.sel = null; bthumbs(); bq()}
+      else if (a === "bpre") {Object.assign(B, BP[b.dataset.n]); boothPaint()}
+      else if (a === "bcam") {bcam()}
+      else if (a === "bsnap") {const v = $("#bv"); if (!v || !v.videoWidth) return; const c = document.createElement("canvas"); c.width = v.videoWidth; c.height = v.videoHeight; const g = c.getContext("2d"); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(v, 0, 0); const url = c.toDataURL("image/jpeg", .92), im = await bimg(url); if (baddPhoto({im, url})) toast("Photo added")}
+      else if (a === "bcamx") {$("#dlg").close()}
+      else if (a === "bdiary") {bdiary()}
+      else if (a === "bpick") {try {const u = S.urls[b.dataset.p], im = await bimg(u, true); if (baddPhoto({im, url: u})) $("#dlg").close()} catch (e) {toast("That photo couldn't be loaded")} }
+      else if (a === "bdl") {try {const bl = await bblob(), l = document.createElement("a"); l.href = URL.createObjectURL(bl); l.download = "eros-photobooth." + (B.fmt === "jpeg" ? "jpg" : "png"); l.click()} catch (e) {toast("Couldn't export. A diary photo may be blocking it; try uploading that photo again.")} }
+      else if (a === "bsave") {if (!B.ph.slice(0, BL[B.lay].n).some(Boolean)) return toast("Add at least one photo first"); bsaveDlg()}
+      else if (a === "bview") {const z = S.bz.find(x => x.id === b.dataset.id), d = $("#dlg"); d.innerHTML = `<img src="${S.urls[z.path] || ""}" alt="Saved photobooth strip" style="width:100%;max-height:65vh;object-fit:contain;background:var(--bg2);border-radius:12px"><div class="row" style="margin-top:12px"><a class="btn alt" style="text-decoration:none" href="${S.urls[z.path] || "#"}" target="_blank" rel="noopener">Open full size</a><button class="btn danger" data-act="bdelz" data-id="${z.id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()}
+      else if (a === "bdelz") {if (confirm("Delete this saved strip? A memory it was added to keeps its copy.")) {const z = S.bz.find(x => x.id === b.dataset.id), inMem = z.memory_id && S.mems.some(m => m.id === z.memory_id && m.photos.includes(z.path)), r = await sb.from("photobooth_creations").delete().eq("id", z.id); if (r.error) return toast(msg(r.error)); if (!inMem) await sb.storage.from("memories").remove([z.path]); $("#dlg").close(); booth()} }
       else if (a === "zclose") {$("#lb").close()}
       else if (a === "anotm") {S.ti = Math.floor(Math.random() * S.mems.filter(m => !m.archived).length); drawWid()}
       else if (a === "newmem") {editor(null)}
@@ -1284,7 +1360,7 @@
     /* ---------- Memory Diary (2a) ---------- */
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
-    const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["coll", "Collection"]];
+    const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["coll", "Collection"], ["booth", "Photobooth"]];
     function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main">${NAVS.map(([k, l], i) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""} ${i > 2 ? "dk" : ""}">${l}</button>`).join("")}<button data-act="more" class="mb ${NAVS.slice(3).some(n => n[0] === S.page) ? "on" : ""}">More</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
@@ -1651,6 +1727,93 @@
         }
         c.toBlob(b => {const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = (g.title || "scrapbook") + ".png"; a.click(); toast("Image saved")}, "image/png")
       } catch (e) {toast("Couldn't export this page. Try again.")}
+    }
+
+
+    /* ---------- Photobooth (5) ---------- */
+    const BL = {classic4: {n: 4, cols: 1, t: "Classic strip (4 photos)"}, three: {n: 3, cols: 1, t: "Three-photo strip"}, two: {n: 2, cols: 1, t: "Mini strip (2 photos)"}, grid: {n: 4, cols: 2, t: "Four-photo grid"}};
+    const BP = {"Soft Pink": {bg: "#F8E3E8", fx: "none", st: "hearts"}, "Baby Blue": {bg: "#C2DAE8", fx: "none", st: "stars"}, "Vintage Film": {bg: "#EADFCB", fx: "film", st: "none"}, "Warm Memories": {bg: "#F6E3CF", fx: "warm", st: "hearts"}, "Classic Photobooth": {bg: "#FFFFFF", fx: "bw", st: "none"}};
+    const B = {lay: "classic4", ph: [null, null, null, null], sel: null, bg: "#F8E3E8", bd: 28, gap: 18, round: 0, fx: "none", bri: 0, con: 100, stamp: true, date: "", cap: "", names: "", al: "center", pos: "bottom", st: "hearts", fmt: "png", stream: null};
+    const bimg = (src, cors) => new Promise((ok, no) => {const i = new Image(); if (cors) i.crossOrigin = "anonymous"; i.onload = () => ok(i); i.onerror = no; i.src = src});
+    function bgeo() {
+      const L = BL[B.lay], b = +B.bd, g = +B.gap, cols = L.cols, sw = cols === 2 ? 400 : 520, sh = cols === 2 ? 300 : 390, rows = Math.ceil(L.n / cols), foot = 170, gh = rows * sh + (rows - 1) * g, W = b * 2 + cols * sw + (cols - 1) * g, H = b * 2 + gh + foot, y0 = B.pos === "top" ? b + foot : b, slots = [];
+      for (let i = 0; i < L.n; i++)slots.push({x: b + (i % cols) * (sw + g), y: y0 + Math.floor(i / cols) * (sh + g), w: sw, h: sh}); return {W, H, slots, fy: B.pos === "top" ? b : b + gh, foot}
+    }
+    function brr(x, a, b, w, h, r) {r = Math.min(r, w / 2, h / 2); x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath()}
+    function bfx(g, w, h) {
+      try {
+        const d = g.getImageData(0, 0, w, h), p = d.data, cf = B.con / 100, off = B.bri * 2.55, f = B.fx; for (let i = 0; i < p.length; i += 4) {
+          let R = p[i], G = p[i + 1], Bl = p[i + 2];
+          if (f === "bw") {R = G = Bl = R * .3 + G * .59 + Bl * .11} else if (f === "sepia" || f === "film") {const k = f === "film" ? .55 : 1, r = R * .393 + G * .769 + Bl * .189, gg = R * .349 + G * .686 + Bl * .168, b2 = R * .272 + G * .534 + Bl * .131; R = R + (r - R) * k; G = G + (gg - G) * k; Bl = Bl + (b2 - Bl) * k; if (f === "film") {R = (R - 128) * 1.08 + 128; G = (G - 128) * 1.08 + 128; Bl = (Bl - 128) * 1.08 + 128} }
+          else if (f === "warm") {R = R * 1.07 + 8; Bl = Bl * .9} else if (f === "cool") {Bl = Bl * 1.1 + 6; R = R * .94}
+          p[i] = (R - 128) * cf + 128 + off; p[i + 1] = (G - 128) * cf + 128 + off; p[i + 2] = (Bl - 128) * cf + 128 + off
+        } g.putImageData(d, 0, 0)
+      } catch (e) { }
+    }
+    function bstick(x, k, px, py, sz, rot, col) {
+      x.save(); x.translate(px, py); x.rotate(rot); x.fillStyle = col; x.beginPath();
+      if (k === "hearts") {const s = sz / 2; x.moveTo(0, s * .9); x.bezierCurveTo(-s * 1.6, -s * .2, -s * .6, -s * 1.2, 0, -s * .4); x.bezierCurveTo(s * .6, -s * 1.2, s * 1.6, -s * .2, 0, s * .9)}
+      else {for (let i = 0; i < 10; i++) {const a = i * Math.PI / 5 - Math.PI / 2, r = i % 2 ? sz * .2 : sz * .5; x[i ? "lineTo" : "moveTo"](Math.cos(a) * r, Math.sin(a) * r)} x.closePath()} x.fill(); x.restore()
+    }
+    function bdraw(cv) {
+      const G = bgeo(), x = cv.getContext("2d"); cv.width = G.W; cv.height = G.H; x.fillStyle = B.bg; x.fillRect(0, 0, G.W, G.H); const rd = +B.round;
+      G.slots.forEach((s, i) => {
+        const e = B.ph[i]; x.save(); brr(x, s.x, s.y, s.w, s.h, rd); x.clip();
+        if (e) {const im = e.im, w = im.naturalWidth || im.width, h = im.naturalHeight || im.height, k = Math.max(s.w / w, s.h / h), t = document.createElement("canvas"); t.width = s.w; t.height = s.h; const tg = t.getContext("2d"); tg.drawImage(im, (s.w - w * k) / 2, (s.h - h * k) / 2, w * k, h * k); bfx(tg, s.w, s.h); x.drawImage(t, s.x, s.y)}
+        else {x.fillStyle = "rgba(0,0,0,.07)"; x.fillRect(s.x, s.y, s.w, s.h); x.fillStyle = "rgba(0,0,0,.35)"; x.font = "700 64px Dongle, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("Photo " + (i + 1), s.x + s.w / 2, s.y + s.h / 2)} x.restore()
+      });
+      const n = parseInt(B.bg.slice(1), 16), lum = ((n >> 16) & 255) * .3 + ((n >> 8) & 255) * .59 + (n & 255) * .11, ink = lum > 140 ? "#40383A" : "#F7F0F3", b = +B.bd, ax = B.al === "left" ? b : B.al === "right" ? G.W - b : G.W / 2;
+      const lines = []; if (B.cap.trim()) lines.push([B.cap.trim(), 76]); if (B.names.trim()) lines.push([B.names.trim(), 58]); if (B.stamp && B.date) {const d = new Date(B.date + "T00:00"); lines.push([d.toLocaleDateString(undefined, {day: "numeric", month: "short", year: "numeric"}).toUpperCase(), 44])}
+      const tot = lines.reduce((a, l) => a + l[1] * .9, 0); let ty = G.fy + (G.foot - tot) / 2; x.fillStyle = ink; x.textAlign = B.al; x.textBaseline = "top"; lines.forEach(([t, sz]) => {x.font = `700 ${sz}px Dongle, sans-serif`; x.fillText(t, ax, ty, G.W - 2 * b); ty += sz * .9});
+      if (B.st !== "none") {const cols = ["#C9788C", "#5E8BA6"]; G.slots.forEach((s, i) => {bstick(x, B.st, s.x + s.w - 6, s.y + 10, 44, .4 * (i % 2 ? -1 : 1), cols[i % 2]); if (i === G.slots.length - 1) bstick(x, B.st, s.x + 8, s.y + s.h - 8, 34, -.3, cols[(i + 1) % 2])})}
+    }
+    let braf = 0; function bq() {if (braf) return; braf = requestAnimationFrame(() => {braf = 0; const cv = $("#bcv"); if (cv) bdraw(cv)})}
+    function bthumbs() {const el = $("#bth"); if (!el) return; el.innerHTML = Array.from({length: BL[B.lay].n}, (_, i) => {const e = B.ph[i]; return `<div class="bsl ${B.sel === i ? "on" : ""}"><button data-act="bsel" data-i="${i}" aria-label="${e ? "Select photo " + (i + 1) + " to replace" : "Empty slot " + (i + 1)}">${e ? `<img src="${e.url}" alt="Photo ${i + 1}">` : "+"}</button><div class="mini"><button data-act="bmv" data-i="${i}" data-d="-1" aria-label="Move earlier">‹</button><button data-act="bmv" data-i="${i}" data-d="1" aria-label="Move later">›</button><button data-act="brm" data-i="${i}" aria-label="Remove photo">×</button></div></div>`}).join("")}
+    function baddPhoto(e) {const n = BL[B.lay].n, i = B.sel != null ? B.sel : B.ph.slice(0, n).findIndex(p => !p); if (i < 0 || i >= n) {toast("All slots are full. Tap a photo to replace it, or remove one."); return false} B.ph[i] = e; B.sel = null; bthumbs(); bq(); return true}
+    async function booth() {
+      app.innerHTML = topbar() + `<h1>Photobooth</h1><p class="muted">Loading…</p>`; if (!B.date) B.date = todayIso(); try {await document.fonts.load("700 60px Dongle")} catch (e) { }
+      const r = await sb.from("photobooth_creations").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.bz = r.data || []; S.bzE = r.error; await signed(S.bz.map(x => x.path)); boothPaint()
+    }
+    function boothPaint() {
+      const o = (v, t, c) => `<option value="${v}" ${String(c) === String(v) ? "selected" : ""}>${t}</option>`, rg = (k, l, a, b) => `<label for="b${k}">${l}</label><input id="b${k}" type="range" min="${a}" max="${b}" value="${B[k]}" data-bb="${k}">`;
+      app.innerHTML = topbar() + `<h1>Photobooth</h1><div class="grid" style="align-items:start"><div class="card"><canvas id="bcv" role="img" aria-label="Preview of your photobooth strip"></canvas><div class="row" style="margin-top:12px;justify-content:center"><button class="btn" data-act="bdl">Download</button><button class="btn alt" data-act="bsave">Save to Eros</button></div></div>
+  <div class="card bg"><h3 style="margin-top:0">Photos</h3><div class="row" id="bth"></div><div class="row" style="margin-top:10px"><label class="btn alt" style="margin:0;color:#33444F">Upload<input id="bup" type="file" accept="image/*" multiple hidden></label><button class="btn ghost" data-act="bcam">Use camera</button><button class="btn ghost" data-act="bdiary">From my diary</button></div>
+  <h3>Look</h3><div class="chips">${Object.keys(BP).map(n => `<button data-act="bpre" data-n="${n}">${n}</button>`).join("")}</div>
+  <label for="blay">Layout</label><select id="blay" data-bb="lay">${Object.entries(BL).map(([k, v]) => o(k, v.t, B.lay)).join("")}</select>
+  <label for="bbg">Background colour</label><input id="bbg" type="color" data-bb="bg" value="${B.bg}" style="padding:2px">
+  ${rg("bd", "Border thickness", 0, 60)}${rg("gap", "Spacing between photos", 0, 40)}<label for="bround">Photo corners</label><select id="bround" data-bb="round">${o(0, "Square", B.round)}${o(28, "Rounded", B.round)}</select>
+  <label for="bfx">Film filter</label><select id="bfx" data-bb="fx">${[["none", "None"], ["bw", "Black and white"], ["sepia", "Sepia"], ["film", "Vintage film"], ["warm", "Warm"], ["cool", "Cool"]].map(([k, t]) => o(k, t, B.fx)).join("")}</select>${rg("bri", "Brightness", -30, 30)}${rg("con", "Contrast", 70, 140)}
+  <label for="bst">Stickers</label><select id="bst" data-bb="st">${[["none", "None"], ["hearts", "Hearts"], ["stars", "Stars"]].map(([k, t]) => o(k, t, B.st)).join("")}</select>
+  <h3>Text</h3><label for="bcap">Caption</label><input id="bcap" maxlength="40" data-bb="cap" value="${esc(B.cap)}"><label for="bnames">Names or initials</label><input id="bnames" maxlength="40" data-bb="names" value="${esc(B.names)}">
+  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-bb="stamp" style="width:auto;min-height:0" ${B.stamp ? "checked" : ""}> Show date stamp</label><input id="bdate" type="date" data-bb="date" value="${B.date}" aria-label="Date stamp">
+  <label for="bal">Text alignment</label><select id="bal" data-bb="al">${o("left", "Left", B.al)}${o("center", "Centre", B.al)}${o("right", "Right", B.al)}</select><label for="bpos">Text position</label><select id="bpos" data-bb="pos">${o("bottom", "Below the photos", B.pos)}${o("top", "Above the photos", B.pos)}</select>
+  <label for="bfmt">Download format</label><select id="bfmt" data-bb="fmt">${o("png", "PNG", B.fmt)}${o("jpeg", "JPEG", B.fmt)}</select></div></div>
+  ${S.bzE ? `<p class="err">${esc(msg(S.bzE))} Did you run schema_5.sql?</p>` : ""}${S.bz.length ? `<h2 style="margin-top:1em">Saved strips</h2><div class="hs">${S.bz.map(z => `<button class="card mem" data-act="bview" data-id="${z.id}"><div class="ph" style="background-image:url('${S.urls[z.path] || ""}');background-size:contain;background-color:var(--bg2);aspect-ratio:1/1" role="img" aria-label="Saved strip"></div><div class="pad"><p class="muted">${fdt(z.created_at.slice(0, 10))}</p></div></button>`).join("")}</div>` : ""}<dialog id="dlg"></dialog><dialog id="lb"></dialog>`; bthumbs(); bdraw($("#bcv"))
+    }
+    document.addEventListener("input", e => {const t = e.target, k = t.dataset && t.dataset.bb; if (!k) return; B[k] = t.type === "checkbox" ? t.checked : t.type === "range" ? +t.value : t.value; if (k === "lay") bthumbs(); bq()});
+    document.addEventListener("change", async e => {if (e.target.id !== "bup") return; for (const f of e.target.files) {if (!/^image\//.test(f.type)) {toast(f.name + " isn't an image"); continue} try {const u = URL.createObjectURL(f), im = await bimg(u); if (!baddPhoto({im, url: u})) break} catch (x) {toast(f.name + " couldn't be read")} } e.target.value = ""});
+    function bstop() {B.stream && B.stream.getTracks().forEach(t => t.stop()); B.stream = null}
+    function bcam() {
+      const d = $("#dlg"); d.innerHTML = `<h3>Camera</h3><video id="bv" autoplay playsinline muted style="width:100%;border-radius:14px;background:#000;transform:scaleX(-1)"></video><div class="err" id="bce" role="alert"></div><div class="row"><button class="btn" data-act="bsnap">Take photo</button><button class="btn ghost" data-act="bcamx">Done</button></div>`; d.showModal(); d.addEventListener("close", bstop, {once: true});
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {$("#bce").textContent = "This browser can't use the camera. Please upload photos instead."; return }
+      navigator.mediaDevices.getUserMedia({video: {facingMode: "user"}, audio: false}).then(st => {B.stream = st; $("#bv").srcObject = st}).catch(() => {$("#bce").textContent = "Camera access was blocked or isn't available. Allow it in your browser settings, or upload photos instead."})
+    }
+    async function bdiary() {
+      const ps = S.mems.length ? S.mems : (await loadMems(), S.mems), all = ps.filter(m => !m.archived).flatMap(m => m.photos).slice(0, 60); await signed(all); const d = $("#dlg");
+      d.innerHTML = `<h3>Pick from your diary</h3>${all.length ? `<div class="thumbs" style="gap:8px">${all.map(p => `<button type="button" data-act="bpick" data-p="${p}" aria-label="Use this photo" style="border:0;padding:0;background:none;cursor:pointer"><img src="${S.urls[p] || ""}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:10px"></button>`).join("")}</div>` : `<p class="muted">No diary photos yet.</p>`}<div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+    }
+    async function bblob() {const c = document.createElement("canvas"); bdraw(c); return new Promise((ok, no) => {try {c.toBlob(b => b ? ok(b) : no(new Error("empty")), B.fmt === "jpeg" ? "image/jpeg" : "image/png", .95)} catch (e) {no(e)} })}
+    function bsaveDlg() {
+      const ms = S.mems.filter(m => !m.archived && m.photos.length < 8); dialog(`<h3>Save to Eros</h3><label for="bs1">Add this strip to</label><select id="bs1"><option value="">A new memory</option>${ms.map(m => `<option value="${m.id}">${esc(m.title)} (${fdt(m.memory_date)})</option>`).join("")}</select><label for="bs2">Title (for a new memory)</label><input id="bs2" maxlength="200" value="Photobooth ${fdt(B.date || todayIso())}">`,
+        async () => {
+          try {
+            $("#derr").textContent = "Saving…"; const blob = await bblob(), id = crypto.randomUUID(), path = `${S.couple.id}/booth/${id}.${B.fmt === "jpeg" ? "jpg" : "png"}`, u = await sb.storage.from("memories").upload(path, blob, {contentType: blob.type}); if (u.error) throw u.error;
+            let mid = $("#bs1").value || null; if (mid) {const m = S.mems.find(x => x.id === mid), r = await sb.from("memories").update({photos: [...m.photos, path]}).eq("id", mid); if (r.error) throw r.error}
+            else {const t = $("#bs2").value.trim() || "Photobooth strip"; mid = crypto.randomUUID(); const r = await sb.from("memories").insert({id: mid, couple_id: S.couple.id, title: t, memory_date: B.date || todayIso(), category: "Everyday Moments", photos: [path]}); if (r.error) throw r.error}
+            const r2 = await sb.from("photobooth_creations").insert({id, couple_id: S.couple.id, path, memory_id: mid, title: "Photobooth strip"}); if (r2.error) throw r2.error
+          } catch (e) {return "Couldn't save: " + msg(e)}
+          await booth(); toast("Saved to your memories")
+        })
     }
 
     /* boot */
