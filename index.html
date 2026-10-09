@@ -1,232 +1,784 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Eros</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
-<style>
-/* Adelia is a licensed font. Put your file at fonts/Adelia.woff2 (see README). Until then the wordmark uses the fallback stack below. */
-@font-face{font-family:"Adelia";src:url("fonts/Adelia.woff2") format("woff2");font-display:swap}
-:root{--pink:#F8E3E8;--blue:#C2DAE8;--bg:#FFFCFA;--bg2:#F8F4F1;--card:#fff;--text:#40383A;--text2:#8B7D82;--line:#EEE5E7;--rose:#C9788C;--sky:#5E8BA6;--on-accent:#fff;--shadow:0 6px 24px rgba(64,56,58,.07)}
-[data-theme=dark]{--bg:#201D22;--bg2:#29252C;--card:#312C34;--text:#F7F0F3;--text2:#BEB1BC;--line:#443B46;--rose:#F8E3E8;--sky:#C2DAE8;--on-accent:#201D22;--shadow:0 6px 24px rgba(0,0,0,.35)}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{background:var(--bg);color:var(--text);font-family:"Dongle",system-ui,sans-serif;font-size:24px;line-height:1.1;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
-h1,h2,h3{font-weight:700;margin:0 0 .3em;line-height:.95}
-h1{font-size:3.2rem}h2{font-size:2.2rem}h3{font-size:1.6rem}
-p{margin:0 0 .6em;line-height:1.15}
-.logo{font-family:"Adelia","Snell Roundhand","Brush Script MT",cursive;font-size:2.4rem;color:var(--rose);line-height:1}
-.muted{color:var(--text2)}
-button,input{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
-.btn{border:0;border-radius:999px;padding:.35em 1.1em;font-weight:700;cursor:pointer;background:var(--rose);color:var(--on-accent);min-height:44px;font-size:1.2rem}
-.btn.alt{background:var(--blue);color:#33444F}
-.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--text)}
-.btn.danger{background:transparent;border:1.5px solid var(--rose);color:var(--rose)}
-.btn:disabled{opacity:.6;cursor:wait}
-.wrap{max-width:1000px;margin:0 auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
-label{display:block;margin:.5em 0 .1em;color:var(--text2)}
-input{width:100%;background:var(--bg2);border:1.5px solid var(--line);border-radius:14px;padding:.3em .7em;min-height:46px;font-size:1.2rem}
-.pw{position:relative}.pw button{position:absolute;right:6px;top:4px;min-height:38px;padding:0 .8em}
-.err{color:#B3414F;min-height:1.2em;margin-top:.4em}[data-theme=dark] .err{color:#F2A0AB}
-.ok{color:var(--sky)}
-/* hero */
-.hero{display:grid;gap:24px;align-items:center;padding:24px 0;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
-.polaroids{position:relative;height:300px}
-.pol{position:absolute;width:150px;background:#fff;padding:10px 10px 34px;box-shadow:var(--shadow);border-radius:4px;color:#40383A;font-size:1.2rem;text-align:center}
-.pol i{display:block;height:120px;background:var(--pink)}
-.pol.b i{background:var(--blue)}
-.pol.a{left:6%;top:20px;transform:rotate(-6deg)}.pol.b{left:42%;top:70px;transform:rotate(5deg)}.pol.c{left:18%;top:150px;transform:rotate(-2deg)}
-.stat{font-size:4rem;font-weight:700;line-height:.9}
-.code{font-size:2.6rem;letter-spacing:.15em;background:var(--bg2);border-radius:14px;padding:.1em .5em;display:inline-block}
-.pill{background:var(--pink);color:#6B4650;border-radius:999px;padding:.1em .7em;display:inline-block}
-[data-theme=dark] .pill{background:#4a3a44;color:var(--pink)}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:.3em 1em;border-radius:999px;z-index:9}
-@media (prefers-reduced-motion:no-preference){.btn{transition:transform .15s}.btn:active{transform:scale(.97)}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Eros</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Adelia is a licensed font. Put your file at fonts/Adelia.woff2 (see README). Until then the wordmark uses the fallback stack below. */
+    @font-face {
+      font-family: "Adelia";
+      src: url("fonts/Adelia.woff2") format("woff2");
+      font-display: swap
+    }
+
+    :root {
+      --pink: #F8E3E8;
+      --blue: #C2DAE8;
+      --bg: #FFFCFA;
+      --bg2: #F8F4F1;
+      --card: #fff;
+      --text: #40383A;
+      --text2: #8B7D82;
+      --line: #EEE5E7;
+      --rose: #C9788C;
+      --sky: #5E8BA6;
+      --on-accent: #fff;
+      --shadow: 0 6px 24px rgba(64, 56, 58, .07)
+    }
+
+    [data-theme=dark] {
+      --bg: #201D22;
+      --bg2: #29252C;
+      --card: #312C34;
+      --text: #F7F0F3;
+      --text2: #BEB1BC;
+      --line: #443B46;
+      --rose: #F8E3E8;
+      --sky: #C2DAE8;
+      --on-accent: #201D22;
+      --shadow: 0 6px 24px rgba(0, 0, 0, .35)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Dongle", system-ui, sans-serif;
+      font-size: 24px;
+      line-height: 1.1;
+      padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0)
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-weight: 700;
+      margin: 0 0 .3em;
+      line-height: .95
+    }
+
+    h1 {
+      font-size: 3.2rem
+    }
+
+    h2 {
+      font-size: 2.2rem
+    }
+
+    h3 {
+      font-size: 1.6rem
+    }
+
+    p {
+      margin: 0 0 .6em;
+      line-height: 1.15
+    }
+
+    .logo {
+      font-family: "Adelia", "Snell Roundhand", "Brush Script MT", cursive;
+      font-size: 2.4rem;
+      color: var(--rose);
+      line-height: 1
+    }
+
+    .muted {
+      color: var(--text2)
+    }
+
+    button,
+    input {
+      font: inherit;
+      color: inherit
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--sky);
+      outline-offset: 2px
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: .35em 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--rose);
+      color: var(--on-accent);
+      min-height: 44px;
+      font-size: 1.2rem
+    }
+
+    .btn.alt {
+      background: var(--blue);
+      color: #33444F
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1.5px solid var(--line);
+      color: var(--text)
+    }
+
+    .btn.danger {
+      background: transparent;
+      border: 1.5px solid var(--rose);
+      color: var(--rose)
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: wait
+    }
+
+    .wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 16px
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow)
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 0
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr))
+    }
+
+    label {
+      display: block;
+      margin: .5em 0 .1em;
+      color: var(--text2)
+    }
+
+    input {
+      width: 100%;
+      background: var(--bg2);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: .3em .7em;
+      min-height: 46px;
+      font-size: 1.2rem
+    }
+
+    .pw {
+      position: relative
+    }
+
+    .pw button {
+      position: absolute;
+      right: 6px;
+      top: 4px;
+      min-height: 38px;
+      padding: 0 .8em
+    }
+
+    .err {
+      color: #B3414F;
+      min-height: 1.2em;
+      margin-top: .4em
+    }
+
+    [data-theme=dark] .err {
+      color: #F2A0AB
+    }
+
+    .ok {
+      color: var(--sky)
+    }
+
+    /* hero */
+    .hero {
+      display: grid;
+      gap: 24px;
+      align-items: center;
+      padding: 24px 0;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr))
+    }
+
+    .polaroids {
+      position: relative;
+      height: 300px
+    }
+
+    .pol {
+      position: absolute;
+      width: 150px;
+      background: #fff;
+      padding: 10px 10px 34px;
+      box-shadow: var(--shadow);
+      border-radius: 4px;
+      color: #40383A;
+      font-size: 1.2rem;
+      text-align: center
+    }
+
+    .pol i {
+      display: block;
+      height: 120px;
+      background: var(--pink)
+    }
+
+    .pol.b i {
+      background: var(--blue)
+    }
+
+    .pol.a {
+      left: 6%;
+      top: 20px;
+      transform: rotate(-6deg)
+    }
+
+    .pol.b {
+      left: 42%;
+      top: 70px;
+      transform: rotate(5deg)
+    }
+
+    .pol.c {
+      left: 18%;
+      top: 150px;
+      transform: rotate(-2deg)
+    }
+
+    .stat {
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: .9
+    }
+
+    .code {
+      font-size: 2.6rem;
+      letter-spacing: .15em;
+      background: var(--bg2);
+      border-radius: 14px;
+      padding: .1em .5em;
+      display: inline-block
+    }
+
+    .pill {
+      background: var(--pink);
+      color: #6B4650;
+      border-radius: 999px;
+      padding: .1em .7em;
+      display: inline-block
+    }
+
+    [data-theme=dark] .pill {
+      background: #4a3a44;
+      color: var(--pink)
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0));
+      transform: translateX(-50%);
+      background: var(--text);
+      color: var(--bg);
+      padding: .3em 1em;
+      border-radius: 999px;
+      z-index: 9
+    }
+
+    @media (prefers-reduced-motion:no-preference) {
+      .btn {
+        transition: transform .15s
+      }
+
+      .btn:active {
+        transform: scale(.97)
+      }
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px
+    }
+
+    .nav button {
+      background: none;
+      border: 0;
+      cursor: pointer;
+      font-size: 1.3rem;
+      padding: .2em .8em;
+      border-radius: 999px;
+      min-height: 44px;
+      color: var(--text2)
+    }
+
+    .nav button.on {
+      background: var(--pink);
+      color: #6B4650
+    }
+
+    [data-theme=dark] .nav button.on {
+      background: #4a3a44;
+      color: var(--pink)
+    }
+
+    @media(max-width:640px) {
+      body {
+        padding-bottom: 76px
+      }
+
+      .nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 5;
+        justify-content: space-around;
+        background: var(--card);
+        border-top: 1px solid var(--line);
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0))
+      }
+    }
+
+    .mem {
+      padding: 0;
+      overflow: hidden;
+      cursor: pointer;
+      text-align: left;
+      width: 100%
+    }
+
+    .mem .ph {
+      aspect-ratio: 4/3;
+      background: var(--bg2);
+      background-size: cover;
+      background-position: center
+    }
+
+    .mem .pad {
+      padding: 12px 16px 16px
+    }
+
+    .tag {
+      background: var(--blue);
+      color: #33444F;
+      border-radius: 999px;
+      padding: 0 .6em;
+      margin-right: .3em;
+      display: inline-block
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: .6em 0
+    }
+
+    .chips button {
+      border: 1.5px solid var(--line);
+      background: none;
+      border-radius: 999px;
+      padding: .1em .9em;
+      min-height: 40px;
+      cursor: pointer;
+      font-size: 1.2rem
+    }
+
+    .chips button.on {
+      background: var(--blue);
+      color: #33444F;
+      border-color: var(--blue)
+    }
+
+    .car {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 8px;
+      margin-bottom: .6em
+    }
+
+    .car img {
+      scroll-snap-align: center;
+      max-width: 100%;
+      max-height: 50vh;
+      border-radius: 14px;
+      flex: none
+    }
+
+    textarea,
+    select {
+      width: 100%;
+      background: var(--bg2);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: .3em .7em;
+      font: inherit;
+      font-size: 1.2rem;
+      color: inherit;
+      min-height: 46px
+    }
+
+    dialog.wide {
+      width: min(94vw, 560px);
+      max-height: 90vh
+    }
+
+    dialog::backdrop {
+      background: rgba(32, 29, 34, .5)
+    }
+
+    .thumbs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .thumbs div {
+      position: relative
+    }
+
+    .thumbs img {
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 10px
+    }
+
+    .thumbs button {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      border: 0;
+      cursor: pointer;
+      background: var(--rose);
+      color: var(--on-accent)
+    }
+  </style>
 </head>
+
 <body>
-<div id="app" class="wrap"><p class="muted">Loading…</p></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script>
-const SUPABASE_URL="https://hhsejvipqxtgswygwwcv.supabase.co";
-// Anon key is public by design. Your data is protected by the row-level security rules in schema.sql.
-const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc2VqdmlwcXh0Z3N3eWd3d2N2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MTMwNDcsImV4cCI6MjEwNzA4OTA0N30.xLtHIu6wUp6PYauQhuOAYMSqjpQCvSg9f0NvjbobOmI";
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const $=s=>document.querySelector(s), app=$("#app");
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let S={user:null,profile:null,couple:null,members:[],authMode:"login"};
+  <div id="app" class="wrap">
+    <p class="muted">Loading…</p>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script>
+    const SUPABASE_URL = "https://hhsejvipqxtgswygwwcv.supabase.co";
+    // Anon key is public by design. Your data is protected by the row-level security rules in schema.sql.
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc2VqdmlwcXh0Z3N3eWd3d2N2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MTMwNDcsImV4cCI6MjEwNzA4OTA0N30.xLtHIu6wUp6PYauQhuOAYMSqjpQCvSg9f0NvjbobOmI";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const $ = s => document.querySelector(s), app = $("#app");
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+    let S = {user: null, profile: null, couple: null, members: [], authMode: "login"};
 
-/* theme */
-function setTheme(t){try{localStorage.setItem("eros-theme",t)}catch(e){}applyTheme()}
-function applyTheme(){let t="auto";try{t=localStorage.getItem("eros-theme")||"auto"}catch(e){}
-  const dark=t==="dark"||(t==="auto"&&matchMedia("(prefers-color-scheme:dark)").matches);
-  document.documentElement.dataset.theme=dark?"dark":"light"}
-function toggleTheme(){setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");render()}
-applyTheme();
+    /* theme */
+    function setTheme(t) {try {localStorage.setItem("eros-theme", t)} catch (e) { } applyTheme()}
+    function applyTheme() {
+      let t = "auto"; try {t = localStorage.getItem("eros-theme") || "auto"} catch (e) { }
+      const dark = t === "dark" || (t === "auto" && matchMedia("(prefers-color-scheme:dark)").matches);
+      document.documentElement.dataset.theme = dark ? "dark" : "light"
+    }
+    function toggleTheme() {setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"); render()}
+    applyTheme();
 
-function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;t.setAttribute("role","status");document.body.append(t);setTimeout(()=>t.remove(),2600)}
-const themeBtn=()=>`<button class="btn ghost" data-act="theme" aria-label="Switch between light and dark mode">${document.documentElement.dataset.theme==="dark"?"Light mode":"Dark mode"}</button>`;
-const msg=e=>e&&e.message?e.message:"Something went wrong. Please try again.";
+    function toast(m) {const t = document.createElement("div"); t.className = "toast"; t.textContent = m; t.setAttribute("role", "status"); document.body.append(t); setTimeout(() => t.remove(), 2600)}
+    const themeBtn = () => `<button class="btn ghost" data-act="theme" aria-label="Switch between light and dark mode">${document.documentElement.dataset.theme === "dark" ? "Light mode" : "Dark mode"}</button>`;
+    const msg = e => e && e.message ? e.message : "Something went wrong. Please try again.";
 
-/* invite code from link */
-const urlCode=new URLSearchParams(location.search).get("invite");
-if(urlCode){try{localStorage.setItem("eros-invite",urlCode.toUpperCase())}catch(e){}history.replaceState({},"",location.pathname)}
-const pendingCode=()=>{try{return localStorage.getItem("eros-invite")}catch(e){return null}};
-const clearCode=()=>{try{localStorage.removeItem("eros-invite")}catch(e){}};
+    /* invite code from link */
+    const urlCode = new URLSearchParams(location.search).get("invite");
+    if (urlCode) {try {localStorage.setItem("eros-invite", urlCode.toUpperCase())} catch (e) { } history.replaceState({}, "", location.pathname)}
+    const pendingCode = () => {try {return localStorage.getItem("eros-invite")} catch (e) {return null} };
+    const clearCode = () => {try {localStorage.removeItem("eros-invite")} catch (e) { } };
 
-/* data */
-async function load(){
-  const {data:{session}}=await sb.auth.getSession();
-  S.user=session?.user||null;
-  if(!S.user){S.profile=S.couple=null;return}
-  const p=await sb.from("profiles").select("*").eq("id",S.user.id).maybeSingle();S.profile=p.data;
-  const m=await sb.from("couple_members").select("couple_id").eq("user_id",S.user.id).maybeSingle();
-  if(m.data){
-    const c=await sb.from("couples").select("*").eq("id",m.data.couple_id).single();S.couple=c.data;
-    const ms=await sb.from("couple_members").select("user_id").eq("couple_id",m.data.couple_id);
-    const ids=(ms.data||[]).map(x=>x.user_id);
-    const pr=await sb.from("profiles").select("id,display_name").in("id",ids);
-    S.members=pr.data||[];
-    if(S.couple&&!S.couple.invite_code&&ids.length<2){const iv=await sb.from("invites").select("code,expires_at").eq("couple_id",S.couple.id).is("accepted_at",null).maybeSingle();S.invite=iv.data}else S.invite=null;
-  }else{S.couple=null;S.members=[];S.invite=null}
-}
+    /* data */
+    async function load() {
+      const {data: {session}} = await sb.auth.getSession();
+      S.user = session?.user || null;
+      if (!S.user) {S.profile = S.couple = null; return }
+      const p = await sb.from("profiles").select("*").eq("id", S.user.id).maybeSingle(); S.profile = p.data;
+      const m = await sb.from("couple_members").select("couple_id").eq("user_id", S.user.id).maybeSingle();
+      if (m.data) {
+        const c = await sb.from("couples").select("*").eq("id", m.data.couple_id).single(); S.couple = c.data;
+        const ms = await sb.from("couple_members").select("user_id").eq("couple_id", m.data.couple_id);
+        const ids = (ms.data || []).map(x => x.user_id);
+        const pr = await sb.from("profiles").select("id,display_name").in("id", ids);
+        S.members = pr.data || [];
+        if (S.couple && !S.couple.invite_code && ids.length < 2) {const iv = await sb.from("invites").select("code,expires_at").eq("couple_id", S.couple.id).is("accepted_at", null).maybeSingle(); S.invite = iv.data} else S.invite = null;
+      } else {S.couple = null; S.members = []; S.invite = null}
+    }
 
-/* views */
-function render(){
-  if(!S.user)return landing();
-  if(!S.couple)return onboarding();
-  return dashboard();
-}
-function landing(){
-  const signup=S.authMode==="signup", forgot=S.authMode==="forgot";
-  app.innerHTML=`<div class="top"><span class="logo">Eros</span>${themeBtn()}</div>
+    /* views */
+    function render() {
+      if (!S.user) return landing();
+      if (!S.couple) return onboarding();
+      return S.page === "diary" ? diary() : dashboard();
+    }
+    function landing() {
+      const signup = S.authMode === "signup", forgot = S.authMode === "forgot";
+      app.innerHTML = `<div class="top"><span class="logo">Eros</span>${themeBtn()}</div>
   <section class="hero"><div>
     <h1>A little home for your memories together.</h1>
     <p class="muted">A private space for two. Keep your moments, plan your dates and count the days.</p>
-    ${pendingCode()?`<p class="pill">You have an invitation. Sign in or sign up to accept it.</p>`:""}
+    ${pendingCode() ? `<p class="pill">You have an invitation. Sign in or sign up to accept it.</p>` : ""}
     <div class="polaroids" aria-hidden="true"><div class="pol a"><i></i>first coffee</div><div class="pol b"><i></i>rainy walk</div><div class="pol c"><i></i>our table</div></div>
   </div>
-  <div class="card"><h2>${forgot?"Reset password":signup?"Create your account":"Welcome back"}</h2>
+  <div class="card"><h2>${forgot ? "Reset password" : signup ? "Create your account" : "Welcome back"}</h2>
   <form id="auth" novalidate>
-    ${signup?`<label for="n">Your name</label><input id="n" autocomplete="name" required>`:""}
+    ${signup ? `<label for="n">Your name</label><input id="n" autocomplete="name" required>` : ""}
     <label for="e">Email</label><input id="e" type="email" autocomplete="email" required>
-    ${forgot?"":`<label for="p">Password</label><div class="pw"><input id="p" type="password" autocomplete="${signup?"new-password":"current-password"}" minlength="8" required><button type="button" class="btn ghost" data-act="showpw" aria-label="Show or hide password">Show</button></div>`}
-    ${signup?`<label for="p2">Confirm password</label><input id="p2" type="password" autocomplete="new-password" required>`:""}
+    ${forgot ? "" : `<label for="p">Password</label><div class="pw"><input id="p" type="password" autocomplete="${signup ? "new-password" : "current-password"}" minlength="8" required><button type="button" class="btn ghost" data-act="showpw" aria-label="Show or hide password">Show</button></div>`}
+    ${signup ? `<label for="p2">Confirm password</label><input id="p2" type="password" autocomplete="new-password" required>` : ""}
     <div class="err" id="err" role="alert"></div>
-    <button class="btn" id="go" style="width:100%">${forgot?"Send reset link":signup?"Sign up":"Log in"}</button>
+    <button class="btn" id="go" style="width:100%">${forgot ? "Send reset link" : signup ? "Sign up" : "Log in"}</button>
   </form>
   <p style="margin-top:.8em" class="row">
-    ${signup||forgot?`<button class="btn ghost" data-act="mode" data-m="login">Log in instead</button>`:`<button class="btn ghost" data-act="mode" data-m="signup">New here? Sign up</button><button class="btn ghost" data-act="mode" data-m="forgot">Forgot password</button>`}
+    ${signup || forgot ? `<button class="btn ghost" data-act="mode" data-m="login">Log in instead</button>` : `<button class="btn ghost" data-act="mode" data-m="signup">New here? Sign up</button><button class="btn ghost" data-act="mode" data-m="forgot">Forgot password</button>`}
   </p></div></section>`;
-  $("#auth").onsubmit=async ev=>{ev.preventDefault();
-    const v=id=>$("#"+id)?.value.trim()??"", err=t=>{$("#err").textContent=t;$("#err").className="err"};
-    const email=v("e"),pw=$("#p")?.value;
-    if(!/^\S+@\S+\.\S+$/.test(email))return err("Enter a valid email address.");
-    if(!forgot&&(!pw||pw.length<8))return err("Use a password with at least 8 characters.");
-    if(signup){if(!v("n"))return err("Enter your name.");if(pw!==$("#p2").value)return err("The passwords don't match.")}
-    $("#go").disabled=true;
-    try{
-      if(forgot){const r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;$("#err").className="err ok";$("#err").textContent="Check your inbox for a reset link."}
-      else if(signup){const r=await sb.auth.signUp({email,password:pw,options:{data:{name:v("n")},emailRedirectTo:location.origin+location.pathname}});if(r.error)throw r.error;
-        if(!r.data.session){$("#err").className="err ok";$("#err").textContent="Almost there. Open the confirmation email we sent, then log in."}}
-      else{const r=await sb.auth.signInWithPassword({email,password:pw});if(r.error)throw new Error(r.error.message==="Invalid login credentials"?"That email and password don't match.":r.error.message)}
-    }catch(e){err(msg(e))}
-    $("#go").disabled=false};
-}
-function onboarding(){
-  const name=S.profile?.display_name||"";
-  app.innerHTML=`<div class="top"><span class="logo">Eros</span><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div>
-  <h1>Hi${name?`, ${esc(name)}`:""}. Let's set up your space.</h1>
+      $("#auth").onsubmit = async ev => {
+        ev.preventDefault();
+        const v = id => $("#" + id)?.value.trim() ?? "", err = t => {$("#err").textContent = t; $("#err").className = "err"};
+        const email = v("e"), pw = $("#p")?.value;
+        if (!/^\S+@\S+\.\S+$/.test(email)) return err("Enter a valid email address.");
+        if (!forgot && (!pw || pw.length < 8)) return err("Use a password with at least 8 characters.");
+        if (signup) {if (!v("n")) return err("Enter your name."); if (pw !== $("#p2").value) return err("The passwords don't match.")}
+        $("#go").disabled = true;
+        try {
+          if (forgot) {const r = await sb.auth.resetPasswordForEmail(email, {redirectTo: location.origin + location.pathname}); if (r.error) throw r.error; $("#err").className = "err ok"; $("#err").textContent = "Check your inbox for a reset link."}
+          else if (signup) {
+            const r = await sb.auth.signUp({email, password: pw, options: {data: {name: v("n")}, emailRedirectTo: location.origin + location.pathname}}); if (r.error) throw r.error;
+            if (!r.data.session) {$("#err").className = "err ok"; $("#err").textContent = "Almost there. Open the confirmation email we sent, then log in."}
+          }
+          else {const r = await sb.auth.signInWithPassword({email, password: pw}); if (r.error) throw new Error(r.error.message === "Invalid login credentials" ? "That email and password don't match." : r.error.message)}
+        } catch (e) {err(msg(e))}
+        $("#go").disabled = false
+      };
+    }
+    function onboarding() {
+      const name = S.profile?.display_name || "";
+      app.innerHTML = `<div class="top"><span class="logo">Eros</span><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div>
+  <h1>Hi${name ? `, ${esc(name)}` : ""}. Let's set up your space.</h1>
   <div class="grid">
    <div class="card"><h2>Start a new space</h2>
     <form id="mk" novalidate><label for="pn">Your partner's name or nickname (optional)</label><input id="pn">
-    <label for="sd">Relationship start date</label><input id="sd" type="date" max="${new Date().toISOString().slice(0,10)}">
+    <label for="sd">Relationship start date</label><input id="sd" type="date" max="${new Date().toISOString().slice(0, 10)}">
     <label for="an">Anniversary date (optional)</label><input id="an" type="date">
     <div class="err" id="err1" role="alert"></div><button class="btn" id="mkb">Create our space</button></form></div>
    <div class="card"><h2>Join with a code</h2><p class="muted">Your partner already started a space? Enter their invitation code.</p>
-    <form id="jn" novalidate><label for="ic">Invitation code</label><input id="ic" value="${esc(pendingCode()||"")}" autocapitalize="characters">
+    <form id="jn" novalidate><label for="ic">Invitation code</label><input id="ic" value="${esc(pendingCode() || "")}" autocapitalize="characters">
     <div class="err" id="err2" role="alert"></div><button class="btn alt" id="jnb">Join</button></form></div>
   </div>`;
-  $("#mk").onsubmit=async ev=>{ev.preventDefault();$("#mkb").disabled=true;
-    const r=await sb.rpc("create_couple",{p_partner:$("#pn").value.trim()||null,p_start:$("#sd").value||null,p_anniversary:$("#an").value||null});
-    if(r.error){$("#err1").textContent=msg(r.error);$("#mkb").disabled=false;return}
-    await load();render();toast("Your space is ready")};
-  $("#jn").onsubmit=async ev=>{ev.preventDefault();$("#jnb").disabled=true;
-    const r=await sb.rpc("accept_invite",{p_code:$("#ic").value});
-    if(r.error){$("#err2").textContent=msg(r.error);$("#jnb").disabled=false;return}
-    clearCode();await load();render();toast("You're paired. Welcome in!")};
-}
-function dayStats(startStr){
-  if(!startStr)return null;
-  const [y,m,d]=startStr.split("-").map(Number), start=new Date(y,m-1,d), now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const days=Math.round((today-start)/864e5);
-  let yrs=today.getFullYear()-y, mos=today.getMonth()-(m-1);
-  if(today.getDate()<d)mos--; if(mos<0){yrs--;mos+=12}
-  let next=new Date(today.getFullYear(),m-1,d); if(next<today)next=new Date(today.getFullYear()+1,m-1,d);
-  return{days,yrs,mos,toNext:Math.round((next-today)/864e5),future:days<0}
-}
-function dashboard(){
-  const h=new Date().getHours(), g=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
-  const me=S.profile?.display_name||"love", c=S.couple, st=dayStats(c.start_date), paired=S.members.length>=2;
-  const partner=paired?S.members.find(x=>x.id!==S.user.id)?.display_name:c.partner_name;
-  const link=S.invite?`${location.origin}${location.pathname}?invite=${S.invite.code}`:"";
-  app.innerHTML=`<div class="top"><span class="logo">Eros</span><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div>
+      $("#mk").onsubmit = async ev => {
+        ev.preventDefault(); $("#mkb").disabled = true;
+        const r = await sb.rpc("create_couple", {p_partner: $("#pn").value.trim() || null, p_start: $("#sd").value || null, p_anniversary: $("#an").value || null});
+        if (r.error) {$("#err1").textContent = msg(r.error); $("#mkb").disabled = false; return }
+        await load(); render(); toast("Your space is ready")
+      };
+      $("#jn").onsubmit = async ev => {
+        ev.preventDefault(); $("#jnb").disabled = true;
+        const r = await sb.rpc("accept_invite", {p_code: $("#ic").value});
+        if (r.error) {$("#err2").textContent = msg(r.error); $("#jnb").disabled = false; return }
+        clearCode(); await load(); render(); toast("You're paired. Welcome in!")
+      };
+    }
+    function dayStats(startStr) {
+      if (!startStr) return null;
+      const [y, m, d] = startStr.split("-").map(Number), start = new Date(y, m - 1, d), now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const days = Math.round((today - start) / 864e5);
+      let yrs = today.getFullYear() - y, mos = today.getMonth() - (m - 1);
+      if (today.getDate() < d) mos--; if (mos < 0) {yrs--; mos += 12}
+      let next = new Date(today.getFullYear(), m - 1, d); if (next < today) next = new Date(today.getFullYear() + 1, m - 1, d);
+      return {days, yrs, mos, toNext: Math.round((next - today) / 864e5), future: days < 0}
+    }
+    function dashboard() {
+      const h = new Date().getHours(), g = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+      const me = S.profile?.display_name || "love", c = S.couple, st = dayStats(c.start_date), paired = S.members.length >= 2;
+      const partner = paired ? S.members.find(x => x.id !== S.user.id)?.display_name : c.partner_name;
+      const link = S.invite ? `${location.origin}${location.pathname}?invite=${S.invite.code}` : "";
+      app.innerHTML = `${topbar()}
   <h1>${g}, ${esc(me)}</h1>
   <div class="grid">
-   <div class="card"><h3>Days together</h3>${st?(st.future?`<p class="muted">Your start date is in the future.</p>`:`<div class="stat">${st.days.toLocaleString()}</div><p class="muted">${st.yrs} year${st.yrs===1?"":"s"}, ${st.mos} month${st.mos===1?"":"s"}</p><p>${st.toNext===0?"Happy anniversary today!":`${st.toNext} days until your next anniversary`}</p>`):`<p class="muted">Add a start date in Settings to see your counter.</p><button class="btn alt" data-act="edit">Add start date</button>`}</div>
+   <div class="card"><h3>Days together</h3>${st ? (st.future ? `<p class="muted">Your start date is in the future.</p>` : `<div class="stat">${st.days.toLocaleString()}</div><p class="muted">${st.yrs} year${st.yrs === 1 ? "" : "s"}, ${st.mos} month${st.mos === 1 ? "" : "s"}</p><p>${st.toNext === 0 ? "Happy anniversary today!" : `${st.toNext} days until your next anniversary`}</p>`) : `<p class="muted">Add a start date in Settings to see your counter.</p><button class="btn alt" data-act="edit">Add start date</button>`}</div>
    <div class="card"><h3>Your space</h3>
-    <p>${esc(me)} ${partner?`and ${esc(partner)}`:""}</p>
-    <p><span class="pill">${paired?"Paired":"Waiting for partner"}</span></p>
-    ${paired?"":S.invite?`<p class="muted">Share this code or link. It expires ${new Date(S.invite.expires_at).toLocaleDateString()}.</p><div class="code">${esc(S.invite.code)}</div><div class="row" style="margin-top:.5em"><button class="btn alt" data-act="copy" data-v="${esc(link)}">Copy invite link</button><button class="btn ghost" data-act="invite">New code</button></div>`:`<button class="btn" data-act="invite">Create invitation</button>`}
+    <p>${esc(me)} ${partner ? `and ${esc(partner)}` : ""}</p>
+    <p><span class="pill">${paired ? "Paired" : "Waiting for partner"}</span></p>
+    ${paired ? "" : S.invite ? `<p class="muted">Share this code or link. It expires ${new Date(S.invite.expires_at).toLocaleDateString()}.</p><div class="code">${esc(S.invite.code)}</div><div class="row" style="margin-top:.5em"><button class="btn alt" data-act="copy" data-v="${esc(link)}">Copy invite link</button><button class="btn ghost" data-act="invite">New code</button></div>` : `<button class="btn" data-act="invite">Create invitation</button>`}
    </div>
    <div class="card"><h3>Settings</h3>
-    <form id="prof"><label for="dn">Display name</label><input id="dn" value="${esc(S.profile?.display_name||"")}"><div class="row" style="margin-top:.5em"><button class="btn alt">Save name</button></div></form>
+    <form id="prof"><label for="dn">Display name</label><input id="dn" value="${esc(S.profile?.display_name || "")}"><div class="row" style="margin-top:.5em"><button class="btn alt">Save name</button></div></form>
     <div class="row" style="margin-top:.8em"><button class="btn ghost" data-act="edit">Edit dates</button><button class="btn ghost" data-act="pw">Change password</button></div>
-    <p style="margin-top:.8em"><button class="btn danger" data-act="leave">${paired?"Disconnect from partner":"Delete this space"}</button></p>
+    <p style="margin-top:.8em"><button class="btn danger" data-act="leave">${paired ? "Disconnect from partner" : "Delete this space"}</button></p>
    </div>
   </div>
   <p class="muted" style="margin-top:1.2em">Memory Diary, Calendar, Places, Keepsakes and Photobooth arrive in the next phases.</p>
   <dialog id="dlg" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);max-width:min(92vw,420px)"></dialog>`;
-  $("#prof").onsubmit=async ev=>{ev.preventDefault();const r=await sb.from("profiles").update({display_name:$("#dn").value.trim()}).eq("id",S.user.id);
-    if(r.error)return toast(msg(r.error));await load();render();toast("Saved")};
-}
-function dialog(html,onSubmit){const d=$("#dlg");d.innerHTML=`<form method="dialog" id="df">${html}<div class="row" style="margin-top:.8em"><button class="btn" value="ok">Confirm</button><button class="btn ghost" type="button" data-act="close">Cancel</button></div><div class="err" id="derr" role="alert"></div></form>`;
-  d.showModal();$("#df").onsubmit=async ev=>{ev.preventDefault();$("#derr").textContent="";const e=await onSubmit();if(e)$("#derr").textContent=e;else d.close()}}
+      $("#prof").onsubmit = async ev => {
+        ev.preventDefault(); const r = await sb.from("profiles").update({display_name: $("#dn").value.trim()}).eq("id", S.user.id);
+        if (r.error) return toast(msg(r.error)); await load(); render(); toast("Saved")
+      };
+    }
+    function dialog(html, onSubmit) {
+      const d = $("#dlg"); d.innerHTML = `<form method="dialog" id="df">${html}<div class="row" style="margin-top:.8em"><button class="btn" value="ok">Confirm</button><button class="btn ghost" type="button" data-act="close">Cancel</button></div><div class="err" id="derr" role="alert"></div></form>`;
+      d.showModal(); $("#df").onsubmit = async ev => {ev.preventDefault(); $("#derr").textContent = ""; const e = await onSubmit(); if (e) $("#derr").textContent = e; else d.close()}
+    }
 
-/* actions */
-document.addEventListener("click",async ev=>{
-  const b=ev.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
-  if(a==="theme")toggleTheme();
-  else if(a==="mode"){S.authMode=b.dataset.m;landing()}
-  else if(a==="showpw"){const i=$("#p");i.type=i.type==="password"?"text":"password";b.textContent=i.type==="password"?"Show":"Hide"}
-  else if(a==="logout"){await sb.auth.signOut()}
-  else if(a==="close")$("#dlg").close();
-  else if(a==="copy"){try{await navigator.clipboard.writeText(b.dataset.v);toast("Link copied")}catch(e){toast("Copy failed. Select the code instead.")}}
-  else if(a==="invite"){const r=await sb.rpc("create_invite");if(r.error)return toast(msg(r.error));await load();render()}
-  else if(a==="edit"){const c=S.couple;dialog(`<h3>Your dates</h3><label for="d1">Relationship start date</label><input id="d1" type="date" value="${c.start_date||""}"><label for="d2">Anniversary (optional)</label><input id="d2" type="date" value="${c.anniversary||""}">`,
-    async()=>{const r=await sb.from("couples").update({start_date:$("#d1").value||null,anniversary:$("#d2").value||null}).eq("id",c.id);if(r.error)return msg(r.error);await load();render()})}
-  else if(a==="pw"){dialog(`<h3>Change password</h3><label for="np">New password</label><input id="np" type="password" autocomplete="new-password" minlength="8">`,
-    async()=>{const v=$("#np").value;if(v.length<8)return"Use at least 8 characters.";const r=await sb.auth.updateUser({password:v});if(r.error)return msg(r.error);toast("Password updated")})}
-  else if(a==="leave"){const paired=S.members.length>=2;dialog(`<h3>${paired?"Disconnect from your partner?":"Delete this space?"}</h3><p class="muted">${paired?"You will leave the shared space. Your partner keeps it.":"This removes your space and anything in it. This can't be undone."}</p>`,
-    async()=>{const r=await sb.rpc("leave_couple");if(r.error)return msg(r.error);await load();render()})}
-});
+    /* actions */
+    document.addEventListener("click", async ev => {
+      const b = ev.target.closest("[data-act]"); if (!b) return; const a = b.dataset.act;
+      if (a === "theme") toggleTheme();
+      else if (a === "nav") {S.page = b.dataset.p; render()}
+      else if (a === "filt") {S.f = b.dataset.k; diary()}
+      else if (a === "newmem") {editor(null)}
+      else if (a === "open") {openMem(b.dataset.id)}
+      else if (a === "rmph") {window.__keep.splice(+b.dataset.i, 1); window.__thumbs()}
+      else if (a === "edit1") {const m = S.mems.find(x => x.id === b.dataset.id); $("#dlg").close(); editor(m)}
+      else if (a === "fav" || a === "arch") {
+        const m = S.mems.find(x => x.id === b.dataset.id), f = a === "fav" ? {favourite: !m.favourite} : {archived: !m.archived};
+        const r = await sb.from("memories").update(f).eq("id", m.id); if (r.error) return toast(msg(r.error)); $("#dlg").close(); diary()
+      }
+      else if (a === "del") {
+        const m = S.mems.find(x => x.id === b.dataset.id); $("#dlg").close();
+        dialog(`<h3>Delete "${esc(m.title)}"?</h3><p class="muted">The memory and its photos will be removed for both of you. This can't be undone.</p>`, async () => {
+          const r = await sb.from("memories").delete().eq("id", m.id); if (r.error) return msg(r.error);
+          if (m.photos.length) await sb.storage.from("memories").remove(m.photos); diary(); toast("Memory deleted")
+        })
+      }
+      else if (a === "mode") {S.authMode = b.dataset.m; landing()}
+      else if (a === "showpw") {const i = $("#p"); i.type = i.type === "password" ? "text" : "password"; b.textContent = i.type === "password" ? "Show" : "Hide"}
+      else if (a === "logout") {await sb.auth.signOut()}
+      else if (a === "close") $("#dlg").close();
+      else if (a === "copy") {try {await navigator.clipboard.writeText(b.dataset.v); toast("Link copied")} catch (e) {toast("Copy failed. Select the code instead.")} }
+      else if (a === "invite") {const r = await sb.rpc("create_invite"); if (r.error) return toast(msg(r.error)); await load(); render()}
+      else if (a === "edit") {
+        const c = S.couple; dialog(`<h3>Your dates</h3><label for="d1">Relationship start date</label><input id="d1" type="date" value="${c.start_date || ""}"><label for="d2">Anniversary (optional)</label><input id="d2" type="date" value="${c.anniversary || ""}">`,
+          async () => {const r = await sb.from("couples").update({start_date: $("#d1").value || null, anniversary: $("#d2").value || null}).eq("id", c.id); if (r.error) return msg(r.error); await load(); render()})
+      }
+      else if (a === "pw") {
+        dialog(`<h3>Change password</h3><label for="np">New password</label><input id="np" type="password" autocomplete="new-password" minlength="8">`,
+          async () => {const v = $("#np").value; if (v.length < 8) return "Use at least 8 characters."; const r = await sb.auth.updateUser({password: v}); if (r.error) return msg(r.error); toast("Password updated")})
+      }
+      else if (a === "leave") {
+        const paired = S.members.length >= 2; dialog(`<h3>${paired ? "Disconnect from your partner?" : "Delete this space?"}</h3><p class="muted">${paired ? "You will leave the shared space. Your partner keeps it." : "This removes your space and anything in it. This can't be undone."}</p>`,
+          async () => {const r = await sb.rpc("leave_couple"); if (r.error) return msg(r.error); await load(); render()})
+      }
+    });
 
-/* boot */
-sb.auth.onAuthStateChange(async(evt)=>{
-  if(evt==="PASSWORD_RECOVERY"){await load();render();setTimeout(()=>document.querySelector('[data-act=pw]')?.click(),0);return}
-  if(evt==="INITIAL_SESSION"||evt==="SIGNED_IN"||evt==="SIGNED_OUT"||evt==="USER_UPDATED"){
-    setTimeout(async()=>{await load();
-      if(S.user&&!S.couple&&pendingCode()){const r=await sb.rpc("accept_invite",{p_code:pendingCode()});if(!r.error){clearCode();await load();toast("You're paired. Welcome in!")}}
-      render()},0)}
-});
-</script>
+
+    /* ---------- Memory Diary (2a) ---------- */
+    const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
+    S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
+    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main"><button data-act="nav" data-p="home" class="${S.page === "home" ? "on" : ""}">Home</button><button data-act="nav" data-p="diary" class="${S.page === "diary" ? "on" : ""}">Diary</button><button data-act="newmem">+ Memory</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div>`}
+    async function signed(paths) {
+      const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
+      const r = await sb.storage.from("memories").createSignedUrls(need, 3600); (r.data || []).forEach(x => {if (x.signedUrl) S.urls[x.path] = x.signedUrl})
+    }
+    async function loadMems() {
+      const r = await sb.from("memories").select("*").eq("couple_id", S.couple.id).order("memory_date", {ascending: false}).order("created_at", {ascending: false});
+      S.mems = r.data || []; S.memErr = r.error; await signed(S.mems.map(m => m.photos[0]).filter(Boolean))
+    }
+    async function diary() {
+      app.innerHTML = topbar() + `<h1>Memory Diary</h1><p class="muted">Loading…</p><dialog id="dlg" class="wide" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text)"></dialog>`;
+      await loadMems();
+      const list = S.mems.filter(m => S.f === "archived" ? m.archived : !m.archived && (S.f !== "fav" || m.favourite));
+      app.innerHTML = topbar() + `<h1>Memory Diary</h1>
+  <div class="chips" role="group" aria-label="Filter">${[["all", "All"], ["fav", "Favourites"], ["archived", "Archived"]].map(([k, l]) => `<button data-act="filt" data-k="${k}" class="${S.f === k ? "on" : ""}">${l}</button>`).join("")}</div>
+  ${S.memErr ? `<p class="err">${esc(msg(S.memErr))} Did you run schema_2a.sql?</p>` : ""}
+  ${list.length ? `<div class="grid">${list.map(m => {const u = S.urls[m.photos[0]]; return `<button class="card mem" data-act="open" data-id="${m.id}"><div class="ph" ${u ? `style="background-image:url('${u}')"` : ""} role="img" aria-label="${u ? "Photo for " + esc(m.title) : "No photo"}"></div><div class="pad"><h3>${m.favourite ? "♥ " : ""}${esc(m.title)}</h3><p class="muted">${new Date(m.memory_date + "T00:00").toLocaleDateString(undefined, {day: "numeric", month: "short", year: "numeric"})}${m.location ? " · " + esc(m.location) : ""}</p><span class="tag">${esc(m.category)}</span></div></button>`}).join("")}</div>`
+          : `<div class="card"><h3>${S.f === "all" ? "Your diary is empty" : "Nothing here yet"}</h3><p class="muted">Capture a moment, even a small one.</p><button class="btn" data-act="newmem">Add your first memory</button></div>`}
+  <dialog id="dlg" class="wide" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text)"></dialog>`;
+    }
+    function shrink(file) {return new Promise((res, rej) => {const img = new Image(), u = URL.createObjectURL(file); img.onload = () => {const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); c.toBlob(b => b ? res(b) : rej(new Error("Could not process " + file.name)), "image/jpeg", .85)}; img.onerror = () => rej(new Error(file.name + " isn't a readable image")); img.src = u})}
+    async function editor(m) {
+      await ensureDlg(); const keep = [...(m?.photos || [])]; await signed(keep);
+      const thumbs = () => $("#th").innerHTML = keep.map((p, i) => `<div><img src="${S.urls[p] || ""}" alt=""><button type="button" data-act="rmph" data-i="${i}" aria-label="Remove photo">×</button></div>`).join("");
+      window.__keep = keep; window.__thumbs = thumbs;
+      dialog(`<h3>${m ? "Edit memory" : "New memory"}</h3>
+  <label for="mt">Title</label><input id="mt" maxlength="200" value="${esc(m?.title || "")}">
+  <label for="md">Date</label><input id="md" type="date" value="${m?.memory_date || new Date().toISOString().slice(0, 10)}">
+  <label for="ml">Location</label><input id="ml" value="${esc(m?.location || "")}">
+  <label for="mc">Category</label><select id="mc">${CATS.map(c => `<option ${c === (m?.category || CATS[0]) ? "selected" : ""}>${c}</option>`).join("")}</select>
+  <label for="ms">Story</label><textarea id="ms" rows="4">${esc(m?.story || "")}</textarea>
+  <label for="mg">Tags (comma separated)</label><input id="mg" value="${esc((m?.tags || []).join(", "))}">
+  <label for="mp">Photos (up to 8, JPG/PNG/WebP)</label><input id="mp" type="file" accept="image/jpeg,image/png,image/webp" multiple><div class="thumbs" id="th" style="margin-top:.5em"></div>`,
+        async () => {
+          const title = $("#mt").value.trim(); if (!title) return "Give this memory a title.";
+          const files = [...$("#mp").files]; if (keep.length + files.length > 8) return "A memory can hold up to 8 photos.";
+          for (const f of files) {if (!/^image\/(jpeg|png|webp)$/.test(f.type)) return f.name + " isn't a JPG, PNG or WebP."; if (f.size > 25e6) return f.name + " is over 25 MB."}
+          const id = m?.id || crypto.randomUUID(), paths = [...keep];
+          try {
+            for (let i = 0; i < files.length; i++) {
+              $("#derr").textContent = `Uploading photo ${i + 1} of ${files.length}…`;
+              const blob = await shrink(files[i]), path = `${S.couple.id}/${id}/${crypto.randomUUID()}.jpg`;
+              const up = await sb.storage.from("memories").upload(path, blob, {contentType: "image/jpeg"}); if (up.error) throw up.error; paths.push(path)
+            }
+          } catch (e) {return "Upload failed: " + msg(e)}
+          const row = {
+            title, memory_date: $("#md").value, location: $("#ml").value.trim() || null, category: $("#mc").value, story: $("#ms").value.trim() || null,
+            tags: $("#mg").value.split(",").map(t => t.trim()).filter(Boolean).slice(0, 12), photos: paths, updated_at: new Date().toISOString()
+          };
+          const r = m ? await sb.from("memories").update(row).eq("id", id) : await sb.from("memories").insert({...row, id, couple_id: S.couple.id});
+          if (r.error) return msg(r.error);
+          if (m) {const gone = (m.photos || []).filter(p => !paths.includes(p)); if (gone.length) await sb.storage.from("memories").remove(gone)}
+          S.page = "diary"; render(); toast("Memory saved")
+        });
+      thumbs();
+    }
+    async function ensureDlg() {if (!S.couple) return; if (S.page !== "diary") {S.page = "diary"; await diary()} }
+    function viewMem(m) {
+      const d = $("#dlg");
+      d.innerHTML = `${m.photos.length ? `<div class="car">${m.photos.map(p => `<img src="${S.urls[p] || ""}" alt="Photo from ${esc(m.title)}">`).join("")}</div>` : ""}
+  <h2>${esc(m.title)}</h2><p class="muted">${new Date(m.memory_date + "T00:00").toLocaleDateString(undefined, {dateStyle: "long"})}${m.location ? " · " + esc(m.location) : ""}</p>
+  <p><span class="tag">${esc(m.category)}</span>${m.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join("")}</p>
+  ${m.story ? `<p style="white-space:pre-wrap">${esc(m.story)}</p>` : ""}
+  <div class="row"><button class="btn alt" data-act="fav" data-id="${m.id}">${m.favourite ? "Unfavourite" : "Favourite"}</button><button class="btn ghost" data-act="edit1" data-id="${m.id}">Edit</button><button class="btn ghost" data-act="arch" data-id="${m.id}">${m.archived ? "Restore" : "Archive"}</button><button class="btn danger" data-act="del" data-id="${m.id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+    }
+    async function openMem(id) {await signed(S.mems.find(x => x.id === id).photos); viewMem(S.mems.find(x => x.id === id))}
+
+    /* boot */
+    sb.auth.onAuthStateChange(async (evt) => {
+      if (evt === "PASSWORD_RECOVERY") {await load(); render(); setTimeout(() => document.querySelector('[data-act=pw]')?.click(), 0); return }
+      if (evt === "INITIAL_SESSION" || evt === "SIGNED_IN" || evt === "SIGNED_OUT" || evt === "USER_UPDATED") {
+        setTimeout(async () => {
+          await load();
+          if (S.user && !S.couple && pendingCode()) {const r = await sb.rpc("accept_invite", {p_code: pendingCode()}); if (!r.error) {clearCode(); await load(); toast("You're paired. Welcome in!")} }
+          render()
+        }, 0)
+      }
+    });
+  </script>
 </body>
+
 </html>
