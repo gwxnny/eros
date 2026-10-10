@@ -1114,6 +1114,58 @@
         scroll-behavior: auto !important
       }
     }
+
+    .sgrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch
+    }
+
+    .sgrid>.card {
+      display: flex;
+      flex-direction: column
+    }
+
+    @media(max-width:760px) {
+      .sgrid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .bwrap {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: 14px;
+      align-items: start
+    }
+
+    .bprev {
+      position: sticky;
+      top: 12px
+    }
+
+    .bcols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 14px
+    }
+
+    @media(max-width:820px) {
+      .bwrap {
+        grid-template-columns: 1fr
+      }
+
+      .bprev {
+        position: static
+      }
+    }
+
+    @media(max-width:480px) {
+      .bcols {
+        grid-template-columns: 1fr
+      }
+    }
   </style>
 </head>
 
@@ -1261,23 +1313,9 @@
   <h1>${g}, ${esc(me)}</h1>
   <div class="grid">
    <div class="card"><h3>Days together</h3>${st ? (st.future ? `<p class="muted">Your start date is in the future.</p>` : `<div class="stat">${st.days.toLocaleString()}</div><p class="muted">${st.yrs} year${st.yrs === 1 ? "" : "s"}, ${st.mos} month${st.mos === 1 ? "" : "s"}</p><p>${st.toNext === 0 ? "Happy anniversary today!" : `${st.toNext} days until your next anniversary`}</p>`) : `<p class="muted">Add a start date in Settings to see your counter.</p><button class="btn alt" data-act="edit">Add start date</button>`}</div>
-   <div class="card"><h3>Your space</h3>
-    <p>${esc(me)} ${partner ? `and ${esc(partner)}` : ""}</p>
-    <p><span class="pill">${paired ? "Paired" : "Waiting for partner"}</span></p>
-    ${paired ? "" : S.invite ? `<p class="muted">Share this code or link. It expires ${new Date(S.invite.expires_at).toLocaleDateString()}.</p><div class="code">${esc(S.invite.code)}</div><div class="row" style="margin-top:.5em"><button class="btn alt" data-act="copy" data-v="${esc(link)}">Copy invite link</button><button class="btn ghost" data-act="invite">New code</button></div>` : `<button class="btn" data-act="invite">Create invitation</button>`}
-   </div>
-   <div class="card"><h3>Settings</h3>
-    <form id="prof"><label for="dn">Display name</label><input id="dn" value="${esc(S.profile?.display_name || "")}"><div class="row" style="margin-top:.5em"><button class="btn alt">Save name</button></div></form>
-    <div class="row" style="margin-top:.8em"><button class="btn alt" data-act="nav" data-p="settings">All settings</button><button class="btn ghost" data-act="edit">Edit dates</button><button class="btn ghost" data-act="pw">Change password</button></div>
-    <p style="margin-top:.8em"><button class="btn danger" data-act="leave">${paired ? "Disconnect from partner" : "Delete this space"}</button></p>
-   </div>
   </div>
-  <div id="wid" style="margin-top:14px"></div><p class="muted" style="margin-top:1.2em">Calendar, Places, Keepsakes and Photobooth arrive in the next phases.</p>
+  <div id="wid" style="margin-top:14px"></div>
   <dialog id="dlg" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);"></dialog>`;
-      $("#prof").onsubmit = async ev => {
-        ev.preventDefault(); const r = await sb.from("profiles").update({display_name: $("#dn").value.trim()}).eq("id", S.user.id);
-        if (r.error) return toast(msg(r.error)); await load(); render(); toast("Saved")
-      };
     }
     function dialog(html, onSubmit) {
       const d = $("#dlg"); d.innerHTML = `<form method="dialog" id="df">${html}<div class="row" style="margin-top:.8em"><button class="btn" value="ok">Confirm</button><button class="btn ghost" type="button" data-act="close">Cancel</button></div><div class="err" id="derr" role="alert"></div></form>`;
@@ -1353,6 +1391,7 @@
       else if (a === "spsz" || a === "sprot" || a === "sprm") {const g = S.pgs.find(x => x.id === S.sp), it = g.items.find(x => x.id === S.sel); if (!it) return; if (a === "spsz") it.w = Math.min(90, Math.max(14, it.w + +b.dataset.d)); else if (a === "sprot") it.r = (it.r + 10) % 360; else {g.items = g.items.filter(x => x !== it); S.sel = null} await spSave(g); spPaint()}
       else if (a === "spexp") {spExport()}
       else if (a === "spdel") {if (confirm("Delete this scrapbook page?")) {const r = await sb.from("scrapbook_pages").delete().eq("id", S.sp); if (r.error) return toast(msg(r.error)); S.pgs = S.pgs.filter(x => x.id !== S.sp); S.sp = null; colBody()} }
+      else if (a === "btab") {B.tab = b.dataset.k; document.querySelectorAll("[data-t]").forEach(x => x.hidden = x.dataset.t !== B.tab); b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b))}
       else if (a === "bsel") {const i = +b.dataset.i; B.sel = B.sel === i ? null : i; bthumbs()}
       else if (a === "bmv") {const i = +b.dataset.i, j = i + +b.dataset.d, n = BL[B.lay].n; if (j < 0 || j >= n) return;[B.ph[i], B.ph[j]] = [B.ph[j], B.ph[i]]; B.sel = null; bthumbs(); bq()}
       else if (a === "brm") {B.ph[+b.dataset.i] = null; B.sel = null; bthumbs(); bq()}
@@ -1422,7 +1461,7 @@
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
     const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["coll", "Collection"], ["booth", "Photobooth"], ["settings", "Settings"]];
-    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main">${NAVS.map(([k, l], i) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""} ${i > 2 ? "dk" : ""}">${l}</button>`).join("")}<button data-act="more" class="mb ${NAVS.slice(3).some(n => n[0] === S.page) ? "on" : ""}">More</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
+    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main">${NAVS.map(([k, l], i) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""} ${i > 2 ? "dk" : ""}">${l}</button>`).join("")}<button data-act="more" class="mb ${NAVS.slice(3).some(n => n[0] === S.page) ? "on" : ""}">More</button></nav></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
       const r = await sb.storage.from("memories").createSignedUrls(need, 3600); (r.data || []).forEach(x => {if (x.signedUrl) S.urls[x.path] = x.signedUrl})
@@ -1452,7 +1491,7 @@
       }
     }
     function paint() {
-      const mm = S.mems.filter(m => !m.archived), cats = [...new Set([...CATS, ...S.mems.map(m => m.category)])], tags = [...new Set(mm.flatMap(m => m.tags))].sort(), locs = [...new Set(mm.map(m => m.location).filter(Boolean))].sort();
+      const mm = S.mems.filter(m => !m.archived), cats = CATS, tags = [...new Set(mm.flatMap(m => m.tags))].sort(), locs = [...new Set(mm.map(m => m.location).filter(Boolean))].sort();
       const sel = (k, l, o) => `<div><label for="s${k}">${l}</label><select id="s${k}" data-flt="${k}"><option value="">Any</option>${o.map(x => `<option ${S[k] === x ? "selected" : ""}>${esc(x)}</option>`).join("")}</select></div>`;
       const ch = (act, key, cur, arr) => arr.map(([k, l]) => `<button data-act="${act}" data-k="${k}" class="${cur === k ? "on" : ""}">${l}</button>`).join("");
       app.innerHTML = topbar() + `<h1>Memory Diary</h1>
@@ -1837,19 +1876,12 @@
       const r = await sb.from("photobooth_creations").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.bz = r.data || []; S.bzE = r.error; await signed(S.bz.map(x => x.path)); boothPaint()
     }
     function boothPaint() {
-      const o = (v, t, c) => `<option value="${v}" ${String(c) === String(v) ? "selected" : ""}>${t}</option>`, rg = (k, l, a, b) => `<label for="b${k}">${l}</label><input id="b${k}" type="range" min="${a}" max="${b}" value="${B[k]}" data-bb="${k}">`;
-      app.innerHTML = topbar() + `<h1>Photobooth</h1><div class="grid" style="align-items:start"><div class="card"><canvas id="bcv" role="img" aria-label="Preview of your photobooth strip"></canvas><div class="row" style="margin-top:12px;justify-content:center"><button class="btn" data-act="bdl">Download</button><button class="btn alt" data-act="bsave">Save to Eros</button></div></div>
-  <div class="card bg"><h3 style="margin-top:0">Photos</h3><div class="row" id="bth"></div><div class="row" style="margin-top:10px"><label class="btn alt" style="margin:0;color:#33444F">Upload<input id="bup" type="file" accept="image/*" multiple hidden></label><button class="btn ghost" data-act="bcam">Use camera</button><button class="btn ghost" data-act="bdiary">From my diary</button></div>
-  <h3>Look</h3><div class="chips">${Object.keys(BP).map(n => `<button data-act="bpre" data-n="${n}">${n}</button>`).join("")}</div>
-  <label for="blay">Layout</label><select id="blay" data-bb="lay">${Object.entries(BL).map(([k, v]) => o(k, v.t, B.lay)).join("")}</select>
-  <label for="bbg">Background colour</label><input id="bbg" type="color" data-bb="bg" value="${B.bg}" style="padding:2px">
-  ${rg("bd", "Border thickness", 0, 60)}${rg("gap", "Spacing between photos", 0, 40)}<label for="bround">Photo corners</label><select id="bround" data-bb="round">${o(0, "Square", B.round)}${o(28, "Rounded", B.round)}</select>
-  <label for="bfx">Film filter</label><select id="bfx" data-bb="fx">${[["none", "None"], ["bw", "Black and white"], ["sepia", "Sepia"], ["film", "Vintage film"], ["warm", "Warm"], ["cool", "Cool"]].map(([k, t]) => o(k, t, B.fx)).join("")}</select>${rg("bri", "Brightness", -30, 30)}${rg("con", "Contrast", 70, 140)}
-  <label for="bst">Stickers</label><select id="bst" data-bb="st">${[["none", "None"], ["hearts", "Hearts"], ["stars", "Stars"]].map(([k, t]) => o(k, t, B.st)).join("")}</select>
-  <h3>Text</h3><label for="bcap">Caption</label><input id="bcap" maxlength="40" data-bb="cap" value="${esc(B.cap)}"><label for="bnames">Names or initials</label><input id="bnames" maxlength="40" data-bb="names" value="${esc(B.names)}">
-  <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-bb="stamp" style="width:auto;min-height:0" ${B.stamp ? "checked" : ""}> Show date stamp</label><input id="bdate" type="date" data-bb="date" value="${B.date}" aria-label="Date stamp">
-  <label for="bal">Text alignment</label><select id="bal" data-bb="al">${o("left", "Left", B.al)}${o("center", "Centre", B.al)}${o("right", "Right", B.al)}</select><label for="bpos">Text position</label><select id="bpos" data-bb="pos">${o("bottom", "Below the photos", B.pos)}${o("top", "Above the photos", B.pos)}</select>
-  <label for="bfmt">Download format</label><select id="bfmt" data-bb="fmt">${o("png", "PNG", B.fmt)}${o("jpeg", "JPEG", B.fmt)}</select></div></div>
+      const o = (v, t, c) => `<option value="${v}" ${String(c) === String(v) ? "selected" : ""}>${t}</option>`, rg = (k, l, a, b) => `<div><label for="b${k}">${l}</label><input id="b${k}" type="range" min="${a}" max="${b}" value="${B[k]}" data-bb="${k}"></div>`, tab = B.tab || "photos", sec = n => `data-t="${n}" ${tab !== n ? "hidden" : ""}`, sel = (k, l, opts) => `<div><label for="b${k}">${l}</label><select id="b${k}" data-bb="${k}">${opts.map(([v, t]) => o(v, t, B[k])).join("")}</select></div>`;
+      app.innerHTML = topbar() + `<h1>Photobooth</h1><div class="bwrap"><div class="card bprev"><canvas id="bcv" role="img" aria-label="Preview of your photobooth strip"></canvas><div class="row" style="margin-top:12px;justify-content:center"><select id="bfmt" data-bb="fmt" aria-label="Download format" style="width:auto">${o("png", "PNG", B.fmt)}${o("jpeg", "JPEG", B.fmt)}</select><button class="btn" data-act="bdl">Download</button><button class="btn alt" data-act="bsave">Save to Eros</button></div></div>
+  <div class="card"><div class="chips" role="group" aria-label="Photobooth options">${[["photos", "Photos"], ["style", "Style"], ["text", "Text"]].map(([k, t]) => `<button data-act="btab" data-k="${k}" class="${tab === k ? "on" : ""}">${t}</button>`).join("")}</div>
+  <section ${sec("photos")}><p class="muted">Tap a photo to replace it. Use the arrows to reorder.</p><div class="row" id="bth"></div><div class="row" style="margin-top:12px"><label class="btn alt" style="margin:0;color:#33444F">Upload<input id="bup" type="file" accept="image/*" multiple hidden></label><button class="btn ghost" data-act="bcam">Use camera</button><button class="btn ghost" data-act="bdiary">From my diary</button></div></section>
+  <section ${sec("style")}><div class="chips">${Object.keys(BP).map(n => `<button data-act="bpre" data-n="${n}">${n}</button>`).join("")}</div><div class="bcols">${sel("lay", "Layout", Object.entries(BL).map(([k, v]) => [k, v.t]))}<div><label for="bbg">Background colour</label><input id="bbg" type="color" data-bb="bg" value="${B.bg}" style="padding:2px"></div>${rg("bd", "Border thickness", 0, 60)}${rg("gap", "Photo spacing", 0, 40)}${sel("round", "Photo corners", [[0, "Square"], [28, "Rounded"]])}${sel("fx", "Film filter", [["none", "None"], ["bw", "Black and white"], ["sepia", "Sepia"], ["film", "Vintage film"], ["warm", "Warm"], ["cool", "Cool"]])}${rg("bri", "Brightness", -30, 30)}${rg("con", "Contrast", 70, 140)}${sel("st", "Stickers", [["none", "None"], ["hearts", "Hearts"], ["stars", "Stars"]])}</div></section>
+  <section ${sec("text")}><div class="bcols"><div><label for="bcap">Caption</label><input id="bcap" maxlength="40" data-bb="cap" value="${esc(B.cap)}"></div><div><label for="bnames">Names or initials</label><input id="bnames" maxlength="40" data-bb="names" value="${esc(B.names)}"></div>${sel("al", "Alignment", [["left", "Left"], ["center", "Centre"], ["right", "Right"]])}${sel("pos", "Position", [["bottom", "Below the photos"], ["top", "Above the photos"]])}<div><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-bb="stamp" style="width:auto;min-height:0" ${B.stamp ? "checked" : ""}> Show date stamp</label><input id="bdate" type="date" data-bb="date" value="${B.date}" aria-label="Date stamp"></div></div></section></div></div>
   ${S.bzE ? `<p class="err">${esc(msg(S.bzE))} Did you run schema_5.sql?</p>` : ""}${S.bz.length ? `<h2 style="margin-top:1em">Saved strips</h2><div class="hs">${S.bz.map(z => `<button class="card mem" data-act="bview" data-id="${z.id}"><div class="ph" style="background-image:url('${S.urls[z.path] || ""}');background-size:contain;background-color:var(--bg2);aspect-ratio:1/1" role="img" aria-label="Saved strip"></div><div class="pad"><p class="muted">${fdt(z.created_at.slice(0, 10))}</p></div></button>`).join("")}</div>` : ""}<dialog id="dlg"></dialog><dialog id="lb"></dialog>`; bthumbs(); bdraw($("#bcv"))
     }
     document.addEventListener("input", e => {const t = e.target, k = t.dataset && t.dataset.bb; if (!k) return; B[k] = t.type === "checkbox" ? t.checked : t.type === "range" ? +t.value : t.value; if (k === "lay") bthumbs(); bq()});
@@ -1891,11 +1923,11 @@
     async function settings() {app.innerHTML = topbar() + `<h1>Settings</h1><p class="muted">Loading…</p>`; await signed([S.profile?.avatar_path, ...S.members.map(m => m.avatar_path)].filter(Boolean)); setPaint()}
     function setPaint() {
       const P = S.profile || {}, pr = P.prefs || {}, c = S.couple, partner = S.members.find(m => m.id !== S.user.id), paired = S.members.length >= 2, av = (path, n) => `<div role="img" aria-label="${esc(n || "Profile photo")}" style="width:72px;height:72px;border-radius:50%;background:var(--pink) center/cover;${path && S.urls[path] ? `background-image:url('${S.urls[path]}')` : ""}"></div>`, cb = (k, l, on) => `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="${k}" style="width:auto;min-height:0" ${on ? "checked" : ""}> ${l}</label>`;
-      app.innerHTML = topbar() + `<h1>Settings</h1><div class="grid" style="align-items:start">
+      app.innerHTML = topbar() + `<h1>Settings</h1><div class="sgrid">
   <div class="card"><h2>Your profile</h2><div class="row">${av(P.avatar_path, "Your photo")}<label class="btn ghost" style="margin:0">Change photo<input id="avf" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>
    <label for="pdn">Display name</label><input id="pdn" value="${esc(P.display_name || "")}" maxlength="60"><label for="pnk">Nickname (used in your greeting)</label><input id="pnk" value="${esc(P.nickname || "")}" maxlength="40">
    <p class="muted" style="margin-top:.6em">Favourite memory categories</p><div class="chips" id="pfc">${CATS.map(k => `<label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" name="fc" value="${k}" style="width:auto;min-height:0" ${(P.fav_cats || []).includes(k) ? "checked" : ""}>${k}</label>`).join("")}</div><button class="btn" data-act="setprof">Save profile</button></div>
-  <div class="card"><h2>Your relationship</h2><p><span class="pill">${paired ? "Paired with " + esc(partner?.display_name || "your partner") : "Waiting for partner"}</span></p>${paired ? `<div class="row">${av(partner?.avatar_path, "Your partner's photo")}<strong>${esc(partner?.nickname || partner?.display_name || "")}</strong></div>` : ""}
+  <div class="card"><h2>Your relationship</h2><p><span class="pill">${paired ? "Paired with " + esc(partner?.display_name || "your partner") : "Waiting for partner"}</span></p>${paired ? "" : (S.invite ? `<p class="muted">Share this code or link. It expires ${new Date(S.invite.expires_at).toLocaleDateString()}.</p><div class="code">${esc(S.invite.code)}</div><div class="row" style="margin:.5em 0"><button class="btn alt" data-act="copy" data-v="${esc(location.origin + location.pathname + "?invite=" + S.invite.code)}">Copy invite link</button><button class="btn ghost" data-act="invite">New code</button></div>` : `<button class="btn" data-act="invite" style="margin:.4em 0">Create invitation</button>`)}${paired ? `<div class="row">${av(partner?.avatar_path, "Your partner's photo")}<strong>${esc(partner?.nickname || partner?.display_name || "")}</strong></div>` : ""}
    <label for="rt">Relationship name</label><input id="rt" value="${esc(c.title || "")}" maxlength="80" placeholder="Us"><label for="rsd">Start date</label><input id="rsd" type="date" value="${c.start_date || ""}"><label for="ran">Anniversary date</label><input id="ran" type="date" value="${c.anniversary || ""}">
    ${paired ? "" : `<label for="rpn">Partner's name or nickname</label><input id="rpn" value="${esc(c.partner_name || "")}" maxlength="60">`}<div class="row" style="margin-top:.8em"><button class="btn" data-act="setrel">Save</button><button class="btn danger" data-act="leave">${paired ? "Disconnect from partner" : "Delete this space"}</button></div><p class="muted">More important dates (birthdays, trips) live in Plans.</p></div>
   <div class="card"><h2>Appearance</h2><label for="sth">Theme</label><select id="sth">${[["auto", "Match my device"], ["light", "Light"], ["dark", "Dark"]].map(([k, t]) => `<option value="${k}" ${(pr.theme || "auto") === k ? "selected" : ""}>${t}</option>`).join("")}</select><label for="sac">Accent colour</label><select id="sac"><option value="rose" ${pr.accent !== "sky" ? "selected" : ""}>Rose</option><option value="sky" ${pr.accent === "sky" ? "selected" : ""}>Dusty blue</option></select>${cb("sde", "Show soft decorations", pr.deco !== false)}<button class="btn" data-act="setapp" style="margin-top:.6em">Save appearance</button></div>
