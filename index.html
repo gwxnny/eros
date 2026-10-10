@@ -26,10 +26,10 @@
       --bg2: #F8F4F1;
       --card: #fff;
       --text: #40383A;
-      --text2: #8B7D82;
+      --text2: #6E6065;
       --line: #EEE5E7;
-      --rose: #C9788C;
-      --sky: #5E8BA6;
+      --rose: #B05E74;
+      --sky: #4A7690;
       --on-accent: #fff;
       --shadow: 0 6px 24px rgba(64, 56, 58, .07)
     }
@@ -1068,13 +1068,60 @@
     .bg h3 {
       margin-top: .8em
     }
+
+    .skip {
+      position: absolute;
+      left: -999px;
+      top: 0
+    }
+
+    .skip:focus {
+      left: 8px;
+      top: 8px;
+      background: var(--card);
+      padding: .3em .8em;
+      border-radius: 8px;
+      z-index: 99
+    }
+
+    html,
+    body {
+      overflow-x: hidden
+    }
+
+    img,
+    canvas,
+    video {
+      max-width: 100%
+    }
+
+    [data-accent=sky] {
+      --rose: #4A7690
+    }
+
+    [data-theme=dark][data-accent=sky] {
+      --rose: #C2DAE8
+    }
+
+    [data-deco=off] .polaroids {
+      display: none
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div id="app" class="wrap">
+  <a class="skip" href="#app">Skip to content</a>
+  <main id="app" class="wrap" tabindex="-1">
     <p class="muted">Loading…</p>
-  </div>
+  </main>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script>
@@ -1093,7 +1140,7 @@
       const dark = t === "dark" || (t === "auto" && matchMedia("(prefers-color-scheme:dark)").matches);
       document.documentElement.dataset.theme = dark ? "dark" : "light"
     }
-    function toggleTheme() {setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"); render()}
+    function toggleTheme() {setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"); if (S.profile && S.user && S.profile.prefs && S.profile.prefs.theme) savePrefs({theme: document.documentElement.dataset.theme}); render()}
     applyTheme();
 
     function toast(m) {const t = document.createElement("div"); t.className = "toast"; t.textContent = m; t.setAttribute("role", "status"); document.body.append(t); setTimeout(() => t.remove(), 2600)}
@@ -1111,13 +1158,13 @@
       const {data: {session}} = await sb.auth.getSession();
       S.user = session?.user || null;
       if (!S.user) {S.profile = S.couple = null; return }
-      const p = await sb.from("profiles").select("*").eq("id", S.user.id).maybeSingle(); S.profile = p.data;
+      const p = await sb.from("profiles").select("*").eq("id", S.user.id).maybeSingle(); S.profile = p.data; applyPrefs();
       const m = await sb.from("couple_members").select("couple_id").eq("user_id", S.user.id).maybeSingle();
       if (m.data) {
         const c = await sb.from("couples").select("*").eq("id", m.data.couple_id).single(); S.couple = c.data;
         const ms = await sb.from("couple_members").select("user_id").eq("couple_id", m.data.couple_id);
         const ids = (ms.data || []).map(x => x.user_id);
-        const pr = await sb.from("profiles").select("id,display_name").in("id", ids);
+        const pr = await sb.from("profiles").select("id,display_name,nickname,avatar_path").in("id", ids);
         S.members = pr.data || [];
         if (S.couple && !S.couple.invite_code && ids.length < 2) {const iv = await sb.from("invites").select("code,expires_at").eq("couple_id", S.couple.id).is("accepted_at", null).maybeSingle(); S.invite = iv.data} else S.invite = null;
       } else {S.couple = null; S.members = []; S.invite = null}
@@ -1127,7 +1174,7 @@
     function render() {
       if (!S.user) return landing();
       if (!S.couple) return onboarding();
-      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); if (S.page === "places") return places(); if (S.page === "coll") return collection(); if (S.page === "booth") return booth(); dashboard(); return homeWidgets();
+      if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); if (S.page === "places") return places(); if (S.page === "coll") return collection(); if (S.page === "booth") return booth(); if (S.page === "settings") return settings(); dashboard(); return homeWidgets();
     }
     function landing() {
       const signup = S.authMode === "signup", forgot = S.authMode === "forgot";
@@ -1207,7 +1254,7 @@
     }
     function dashboard() {
       const h = new Date().getHours(), g = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
-      const me = S.profile?.display_name || "love", c = S.couple, st = dayStats(c.start_date), paired = S.members.length >= 2;
+      const me = S.profile?.nickname || S.profile?.display_name || "love", c = S.couple, st = dayStats(c.start_date), paired = S.members.length >= 2;
       const partner = paired ? S.members.find(x => x.id !== S.user.id)?.display_name : c.partner_name;
       const link = S.invite ? `${location.origin}${location.pathname}?invite=${S.invite.code}` : "";
       app.innerHTML = `${topbar()}
@@ -1221,7 +1268,7 @@
    </div>
    <div class="card"><h3>Settings</h3>
     <form id="prof"><label for="dn">Display name</label><input id="dn" value="${esc(S.profile?.display_name || "")}"><div class="row" style="margin-top:.5em"><button class="btn alt">Save name</button></div></form>
-    <div class="row" style="margin-top:.8em"><button class="btn ghost" data-act="edit">Edit dates</button><button class="btn ghost" data-act="pw">Change password</button></div>
+    <div class="row" style="margin-top:.8em"><button class="btn alt" data-act="nav" data-p="settings">All settings</button><button class="btn ghost" data-act="edit">Edit dates</button><button class="btn ghost" data-act="pw">Change password</button></div>
     <p style="margin-top:.8em"><button class="btn danger" data-act="leave">${paired ? "Disconnect from partner" : "Delete this space"}</button></p>
    </div>
   </div>
@@ -1241,7 +1288,7 @@
     document.addEventListener("click", async ev => {
       const b = ev.target.closest("[data-act]"); if (!b) return; const a = b.dataset.act;
       if (a === "theme") toggleTheme();
-      else if (a === "nav") {document.getElementById("mre")?.remove(); S.page = b.dataset.p; render()}
+      else if (a === "nav") {document.getElementById("mre")?.remove(); S.page = b.dataset.p; scrollTo(0, 0); render()}
       else if (a === "more") {const d = document.createElement("dialog"); d.id = "mre"; d.innerHTML = `<h3>More</h3>${NAVS.slice(3).map(([k, l]) => `<button class="btn ${S.page === k ? "" : "ghost"}" style="width:100%;margin-bottom:8px" data-act="nav" data-p="${k}">${l}</button>`).join("")}<button class="btn ghost" style="width:100%" data-act="mclose">Close</button>`; document.body.append(d); d.showModal()}
       else if (a === "mclose") {document.getElementById("mre")?.remove()}
       else if (a === "filt") {S.f = b.dataset.k; paint()}
@@ -1319,6 +1366,20 @@
       else if (a === "bsave") {if (!B.ph.slice(0, BL[B.lay].n).some(Boolean)) return toast("Add at least one photo first"); bsaveDlg()}
       else if (a === "bview") {const z = S.bz.find(x => x.id === b.dataset.id), d = $("#dlg"); d.innerHTML = `<img src="${S.urls[z.path] || ""}" alt="Saved photobooth strip" style="width:100%;max-height:65vh;object-fit:contain;background:var(--bg2);border-radius:12px"><div class="row" style="margin-top:12px"><a class="btn alt" style="text-decoration:none" href="${S.urls[z.path] || "#"}" target="_blank" rel="noopener">Open full size</a><button class="btn danger" data-act="bdelz" data-id="${z.id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()}
       else if (a === "bdelz") {if (confirm("Delete this saved strip? A memory it was added to keeps its copy.")) {const z = S.bz.find(x => x.id === b.dataset.id), inMem = z.memory_id && S.mems.some(m => m.id === z.memory_id && m.photos.includes(z.path)), r = await sb.from("photobooth_creations").delete().eq("id", z.id); if (r.error) return toast(msg(r.error)); if (!inMem) await sb.storage.from("memories").remove([z.path]); $("#dlg").close(); booth()} }
+      else if (a === "dpsave") {const v = $("#dpa").value.trim(); if (!v) return toast("Write your answer first"); const r = await sb.from("daily_answers").upsert({couple_id: S.couple.id, user_id: S.user.id, day: todayIso(), body: v}, {onConflict: "couple_id,user_id,day"}); if (r.error) return toast(msg(r.error) + " Did you run schema_6.sql?"); await homeWidgets(); toast("Saved")}
+      else if (a === "setprof") {const r = await sb.from("profiles").update({display_name: $("#pdn").value.trim(), nickname: $("#pnk").value.trim() || null, fav_cats: [...document.querySelectorAll("input[name=fc]:checked")].map(x => x.value)}).eq("id", S.user.id); if (r.error) return toast(msg(r.error) + " Did you run schema_6.sql?"); await load(); setPaint(); toast("Profile saved")}
+      else if (a === "setrel") {const row = {title: $("#rt").value.trim() || null, start_date: $("#rsd").value || null, anniversary: $("#ran").value || null}; if ($("#rpn")) row.partner_name = $("#rpn").value.trim() || null; const r = await sb.from("couples").update(row).eq("id", S.couple.id); if (r.error) return toast(msg(r.error)); await load(); setPaint(); toast("Saved")}
+      else if (a === "setapp") {if (await savePrefs({theme: $("#sth").value, accent: $("#sac").value, deco: $("#sde").checked})) {render(); toast("Appearance saved")} }
+      else if (a === "setnot") {if (await savePrefs({anniv: $("#nan").checked, bday: $("#nbd").checked, dates: $("#nda").checked, prompt: $("#npr").checked})) toast("Reminders saved")}
+      else if (a === "xjson") {xjson(b)}
+      else if (a === "xzip") {xzip(b)}
+      else if (a === "delacc") {
+        dialog(`<h3>Delete your account?</h3><p class="muted">This can't be undone. We suggest downloading your data first.</p><label for="dc">Type DELETE to confirm</label><input id="dc" autocomplete="off">`, async () => {
+          if ($("#dc").value.trim() !== "DELETE") return "Type DELETE (in capitals) to confirm.";
+          try {if (S.couple && S.members.length <= 1) {const ps = [...new Set(await allPaths())]; for (let i = 0; i < ps.length; i += 100)await sb.storage.from("memories").remove(ps.slice(i, i + 100))} const r = await sb.rpc("delete_my_account"); if (r.error) throw r.error} catch (e) {return msg(e)}
+          await sb.auth.signOut({scope: "local"}); toast("Your account was deleted")
+        })
+      }
       else if (a === "zclose") {$("#lb").close()}
       else if (a === "anotm") {S.ti = Math.floor(Math.random() * S.mems.filter(m => !m.archived).length); drawWid()}
       else if (a === "newmem") {editor(null)}
@@ -1360,7 +1421,7 @@
     /* ---------- Memory Diary (2a) ---------- */
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
-    const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["coll", "Collection"], ["booth", "Photobooth"]];
+    const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["coll", "Collection"], ["booth", "Photobooth"], ["settings", "Settings"]];
     function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main">${NAVS.map(([k, l], i) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""} ${i > 2 ? "dk" : ""}">${l}</button>`).join("")}<button data-act="more" class="mb ${NAVS.slice(3).some(n => n[0] === S.page) ? "on" : ""}">More</button></nav><div class="row">${themeBtn()}<button class="btn ghost" data-act="logout">Log out</button></div></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
@@ -1404,14 +1465,15 @@
     async function diary() {app.innerHTML = topbar() + `<h1>Memory Diary</h1><p class="muted">Loading…</p>`; await loadMems(); paint()}
     async function loadEv() {const r = await sb.from("events").select("*").eq("couple_id", S.couple.id); S.ev = r.data || []}
     async function loadCnt() {const q = t => sb.from(t).select("id", {count: "exact", head: true}).eq("couple_id", S.couple.id); const [a, b] = await Promise.all([q("places"), q("keepsakes")]); S.cnt = {p: a.count || 0, k: b.count || 0}}
-    async function homeWidgets() {await Promise.all([loadMems(), loadEv(), loadCnt()]); drawWid()}
+    async function loadDaily() {const r = await sb.from("daily_answers").select("*").eq("couple_id", S.couple.id).eq("day", todayIso()); S.dp = r.data || []}
+    async function homeWidgets() {await Promise.all([loadMems(), loadEv(), loadCnt(), loadDaily()]); drawWid()}
     function drawWid() {
       const el = $("#wid"); if (!el) return; const mm = S.mems.filter(m => !m.archived), t = new Date(), md = `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
       if (S.ti == null || S.ti >= mm.length) S.ti = Math.floor(Math.random() * mm.length);
       const tm = mm[S.ti], oth = mm.filter(m => m.memory_date.slice(5) === md && +m.memory_date.slice(0, 4) < t.getFullYear()), rec = [...mm].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
       el.innerHTML = `<div class="grid"><div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
   <div class="card"><h3>On this day</h3>${oth.length ? oth.slice(0, 3).map(mrow).join("") : `<p class="muted">Nothing from this date in past years yet.</p>`}</div>
-  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => o.e.auto || o.e.repeat_yearly || o.e.status === "planned").slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div><div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div></div>
+  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => (o.e.auto || o.e.repeat_yearly || o.e.status === "planned") && (o.e.kind === "Anniversary" ? pref("anniv") : o.e.kind === "Birthday" ? pref("bday") : pref("dates"))).slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div>${pref("prompt") ? dailyHtml() : ""}<div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div></div>
   ${rec.length ? `<h3 style="margin-top:1em">Recently added</h3><div class="hs">${rec.map(mcard).join("")}</div>` : ""}`
     }
     document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.flt; if (!k) return; S[k] = e.target.value; drawRes()});
@@ -1815,6 +1877,55 @@
           await booth(); toast("Saved to your memories")
         })
     }
+
+
+    /* ---------- Settings, privacy, daily prompt (6) ---------- */
+    const PROMPTS = ["What is one little thing I did recently that made you happy?", "What is a memory you wish we could relive?", "What should we do together this weekend?", "What is something small I do that you love?", "Where would you take us for a surprise trip?", "What song reminds you of us?", "What is one thing you are looking forward to with me?", "What was your favourite moment this week?", "What is a dish we should cook together?", "What is something you'd like us to try for the first time?", "What made you smile today?", "What do you want us to remember about this season of life?"];
+    const pref = k => S.profile?.prefs?.[k] !== false;
+    function applyPrefs() {const p = S.profile?.prefs || {}; document.documentElement.dataset.accent = p.accent || "rose"; document.documentElement.dataset.deco = p.deco === false ? "off" : "on"; if (p.theme) {try {localStorage.setItem("eros-theme", p.theme)} catch (e) { } applyTheme()} }
+    async function savePrefs(patch) {const prefs = {...(S.profile.prefs || {}), ...patch}, r = await sb.from("profiles").update({prefs}).eq("id", S.user.id); if (r.error) {toast(msg(r.error) + " Did you run schema_6.sql?"); return false} S.profile.prefs = prefs; applyPrefs(); return true}
+    function dailyHtml() {
+      const q = PROMPTS[Math.floor(Date.now() / 864e5) % PROMPTS.length], rows = S.dp || [], mine = rows.find(r => r.user_id === S.user.id), oth = rows.find(r => r.user_id !== S.user.id), nm = S.members.find(m => oth && m.id === oth.user_id)?.display_name || "Your partner";
+      return `<div class="card"><h3>Today's question</h3><p>${q}</p>` + (oth && mine ? `<p><strong>You</strong><br>${esc(mine.body)}</p><p><strong>${esc(nm)}</strong><br>${esc(oth.body)}</p>` : `<label for="dpa" class="muted">Your answer</label><textarea id="dpa" rows="2" maxlength="1000">${esc(mine?.body || "")}</textarea><button class="btn alt" data-act="dpsave" style="margin-top:.4em">${mine ? "Update my answer" : "Share my answer"}</button><p class="muted">${mine ? "Saved. Your partner's answer appears once they've answered too." : "You'll see each other's answers once you've both replied."}</p>`) + `</div>`
+    }
+    async function settings() {app.innerHTML = topbar() + `<h1>Settings</h1><p class="muted">Loading…</p>`; await signed([S.profile?.avatar_path, ...S.members.map(m => m.avatar_path)].filter(Boolean)); setPaint()}
+    function setPaint() {
+      const P = S.profile || {}, pr = P.prefs || {}, c = S.couple, partner = S.members.find(m => m.id !== S.user.id), paired = S.members.length >= 2, av = (path, n) => `<div role="img" aria-label="${esc(n || "Profile photo")}" style="width:72px;height:72px;border-radius:50%;background:var(--pink) center/cover;${path && S.urls[path] ? `background-image:url('${S.urls[path]}')` : ""}"></div>`, cb = (k, l, on) => `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="${k}" style="width:auto;min-height:0" ${on ? "checked" : ""}> ${l}</label>`;
+      app.innerHTML = topbar() + `<h1>Settings</h1><div class="grid" style="align-items:start">
+  <div class="card"><h2>Your profile</h2><div class="row">${av(P.avatar_path, "Your photo")}<label class="btn ghost" style="margin:0">Change photo<input id="avf" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>
+   <label for="pdn">Display name</label><input id="pdn" value="${esc(P.display_name || "")}" maxlength="60"><label for="pnk">Nickname (used in your greeting)</label><input id="pnk" value="${esc(P.nickname || "")}" maxlength="40">
+   <p class="muted" style="margin-top:.6em">Favourite memory categories</p><div class="chips" id="pfc">${CATS.map(k => `<label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" name="fc" value="${k}" style="width:auto;min-height:0" ${(P.fav_cats || []).includes(k) ? "checked" : ""}>${k}</label>`).join("")}</div><button class="btn" data-act="setprof">Save profile</button></div>
+  <div class="card"><h2>Your relationship</h2><p><span class="pill">${paired ? "Paired with " + esc(partner?.display_name || "your partner") : "Waiting for partner"}</span></p>${paired ? `<div class="row">${av(partner?.avatar_path, "Your partner's photo")}<strong>${esc(partner?.nickname || partner?.display_name || "")}</strong></div>` : ""}
+   <label for="rt">Relationship name</label><input id="rt" value="${esc(c.title || "")}" maxlength="80" placeholder="Us"><label for="rsd">Start date</label><input id="rsd" type="date" value="${c.start_date || ""}"><label for="ran">Anniversary date</label><input id="ran" type="date" value="${c.anniversary || ""}">
+   ${paired ? "" : `<label for="rpn">Partner's name or nickname</label><input id="rpn" value="${esc(c.partner_name || "")}" maxlength="60">`}<div class="row" style="margin-top:.8em"><button class="btn" data-act="setrel">Save</button><button class="btn danger" data-act="leave">${paired ? "Disconnect from partner" : "Delete this space"}</button></div><p class="muted">More important dates (birthdays, trips) live in Plans.</p></div>
+  <div class="card"><h2>Appearance</h2><label for="sth">Theme</label><select id="sth">${[["auto", "Match my device"], ["light", "Light"], ["dark", "Dark"]].map(([k, t]) => `<option value="${k}" ${(pr.theme || "auto") === k ? "selected" : ""}>${t}</option>`).join("")}</select><label for="sac">Accent colour</label><select id="sac"><option value="rose" ${pr.accent !== "sky" ? "selected" : ""}>Rose</option><option value="sky" ${pr.accent === "sky" ? "selected" : ""}>Dusty blue</option></select>${cb("sde", "Show soft decorations", pr.deco !== false)}<button class="btn" data-act="setapp" style="margin-top:.6em">Save appearance</button></div>
+  <div class="card"><h2>Reminders</h2><p class="muted">These choose what shows in your in-app reminders. Email and push notifications aren't available yet.</p>${cb("nan", "Anniversary reminders", pref("anniv"))}${cb("nbd", "Birthday reminders", pref("bday"))}${cb("nda", "Upcoming date and event reminders", pref("dates"))}${cb("npr", "Daily couple question", pref("prompt"))}<button class="btn" data-act="setnot" style="margin-top:.6em">Save reminders</button></div>
+  <div class="card"><h2>Privacy and data</h2><p class="muted">Only you and your partner can see your shared space. Nothing is public. Your partner never sees a Two Perspectives answer or a daily answer until you've both replied.</p><div class="row"><button class="btn alt" data-act="xjson">Download my data (JSON)</button><button class="btn ghost" data-act="xzip">Download all photos (ZIP)</button></div><p class="muted" style="margin-top:.6em">Lost your password? Log out and choose "Forgot password" on the log-in screen.</p></div>
+  <div class="card"><h2>Account</h2><div class="row"><button class="btn ghost" data-act="pw">Change password</button><button class="btn ghost" data-act="logout">Log out</button></div><p class="muted" style="margin-top:.8em">Deleting your account removes your login for good. Shared memories stay with your partner. If you're the only member, the whole space and its photos are deleted.</p><button class="btn danger" data-act="delacc">Delete my account</button></div>
+  </div><dialog id="dlg"></dialog>`}
+    async function allPaths() {
+      const g = async (t, c) => {const r = await sb.from(t).select(c).eq("couple_id", S.couple.id); return r.data || []}; const [m, k, z] = await Promise.all([g("memories", "photos"), g("keepsakes", "original_path,edited_path"), g("photobooth_creations", "path")]);
+      return [...m.flatMap(x => x.photos), ...k.flatMap(x => [x.original_path, x.edited_path]), ...z.map(x => x.path), ...S.members.map(x => x.avatar_path)].filter(Boolean)
+    }
+    async function xjson(b) {
+      b.disabled = true; const out = {exported_at: new Date().toISOString(), profile: S.profile, couple: S.couple};
+      for (const t of ["memories", "timeline_entries", "events", "bucket_items", "places", "keepsakes", "scrapbook_pages", "perspectives", "perspective_answers", "photobooth_creations", "daily_answers"]) {const q = sb.from(t).select("*"), r = await (t === "perspective_answers" ? q : q.eq("couple_id", S.couple.id)); out[t] = r.error ? [] : r.data}
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], {type: "application/json"})); a.download = "eros-data.json"; a.click(); b.disabled = false; toast("Data downloaded")
+    }
+    async function xzip(b) {
+      b.disabled = true; const old = b.textContent; try {
+        b.textContent = "Preparing…"; if (!window.JSZip) await new Promise((ok, no) => {const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"; sc.onload = ok; sc.onerror = no; document.head.append(sc)});
+        const paths = [...new Set(await allPaths())]; if (!paths.length) {toast("No photos to download yet"); b.disabled = false; b.textContent = old; return } await signed(paths); const z = new JSZip(); let n = 0;
+        for (const p of paths) {b.textContent = `Adding ${++n} of ${paths.length}…`; try {const r = await fetch(S.urls[p]); if (r.ok) z.file(p.split("/").slice(1).join("/"), await r.blob())} catch (e) { } }
+        const bl = await z.generateAsync({type: "blob"}), a = document.createElement("a"); a.href = URL.createObjectURL(bl); a.download = "eros-photos.zip"; a.click(); toast("Photos downloaded")
+      } catch (e) {toast("Couldn't build the ZIP. Try again on a stronger connection.")} b.disabled = false; b.textContent = old
+    }
+    document.addEventListener("change", async e => {
+      if (e.target.id !== "avf" || !e.target.files[0]) return; try {
+        const blob = await shrink(e.target.files[0]), path = `${S.couple.id}/profile/${S.user.id}.jpg`, u = await sb.storage.from("memories").upload(path, blob, {contentType: "image/jpeg", upsert: true}); if (u.error) throw u.error;
+        const r = await sb.from("profiles").update({avatar_path: path}).eq("id", S.user.id); if (r.error) throw r.error; delete S.urls[path]; await load(); await signed([path]); setPaint(); toast("Photo updated")
+      } catch (x) {toast("Couldn't update the photo: " + msg(x))}
+    });
 
     /* boot */
     sb.auth.onAuthStateChange(async (evt) => {
