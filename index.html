@@ -1166,6 +1166,62 @@
         grid-template-columns: 1fr
       }
     }
+
+    .hgrid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch
+    }
+
+    @media(max-width:980px) {
+      .hgrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+    }
+
+    @media(max-width:640px) {
+      .hgrid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px
+    }
+
+    .pickgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+      gap: 8px;
+      max-height: 55vh;
+      overflow: auto;
+      padding: 3px
+    }
+
+    .pickgrid button {
+      border: 0;
+      padding: 0;
+      background: var(--bg2);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 1
+    }
+
+    .pickgrid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .pickgrid button:hover,
+    .pickgrid button:focus-visible {
+      outline: 3px solid var(--rose)
+    }
   </style>
 </head>
 
@@ -1304,6 +1360,7 @@
       let next = new Date(today.getFullYear(), m - 1, d); if (next < today) next = new Date(today.getFullYear() + 1, m - 1, d);
       return {days, yrs, mos, toNext: Math.round((next - today) / 864e5), future: days < 0}
     }
+    function daysCard() {const c = S.couple, st = dayStats(c.start_date); return `<div class="card"><h3>Days together</h3>${st ? (st.future ? `<p class="muted">Your start date is in the future.</p>` : `<div class="stat">${st.days.toLocaleString()}</div><p class="muted">${st.yrs} year${st.yrs === 1 ? "" : "s"}, ${st.mos} month${st.mos === 1 ? "" : "s"}</p><p>${st.toNext === 0 ? "Happy anniversary today!" : `${st.toNext} days until your next anniversary`}</p>`) : `<p class="muted">Add a start date in Settings to see your counter.</p><button class="btn alt" data-act="edit">Add start date</button>`}</div>`}
     function dashboard() {
       const h = new Date().getHours(), g = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
       const me = S.profile?.nickname || S.profile?.display_name || "love", c = S.couple, st = dayStats(c.start_date), paired = S.members.length >= 2;
@@ -1311,10 +1368,7 @@
       const link = S.invite ? `${location.origin}${location.pathname}?invite=${S.invite.code}` : "";
       app.innerHTML = `${topbar()}
   <h1>${g}, ${esc(me)}</h1>
-  <div class="grid">
-   <div class="card"><h3>Days together</h3>${st ? (st.future ? `<p class="muted">Your start date is in the future.</p>` : `<div class="stat">${st.days.toLocaleString()}</div><p class="muted">${st.yrs} year${st.yrs === 1 ? "" : "s"}, ${st.mos} month${st.mos === 1 ? "" : "s"}</p><p>${st.toNext === 0 ? "Happy anniversary today!" : `${st.toNext} days until your next anniversary`}</p>`) : `<p class="muted">Add a start date in Settings to see your counter.</p><button class="btn alt" data-act="edit">Add start date</button>`}</div>
-  </div>
-  <div id="wid" style="margin-top:14px"></div>
+  <div id="wid" style="margin-top:14px"><div class="hgrid">${daysCard()}</div></div>
   <dialog id="dlg" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);"></dialog>`;
     }
     function dialog(html, onSubmit) {
@@ -1510,7 +1564,7 @@
       const el = $("#wid"); if (!el) return; const mm = S.mems.filter(m => !m.archived), t = new Date(), md = `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
       if (S.ti == null || S.ti >= mm.length) S.ti = Math.floor(Math.random() * mm.length);
       const tm = mm[S.ti], oth = mm.filter(m => m.memory_date.slice(5) === md && +m.memory_date.slice(0, 4) < t.getFullYear()), rec = [...mm].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
-      el.innerHTML = `<div class="grid"><div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
+      el.innerHTML = `<div class="hgrid">${daysCard()}<div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
   <div class="card"><h3>On this day</h3>${oth.length ? oth.slice(0, 3).map(mrow).join("") : `<p class="muted">Nothing from this date in past years yet.</p>`}</div>
   <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => (o.e.auto || o.e.repeat_yearly || o.e.status === "planned") && (o.e.kind === "Anniversary" ? pref("anniv") : o.e.kind === "Birthday" ? pref("bday") : pref("dates"))).slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div>${pref("prompt") ? dailyHtml() : ""}<div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div></div>
   ${rec.length ? `<h3 style="margin-top:1em">Recently added</h3><div class="hs">${rec.map(mcard).join("")}</div>` : ""}`
@@ -1894,7 +1948,7 @@
     }
     async function bdiary() {
       const ps = S.mems.length ? S.mems : (await loadMems(), S.mems), all = ps.filter(m => !m.archived).flatMap(m => m.photos).slice(0, 60); await signed(all); const d = $("#dlg");
-      d.innerHTML = `<h3>Pick from your diary</h3>${all.length ? `<div class="thumbs" style="gap:8px">${all.map(p => `<button type="button" data-act="bpick" data-p="${p}" aria-label="Use this photo" style="border:0;padding:0;background:none;cursor:pointer"><img src="${S.urls[p] || ""}" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:10px"></button>`).join("")}</div>` : `<p class="muted">No diary photos yet.</p>`}<div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+      d.innerHTML = `<div class="row" style="justify-content:space-between"><h3 style="margin:0">Pick from your diary</h3><button class="btn ghost" data-act="close">Close</button></div><p class="muted">Tap a photo to add it to the next free slot.</p>${all.length ? `<div class="pickgrid">${all.map(p => `<button type="button" data-act="bpick" data-p="${p}" aria-label="Use this photo"><img src="${S.urls[p] || ""}" alt=""></button>`).join("")}</div>` : `<p class="muted">No diary photos yet. Add photos to a memory first.</p>`}`; d.showModal()
     }
     async function bblob() {const c = document.createElement("canvas"); bdraw(c); return new Promise((ok, no) => {try {c.toBlob(b => b ? ok(b) : no(new Error("empty")), B.fmt === "jpeg" ? "image/jpeg" : "image/png", .95)} catch (e) {no(e)} })}
     function bsaveDlg() {
