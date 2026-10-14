@@ -22,14 +22,14 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 ---
 
 ## Features
-
+ 
 **Accounts and pairing**
 - Sign up, log in, forgot and reset password, email verification (if enabled in Supabase), persistent sessions.
 - Guided setup: create a shared space with your start and anniversary dates.
 - Invite your partner with a code or link (expires after 7 days). Either partner can disconnect, with a confirmation.
 
 **Home**
-- Days together, years and months, countdown to your next anniversary.
+- A banner with both your names, a custom background photo, "Since Monday, 9 December 2024", a live count of time together and a live countdown to your next anniversary, both in years, months, days, hours, minutes and seconds.
 - Today's memory (with "Show another"), On this day, Upcoming plans.
 - Today's question: a daily prompt you each answer privately; answers are revealed once you've both replied.
 - Memory stats (memories, photos, dates, places, keepsakes) from your real data.
@@ -39,16 +39,15 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Nine fixed categories: Everyday Moments, Food, Dates, Trips and Holidays, Milestones, Celebrations, Gifts, Random Moments, Other. Categories can't be added or changed by users.
 - Favourite, archive, edit, delete (with confirmation).
 - Search, filters (category, tag, location, date range, created by, favourites) and four views: Grid, Timeline, List, Calendar.
-- Photo viewer with swipe, arrows, dots and a full-screen zoom.
 
+- Photo viewer with swipe, arrows, dots and a full-screen zoom.
 **Timeline**
 - Chronological story grouped by year with yearly recaps, "Jump to year", automatic start date and anniversaries.
 - Add, edit and delete moments; link a moment to a diary memory; optionally weave diary memories in.
-
 **Perspectives (Two Perspectives)**
 - Both partners write their own version of a moment. Nothing is shown until you've both answered, or until a reveal date you choose.
-- Once revealed: side-by-side answers and a shared reflection.
 
+- Once revealed: side-by-side answers and a shared reflection.
 **Plans**
 - Calendar (Month and Agenda), events with time, location, budget, notes, itinerary, things to bring, reservation and links.
 - Birthdays, anniversaries and other events can repeat every year.
@@ -65,7 +64,12 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Optional text reading (OCR) for printed text, with editable results.
 - Scrapbook pages: drag keepsakes and text onto paper backgrounds, resize and rotate, export as a PNG image.
 
+**Stamps** (in Collection)
+- Cut a stamp from any photo: pick the area, shape and edge, add a place and time. The stamp gets perforated edges and goes into a paged stamp album.
+- Tap a stamp to see the photo it was cut from, with the stamp-shaped hole left in it. The uncut original is not kept.
+
 **Photobooth**
+- Booth flow: countdown photo sequence (4, 6, 8 or 10 shots), pick your favourites, style the strip, then watch it print. You can also use your own photos.
 - Upload, camera capture, or pick photos from your diary.
 - Layouts: 4-photo strip, 3-photo strip, 2-photo strip, 2×2 grid.
 - Presets, background colour, border, spacing, corners, film filters, brightness and contrast, stickers, caption, names, date stamp, text alignment and position.
@@ -82,6 +86,7 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Dongle for the interface, Tourmines for the logo.
 - Mobile bottom navigation with a "More" menu, plus a floating "+" button to add a memory from anywhere.
 
+
 ---
 
 ## Project structure
@@ -96,6 +101,7 @@ schema_4.sql            Places, keepsakes, scrapbook pages
 schema_5.sql            Photobooth creations
 schema_6.sql            Profile preferences, daily question, account deletion
 schema_7.sql            Locks memory categories to the fixed list
+schema_8.sql            Couple cover photo, stamp collection, storage update rule
 Assets/font/Tourmines.otf     Logo font
 Assets/images/logo.png        Favicon and home-screen icon
 README.md
