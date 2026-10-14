@@ -22,7 +22,7 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 ---
 
 ## Features
- 
+
 **Accounts and pairing**
 - Sign up, log in, forgot and reset password, email verification (if enabled in Supabase), persistent sessions.
 - Guided setup: create a shared space with your start and anniversary dates.
@@ -39,15 +39,16 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Nine fixed categories: Everyday Moments, Food, Dates, Trips and Holidays, Milestones, Celebrations, Gifts, Random Moments, Other. Categories can't be added or changed by users.
 - Favourite, archive, edit, delete (with confirmation).
 - Search, filters (category, tag, location, date range, created by, favourites) and four views: Grid, Timeline, List, Calendar.
-
 - Photo viewer with swipe, arrows, dots and a full-screen zoom.
+
 **Timeline**
 - Chronological story grouped by year with yearly recaps, "Jump to year", automatic start date and anniversaries.
 - Add, edit and delete moments; link a moment to a diary memory; optionally weave diary memories in.
+
 **Perspectives (Two Perspectives)**
 - Both partners write their own version of a moment. Nothing is shown until you've both answered, or until a reveal date you choose.
-
 - Once revealed: side-by-side answers and a shared reflection.
+
 **Plans**
 - Calendar (Month and Agenda), events with time, location, budget, notes, itinerary, things to bring, reservation and links.
 - Birthdays, anniversaries and other events can repeat every year.
@@ -69,6 +70,7 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Tap a stamp to see the photo it was cut from, with the stamp-shaped hole left in it. The uncut original is not kept.
 
 **Photobooth**
+- Upload your own stickers and keep them in a saved library shared with your partner. Drag, resize and rotate them on the strip.
 - Booth flow: countdown photo sequence (4, 6, 8 or 10 shots), pick your favourites, style the strip, then watch it print. You can also use your own photos.
 - Upload, camera capture, or pick photos from your diary.
 - Layouts: 4-photo strip, 3-photo strip, 2-photo strip, 2×2 grid.
@@ -86,7 +88,6 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Dongle for the interface, Tourmines for the logo.
 - Mobile bottom navigation with a "More" menu, plus a floating "+" button to add a memory from anywhere.
 
-
 ---
 
 ## Project structure
@@ -102,35 +103,13 @@ schema_5.sql            Photobooth creations
 schema_6.sql            Profile preferences, daily question, account deletion
 schema_7.sql            Locks memory categories to the fixed list
 schema_8.sql            Couple cover photo, stamp collection, storage update rule
+schema_9.sql            Saved sticker library for the Photobooth
 Assets/font/Tourmines.otf     Logo font
 Assets/images/logo.png        Favicon and home-screen icon
 README.md
 ```
 
----
-
-Open `http://localhost:8080`. Any static file server works. There's no build step and no `npm install`.
-
-The app loads these from CDNs, so you need an internet connection:
-
-| Library | Used for | Loaded |
-|---|---|---|
-| supabase-js 2.45.4 | Auth, database, storage | On page load |
-| Leaflet 1.9.4 | Places map | On page load |
-| Tesseract.js 5.1.1 | Reading printed text from keepsakes | Only when you press "Read printed text" |
-| JSZip 3.10.1 | Photo backup ZIP | Only when you press "Download all photos" |
-| Google Fonts (Dongle) | Interface font | On page load |
-
----
-
-## Deploying to Netlify
-
-1. Push this folder to a GitHub repository.
-2. In Netlify, choose **Add new site → Import an existing project** and select the repo.
-3. Leave the build command empty and set the publish directory to `.` (or the folder containing `index.html`).
-4. After the first deploy, add your Netlify URL to Supabase **Redirect URLs** (see step 4 above).
-
-Each push to the main branch redeploys the site.
+Netlify is case-sensitive. Keep the folder names exactly `Assets`, `font` and `images`.
 
 ---
 
@@ -189,23 +168,3 @@ The app was built in stages. Run through this on two accounts (use a private win
 12. Download your data (JSON) and photos (ZIP).
 13. Check key pages at phone, tablet and desktop widths.
 14. Delete a throwaway account and confirm a partner keeps shared memories.
-
----
-
-## Troubleshooting
-
-**"Did you run schema_X.sql?"** The error message names the file. Run it in the SQL Editor, and run the earlier ones first if you skipped them.
-
-**Photos don't appear.** Confirm the `memories` bucket exists (created by `schema_2a.sql`) and is private, and that you're signed in. Signed links expire after an hour; refresh the page.
-
-**Sign-up emails don't arrive or links go to the wrong place.** Check Site URL and Redirect URLs in Supabase, and your spam folder. Supabase's default email sender is rate-limited.
-
-**The invite link doesn't pair.** Invitations expire after 7 days and only work for an account that isn't already in a space. Create a new code in Settings → Your relationship.
-
-**The logo font or favicon is missing.** Check the file names and that the `Assets/font` and `Assets/images` folders are capitalised exactly as shown.
-
-**The map is blank.** Check your connection. If the map library can't load, Eros shows the list of places instead.
-
-**Exporting a photobooth strip fails.** Re-upload the photo from your device instead of picking it from the diary, then export again.
-
-**Changes don't show after deploying.** Hard-refresh the page (Ctrl+Shift+R, or Cmd+Shift+R on Mac) to clear the cached copy.
