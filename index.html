@@ -2687,7 +2687,7 @@
     function bprintGo() {const c = document.createElement("canvas"); bdraw(c); try {B.printUrl = c.toDataURL("image/png")} catch (e) {return toast("Couldn't print. A diary photo may be blocking it; try uploading that photo again.")} B.step = "print"; boothRender()}
 
 
-    B.stk = []; B.ss = null; S.lib = [];
+
     function bstk(x, G, ui) {B.stk.forEach((s, i) => {const iw = s.im.naturalWidth || s.im.width, ih = s.im.naturalHeight || s.im.height, w = s.w * G.W, h = w * ih / iw; x.save(); x.translate(s.x * G.W, s.y * G.H); x.rotate(s.r * Math.PI / 180); x.drawImage(s.im, -w / 2, -h / 2, w, h); if (ui && B.ss === i) {x.strokeStyle = "#B05E74"; x.lineWidth = Math.max(3, G.W * .006); x.setLineDash([14, 10]); x.strokeRect(-w / 2, -h / 2, w, h)} x.restore()})}
     function bskHtml() {
       const s = B.stk[B.ss], tile = (act, id, i, u, lab) => `<div class="bsl ${act === "bssel" && B.ss === i ? "on" : ""}" style="width:64px"><button data-act="${act}" data-${act === "bssel" ? "i" : "id"}="${act === "bssel" ? i : id}" aria-label="${lab}" style="width:64px;height:64px"><img src="${u}" alt="" style="object-fit:contain"></button><div class="mini"><button data-act="${act === "bssel" ? "bsrm" : "blibdel"}" data-${act === "bssel" ? "i" : "id"}="${act === "bssel" ? i : id}" aria-label="${act === "bssel" ? "Remove from the strip" : "Delete from library"}" style="width:100%">×</button></div></div>`;
@@ -2849,7 +2849,7 @@
     const BL = {classic4: {n: 4, cols: 1, t: "Classic strip (4 photos)"}, three: {n: 3, cols: 1, t: "Three-photo strip"}, two: {n: 2, cols: 1, t: "Mini strip (2 photos)"}, grid: {n: 4, cols: 2, t: "Four-photo grid"}};
     const BP = {"Soft Pink": {bg: "#F8E3E8", fx: "none", st: "hearts"}, "Baby Blue": {bg: "#C2DAE8", fx: "none", st: "stars"}, "Vintage Film": {bg: "#EADFCB", fx: "film", st: "none"}, "Warm Memories": {bg: "#F6E3CF", fx: "warm", st: "hearts"}, "Classic Photobooth": {bg: "#FFFFFF", fx: "bw", st: "none"}};
     const B = {lay: "classic4", ph: [null, null, null, null], sel: null, bg: "#F8E3E8", bd: 28, gap: 18, round: 0, fx: "none", bri: 0, con: 100, stamp: true, date: "", cap: "", names: "", al: "center", pos: "bottom", st: "hearts", fmt: "png", stream: null};
-    B.step = "start"; B.shots = []; B.total = 4; B.sec = 3; B.picks = []; B.err = "";
+    B.step = "start"; B.shots = []; B.total = 4; B.sec = 3; B.picks = []; B.err = ""; B.stk = []; B.ss = null; S.lib = [];
     const bimg = (src, cors) => new Promise((ok, no) => {const i = new Image(); if (cors) i.crossOrigin = "anonymous"; i.onload = () => ok(i); i.onerror = no; i.src = src});
     function bgeo() {
       const L = BL[B.lay], b = +B.bd, g = +B.gap, cols = L.cols, sw = cols === 2 ? 400 : 520, sh = cols === 2 ? 300 : 390, rows = Math.ceil(L.n / cols), foot = 170, gh = rows * sh + (rows - 1) * g, W = b * 2 + cols * sw + (cols - 1) * g, H = b * 2 + gh + foot, y0 = B.pos === "top" ? b + foot : b, slots = [];
