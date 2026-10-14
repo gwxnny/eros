@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="utf-8">
+  <script>try {var t = localStorage.getItem("eros-theme") || "auto"; document.documentElement.dataset.theme = (t === "dark" || (t === "auto" && matchMedia("(prefers-color-scheme:dark)").matches)) ? "dark" : "light"} catch (e) { }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Eros</title>
   <link rel="icon" type="image/png" href="Assets/images/logo.png">
@@ -1927,14 +1928,169 @@
         min-height: 210px
       }
     }
+
+    /* loading animation */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: var(--bg);
+      display: grid;
+      place-items: center;
+      transition: opacity .5s
+    }
+
+    #splash.out {
+      opacity: 0;
+      pointer-events: none
+    }
+
+    .sp {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px
+    }
+
+    .logo.big {
+      font-size: 5.5rem;
+      letter-spacing: .06em;
+      display: flex
+    }
+
+    .logo.big span,
+    .ldr span {
+      display: inline-block;
+      opacity: 0
+    }
+
+    #splash.go .logo.big span {
+      animation: lrise .9s cubic-bezier(.2, .7, .2, 1) forwards, lbreath 2.4s ease-in-out 1.2s infinite;
+      animation-delay: calc(var(--i)*.14s), calc(1.2s + var(--i)*.14s)
+    }
+
+    .bar {
+      width: 120px;
+      height: 2px;
+      background: var(--line);
+      overflow: hidden;
+      border-radius: 2px;
+      opacity: 0;
+      animation: lfade .6s .8s forwards
+    }
+
+    .bar::after {
+      content: "";
+      display: block;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--pink), var(--blue));
+      animation: lslide 1.3s ease-in-out infinite
+    }
+
+    .ldr {
+      font-family: "Tourmines", "Snell Roundhand", "Brush Script MT", cursive;
+      color: var(--rose);
+      font-size: 3rem;
+      letter-spacing: .06em;
+      text-align: center;
+      padding: 60px 0;
+      display: flex;
+      justify-content: center
+    }
+
+    .ldr span {
+      opacity: .25;
+      animation: lwave 1.2s ease-in-out infinite;
+      animation-delay: calc(var(--i, 0)*.15s)
+    }
+
+    @keyframes lrise {
+      from {
+        opacity: 0;
+        transform: translateY(18px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @keyframes lbreath {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: none
+      }
+
+      50% {
+        opacity: .55;
+        transform: translateY(-3px)
+      }
+    }
+
+    @keyframes lfade {
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes lslide {
+      0% {
+        transform: translateX(-100%)
+      }
+
+      100% {
+        transform: translateX(250%)
+      }
+    }
+
+    @keyframes lwave {
+
+      0%,
+      100% {
+        opacity: .25;
+        transform: none
+      }
+
+      50% {
+        opacity: 1;
+        transform: translateY(-6px)
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      #splash.go .logo.big span {
+        animation: none;
+        opacity: 1
+      }
+
+      .bar::after {
+        animation: none;
+        width: 100%
+      }
+
+      .ldr span {
+        animation: none;
+        opacity: 1
+      }
+    }
   </style>
 </head>
 
 <body>
+  <div id="splash" role="status" aria-label="Loading Eros">
+    <div class="sp">
+      <div class="logo big" aria-hidden="true"><span style="--i:0">E</span><span style="--i:1">R</span><span
+          style="--i:2">O</span><span style="--i:3">S</span></div>
+      <div class="bar"></div>
+    </div>
+  </div>
+  <script>Promise.race([document.fonts.load("2rem Tourmines"), new Promise(function (r) {setTimeout(r, 1200)})]).then(function () {var e = document.getElementById("splash"); if (e) e.classList.add("go")})</script>
   <a class="skip" href="#app">Skip to content</a>
-  <main id="app" class="wrap" tabindex="-1">
-    <p class="muted">Loading…</p>
-  </main>
+  <main id="app" class="wrap" tabindex="-1"></main>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script>
@@ -1942,6 +2098,9 @@
     // Anon key is public by design. Your data is protected by the row-level security rules in schema.sql.
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc2VqdmlwcXh0Z3N3eWd3d2N2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MTMwNDcsImV4cCI6MjEwNzA4OTA0N30.xLtHIu6wUp6PYauQhuOAYMSqjpQCvSg9f0NvjbobOmI";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const ldr = () => `<div class="ldr" role="status" aria-label="Loading">${"EROS".split("").map((c, i) => `<span style="--i:${i}">${c}</span>`).join("")}</div>`;
+    function hideSplash() {const sp = document.getElementById("splash"); if (!sp) return; setTimeout(() => {sp.classList.add("out"); setTimeout(() => sp.remove(), 600)}, Math.max(0, 1100 - performance.now()))}
+    setTimeout(hideSplash, 8000);
     const $ = s => document.querySelector(s), app = $("#app");
     const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
     let S = {user: null, profile: null, couple: null, members: [], authMode: "login"};
@@ -2283,7 +2442,7 @@
   <details id="fd" ${S.fo ? "open" : ""}><summary class="btn ghost" style="display:inline-flex;align-items:center">Filters</summary><div class="grid" style="margin:.6em 0">${sel("fc", "Category", cats)}${sel("ft", "Tag", tags)}${sel("fl", "Location", locs)}<div><label for="sfd1">From</label><input id="sfd1" type="date" data-flt="fd1" value="${S.fd1}"></div><div><label for="sfd2">To</label><input id="sfd2" type="date" data-flt="fd2" value="${S.fd2}"></div><div><label for="sfb">Created by</label><select id="sfb" data-flt="fb"><option value="">Anyone</option><option value="me" ${S.fb === "me" ? "selected" : ""}>Me</option><option value="p" ${S.fb === "p" ? "selected" : ""}>My partner</option></select></div></div><button class="btn ghost" data-act="clr">Clear filters</button></details>
   ${S.memErr ? `<p class="err">${esc(msg(S.memErr))} Did you run schema_2a.sql?</p>` : ""}<div id="res" style="margin-top:12px"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; drawRes()
     }
-    async function diary() {app.innerHTML = topbar() + `<h1>Memory Diary</h1><p class="muted">Loading…</p>`; await loadMems(); paint()}
+    async function diary() {app.innerHTML = topbar() + `<h1>Memory Diary</h1>${ldr()}`; await loadMems(); paint()}
     async function loadEv() {const r = await sb.from("events").select("*").eq("couple_id", S.couple.id); S.ev = r.data || []}
     async function loadCnt() {const q = t => sb.from(t).select("id", {count: "exact", head: true}).eq("couple_id", S.couple.id); const [a, b] = await Promise.all([q("places"), q("keepsakes")]); S.cnt = {p: a.count || 0, k: b.count || 0}}
     async function loadDaily() {const r = await sb.from("daily_answers").select("*").eq("couple_id", S.couple.id).eq("day", todayIso()); S.dp = r.data || []}
@@ -2365,7 +2524,7 @@
     const KINDS = ["First meeting", "First date", "Relationship start", "Anniversary", "Birthday", "Trip", "Special occasion", "Gift", "Milestone", "Everyday"];
     S.tlm = false; S.tl = []; S.ps = []; S.pc = {};
     async function timeline() {
-      app.innerHTML = topbar() + `<h1>Our timeline</h1><p class="muted">Loading…</p>`;
+      app.innerHTML = topbar() + `<h1>Our timeline</h1>${ldr()}`;
       const [t] = await Promise.all([sb.from("timeline_entries").select("*").eq("couple_id", S.couple.id), loadMems()]); S.tl = t.data || []; S.tlErr = t.error; tlPaint()
     }
     function tlItems() {
@@ -2399,7 +2558,7 @@
     }
     /* ---------- Two Perspectives (2c) ---------- */
     async function persp() {
-      app.innerHTML = topbar() + `<h1>Two Perspectives</h1><p class="muted">Loading…</p>`;
+      app.innerHTML = topbar() + `<h1>Two Perspectives</h1>${ldr()}`;
       const [p, c] = await Promise.all([sb.from("perspectives").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}), sb.rpc("perspective_counts")]);
       S.ps = p.data || []; S.pe = p.error; S.pc = {}; (c.data || []).forEach(x => S.pc[x.pid] = x); paintP()
     }
@@ -2443,7 +2602,7 @@
       return `<button class="ri" data-act="${e.auto ? "nav" : "eopen"}" data-p="plans" data-id="${e.id}" data-d="${o.d}"><div style="flex:1"><strong ${x ? 'style="text-decoration:line-through"' : ""}>${esc(e.title)}</strong><br><span class="muted">${fdt(o.d)}${e.start_time ? " · " + e.start_time.slice(0, 5) : ""} · ${esc(e.kind)}${e.status === "done" ? " · done" : ""}</span></div><span class="muted">${cdn(o.d)}</span>${rem ? '<span class="pill">Reminder</span>' : ""}</button>`
     }
     async function loadPlans() {const [e, b] = await Promise.all([sb.from("events").select("*").eq("couple_id", S.couple.id), sb.from("bucket_items").select("*").eq("couple_id", S.couple.id), loadMems()]); S.ev = e.data || []; S.bk = b.data || []; S.plErr = e.error || b.error}
-    async function plans() {app.innerHTML = topbar() + `<h1>Plans</h1><p class="muted">Loading…</p>`; await loadPlans(); plPaint()}
+    async function plans() {app.innerHTML = topbar() + `<h1>Plans</h1>${ldr()}`; await loadPlans(); plPaint()}
     function plPaint() {app.innerHTML = topbar() + `<h1>Plans</h1><div class="chips" role="group" aria-label="Section">${[["cal", "Calendar"], ["bk", "Bucket list"]].map(([k, l]) => `<button data-act="pltab" data-k="${k}" class="${S.pt === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.plErr ? `<p class="err">${esc(msg(S.plErr))} Did you run schema_3.sql?</p>` : ""}<div id="plb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; plBody()}
     function plBody() {
       const el = $("#plb"); if (!el) return;
@@ -2562,7 +2721,7 @@
     /* ---------- Places (4) ---------- */
     const PC = ["Restaurant or café", "Cinema", "Park", "Attraction", "Holiday destination", "First date spot", "Hangout", "Other"];
     S.plc = []; S.plf = "all"; S.map = null;
-    async function places() {app.innerHTML = topbar() + `<h1>Our places</h1><p class="muted">Loading…</p>`; const r = await sb.from("places").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.plc = r.data || []; S.plcE = r.error; await loadMems(); plcPaint()}
+    async function places() {app.innerHTML = topbar() + `<h1>Our places</h1>${ldr()}`; const r = await sb.from("places").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.plc = r.data || []; S.plcE = r.error; await loadMems(); plcPaint()}
     function plcPaint() {
       if (S.map) {S.map.remove(); S.map = null}
       const l = S.plc.filter(p => S.plf === "all" || (S.plf === "fav" && p.favourite) || (S.plf === "multi" && p.visits.length > 1) || (S.plf === "want" && p.want_to_visit)), hasMap = !!window.L;
@@ -2602,7 +2761,7 @@
     const KC = ["Movie ticket", "Attraction ticket", "Receipt", "Handwritten note", "Letter", "Card", "Gift tag", "Wristband", "Printed photo", "Screenshot", "Other"], BGS = [["#FFFCFA", "Cream"], ["#F8E3E8", "Pink"], ["#C2DAE8", "Blue"], ["#EADFCB", "Kraft"], ["#FFFFFF", "White"]];
     S.kp = []; S.pgs = []; S.stp = []; S.spg = 0; S.ct = "st"; S.kfc = ""; S.sp = null; S.sel = null; let K = null;
     async function collection() {
-      app.innerHTML = topbar() + `<h1>Our collection</h1><p class="muted">Loading…</p>`;
+      app.innerHTML = topbar() + `<h1>Our collection</h1>${ldr()}`;
       const [k, g, st] = await Promise.all([sb.from("keepsakes").select("*").eq("couple_id", S.couple.id).order("item_date", {ascending: false, nullsFirst: false}), sb.from("scrapbook_pages").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}), sb.from("stamps").select("*").eq("couple_id", S.couple.id).order("taken_at", {ascending: true})]);
       S.kp = k.data || []; S.pgs = g.data || []; S.stp = st.data || []; S.stE = st.error; S.kpE = k.error || g.error; await signed([...S.kp.map(x => x.edited_path), ...S.stp.map(x => x.stamp_path)].filter(Boolean)); colPaint()
     }
@@ -2728,7 +2887,7 @@
     function bthumbs() {const el = $("#bth"); if (!el) return; el.innerHTML = Array.from({length: BL[B.lay].n}, (_, i) => {const e = B.ph[i]; return `<div class="bsl ${B.sel === i ? "on" : ""}"><button data-act="bsel" data-i="${i}" aria-label="${e ? "Select photo " + (i + 1) + " to replace" : "Empty slot " + (i + 1)}">${e ? `<img src="${e.url}" alt="Photo ${i + 1}">` : "+"}</button><div class="mini"><button data-act="bmv" data-i="${i}" data-d="-1" aria-label="Move earlier">‹</button><button data-act="bmv" data-i="${i}" data-d="1" aria-label="Move later">›</button><button data-act="brm" data-i="${i}" aria-label="Remove photo">×</button></div></div>`}).join("")}
     function baddPhoto(e) {const n = BL[B.lay].n, i = B.sel != null ? B.sel : B.ph.slice(0, n).findIndex(p => !p); if (i < 0 || i >= n) {toast("All slots are full. Tap a photo to replace it, or remove one."); return false} B.ph[i] = e; B.sel = null; bthumbs(); bq(); return true}
     async function booth() {
-      app.innerHTML = topbar() + `<h1>Photobooth</h1><p class="muted">Loading…</p>`; if (!B.date) B.date = todayIso(); try {await document.fonts.load("700 60px Dongle")} catch (e) { }
+      app.innerHTML = topbar() + `<h1>Photobooth</h1>${ldr()}`; if (!B.date) B.date = todayIso(); try {await document.fonts.load("700 60px Dongle")} catch (e) { }
       const r = await sb.from("photobooth_creations").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.bz = r.data || []; S.bzE = r.error; const sl = await sb.from("stickers").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.lib = sl.data || []; S.libE = sl.error; await signed([...S.bz.map(x => x.path), ...S.lib.map(x => x.path)]); if (B.step === "shoot" || B.step === "print") B.step = B.shots.length ? "pick" : "start"; boothRender()
     }
     function bgal() {return `${S.bzE ? `<p class="err">${esc(msg(S.bzE))} Did you run schema_5.sql?</p>` : ""}${S.bz.length ? `<h2 style="margin-top:1em">Saved strips</h2><div class="hs">${S.bz.map(z => `<button class="card mem" data-act="bview" data-id="${z.id}"><div class="ph" style="background-image:url('${S.urls[z.path] || ""}');background-size:contain;background-color:var(--bg2);aspect-ratio:1/1" role="img" aria-label="Saved strip"></div><div class="pad"><p class="muted">${fdt(z.created_at.slice(0, 10))}</p></div></button>`).join("")}</div>` : ""}`}
@@ -2778,7 +2937,7 @@
       const q = PROMPTS[Math.floor(Date.now() / 864e5) % PROMPTS.length], rows = S.dp || [], mine = rows.find(r => r.user_id === S.user.id), oth = rows.find(r => r.user_id !== S.user.id), nm = S.members.find(m => oth && m.id === oth.user_id)?.display_name || "Your partner";
       return `<p>${q}</p>` + (oth && mine ? `<p><strong>You</strong><br>${esc(mine.body)}</p><p><strong>${esc(nm)}</strong><br>${esc(oth.body)}</p>` : `<label for="dpa" class="muted">Your answer</label><textarea id="dpa" rows="2" maxlength="1000">${esc(mine?.body || "")}</textarea><button class="btn alt" data-act="dpsave" style="margin-top:.4em">${mine ? "Update my answer" : "Share my answer"}</button><p class="muted">${mine ? "Saved. Your partner's answer appears once they've answered too." : "You'll see each other's answers once you've both replied."}</p>`)
     }
-    async function settings() {app.innerHTML = topbar() + `<h1>Settings</h1><p class="muted">Loading…</p>`; await signed([S.profile?.avatar_path, ...S.members.map(m => m.avatar_path)].filter(Boolean)); setPaint()}
+    async function settings() {app.innerHTML = topbar() + `<h1>Settings</h1>${ldr()}`; await signed([S.profile?.avatar_path, ...S.members.map(m => m.avatar_path)].filter(Boolean)); setPaint()}
     function setPaint() {
       const P = S.profile || {}, pr = P.prefs || {}, c = S.couple, partner = S.members.find(m => m.id !== S.user.id), paired = S.members.length >= 2, av = (path, n) => `<div role="img" aria-label="${esc(n || "Profile photo")}" style="width:72px;height:72px;border-radius:50%;background:var(--pink) center/cover;${path && S.urls[path] ? `background-image:url('${S.urls[path]}')` : ""}"></div>`, cb = (k, l, on) => `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="${k}" style="width:auto;min-height:0" ${on ? "checked" : ""}> ${l}</label>`;
       app.innerHTML = topbar() + `<h1>Settings</h1><div class="sgrid">
@@ -2879,12 +3038,12 @@
 
     /* boot */
     sb.auth.onAuthStateChange(async (evt) => {
-      if (evt === "PASSWORD_RECOVERY") {await load(); render(); setTimeout(() => document.querySelector('[data-act=pw]')?.click(), 0); return }
+      if (evt === "PASSWORD_RECOVERY") {await load(); render(); hideSplash(); setTimeout(() => document.querySelector('[data-act=pw]')?.click(), 0); return }
       if (evt === "INITIAL_SESSION" || evt === "SIGNED_IN" || evt === "SIGNED_OUT" || evt === "USER_UPDATED") {
         setTimeout(async () => {
-          await load();
+          if (evt === "SIGNED_IN" && !S.user) app.innerHTML = ldr(); await load();
           if (S.user && !S.couple && pendingCode()) {const r = await sb.rpc("accept_invite", {p_code: pendingCode()}); if (!r.error) {clearCode(); await load(); toast("You're paired. Welcome in!")} }
-          render()
+          render(); hideSplash()
         }, 0)
       }
     });
