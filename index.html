@@ -1222,6 +1222,427 @@
     .pickgrid button:focus-visible {
       outline: 3px solid var(--rose)
     }
+
+    .hero2 {
+      border-radius: 18px;
+      padding: 30px 20px;
+      text-align: center;
+      color: #40383A;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, var(--pink), var(--blue)) center/cover
+    }
+
+    .hero2.has {
+      color: #fff;
+      border: 0
+    }
+
+    .hero2 .since {
+      margin: 0;
+      letter-spacing: .04em
+    }
+
+    .hero2 .names {
+      font-size: 2.8rem;
+      margin: .1em 0 .3em
+    }
+
+    .hero2 .names span {
+      font-weight: 300
+    }
+
+    .hero2 .lbl {
+      margin: .7em 0 .3em;
+      opacity: .9
+    }
+
+    .units {
+      display: flex;
+      gap: 6px 14px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .un {
+      min-width: 56px
+    }
+
+    .un b {
+      display: block;
+      font-size: 2.4rem;
+      line-height: 1
+    }
+
+    .un span {
+      font-size: 1rem;
+      opacity: .85
+    }
+
+    .hbtns {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .hero2 .btn.ghost {
+      color: inherit;
+      border-color: currentColor;
+      opacity: .9
+    }
+
+    .stmini {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px
+    }
+
+    .stmini img {
+      width: 31%;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .28))
+    }
+
+    .stpage {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px 12px;
+      padding: 22px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      margin: 14px 0
+    }
+
+    .stamp {
+      background: none;
+      border: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transform: rotate(var(--t));
+      padding: 0;
+      color: var(--text2)
+    }
+
+    .stamp img {
+      width: 100%;
+      max-width: 200px;
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .28))
+    }
+
+    .stamp span {
+      font-size: 1rem
+    }
+
+    .stbig {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      max-height: 50vh;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .3))
+    }
+
+    #scw {
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      margin: 8px 0;
+      touch-action: none
+    }
+
+    #scw img {
+      width: 100%;
+      display: block
+    }
+
+    #scb {
+      position: absolute;
+      border: 2px dashed #fff;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, .45);
+      cursor: move;
+      touch-action: none
+    }
+
+    .bm {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 20px;
+      max-width: 460px;
+      margin: 12px auto;
+      text-align: center
+    }
+
+    .bm.dark {
+      background: #2b2429;
+      border-color: #2b2429;
+      color: #F7F0F3
+    }
+
+    .curtain {
+      height: 8px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--pink), var(--blue));
+      margin-bottom: 12px
+    }
+
+    .vw {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      aspect-ratio: 4/3
+    }
+
+    .vw video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      display: block
+    }
+
+    .bnum {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 9rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, .5)
+    }
+
+    .bflash {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none
+    }
+
+    .pd {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin: 10px 0
+    }
+
+    .pd i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--line)
+    }
+
+    .pd i.on {
+      background: var(--rose)
+    }
+
+    .pickshots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 8px
+    }
+
+    .pickshots button {
+      position: relative;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 0;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: var(--bg2);
+      cursor: pointer
+    }
+
+    .pickshots img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .pickshots button.on {
+      border-color: var(--rose)
+    }
+
+    .pickshots b {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--rose);
+      color: var(--on-accent);
+      display: none;
+      place-items: center;
+      font-size: 1rem
+    }
+
+    .pickshots button.on b {
+      display: grid
+    }
+
+    .bm .slot {
+      height: 14px;
+      background: #0f0c10;
+      border-radius: 8px;
+      box-shadow: inset 0 2px 6px #000;
+      position: relative;
+      z-index: 2;
+      margin-top: 8px
+    }
+
+    .bm .win {
+      overflow: hidden;
+      margin: -4px 14px 0;
+      height: min(62vh, 560px);
+      display: flex;
+      justify-content: center
+    }
+
+    .bm .win img {
+      height: 100%;
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+      transform: translateY(-100%);
+      animation: bprint 4.5s steps(36, end) forwards;
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45))
+    }
+
+    @keyframes bprint {
+      to {
+        transform: translateY(0)
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .bm .win img {
+        transform: none
+      }
+    }
+
+    .msl button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      padding: .5em 0;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text)
+    }
+
+    .msl button.on {
+      color: var(--rose)
+    }
+
+    /* minimal pass */
+    .wrap {
+      max-width: 1040px;
+      padding: 20px 20px 40px
+    }
+
+    h1 {
+      font-size: 2.5rem
+    }
+
+    h2 {
+      font-size: 1.8rem
+    }
+
+    .card {
+      box-shadow: none;
+      border-radius: 16px;
+      padding: 18px
+    }
+
+    .btn {
+      font-size: 1.15rem;
+      min-height: 40px;
+      padding: .25em 1em
+    }
+
+    .btn.alt {
+      background: var(--bg2);
+      color: var(--text);
+      border: 1px solid var(--line)
+    }
+
+    label.btn.alt {
+      color: var(--text) !important
+    }
+
+    .btn.ghost {
+      border-color: var(--line)
+    }
+
+    .tag,
+    .pill {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text2)
+    }
+
+    [data-theme=dark] .pill {
+      background: transparent;
+      color: var(--text2)
+    }
+
+    .chips button.on {
+      background: var(--bg2);
+      border-color: var(--text);
+      color: var(--text)
+    }
+
+    .top {
+      padding: 6px 0 14px
+    }
+
+    .fab {
+      width: 52px;
+      height: 52px;
+      box-shadow: none;
+      border: 1px solid var(--line)
+    }
+
+    .nav button {
+      border-radius: 0;
+      padding: .2em .2em;
+      margin: 0 .7em;
+      border-bottom: 2px solid transparent
+    }
+
+    [data-theme] .nav button.on {
+      background: none;
+      color: var(--text);
+      border-bottom-color: var(--rose)
+    }
+
+    @media(max-width:640px) {
+      .nav button {
+        margin: 0;
+        font-size: 1.15rem;
+        padding: .2em .5em
+      }
+
+      .stpage {
+        gap: 16px 8px;
+        padding: 16px 8px
+      }
+
+      .bnum {
+        font-size: 6rem
+      }
+    }
   </style>
 </head>
 
@@ -1280,6 +1701,7 @@
 
     /* views */
     function render() {
+      clearInterval(S.tick);
       if (!S.user) return landing();
       if (!S.couple) return onboarding();
       if (S.page === "diary") return diary(); if (S.page === "timeline") return timeline(); if (S.page === "persp") return persp(); if (S.page === "plans") return plans(); if (S.page === "places") return places(); if (S.page === "coll") return collection(); if (S.page === "booth") return booth(); if (S.page === "settings") return settings(); dashboard(); return homeWidgets();
@@ -1360,7 +1782,6 @@
       let next = new Date(today.getFullYear(), m - 1, d); if (next < today) next = new Date(today.getFullYear() + 1, m - 1, d);
       return {days, yrs, mos, toNext: Math.round((next - today) / 864e5), future: days < 0}
     }
-    function daysCard() {const c = S.couple, st = dayStats(c.start_date); return `<div class="card"><h3>Days together</h3>${st ? (st.future ? `<p class="muted">Your start date is in the future.</p>` : `<div class="stat">${st.days.toLocaleString()}</div><p class="muted">${st.yrs} year${st.yrs === 1 ? "" : "s"}, ${st.mos} month${st.mos === 1 ? "" : "s"}</p><p>${st.toNext === 0 ? "Happy anniversary today!" : `${st.toNext} days until your next anniversary`}</p>`) : `<p class="muted">Add a start date in Settings to see your counter.</p><button class="btn alt" data-act="edit">Add start date</button>`}</div>`}
     function dashboard() {
       const h = new Date().getHours(), g = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
       const me = S.profile?.nickname || S.profile?.display_name || "love", c = S.couple, st = dayStats(c.start_date), paired = S.members.length >= 2;
@@ -1368,8 +1789,9 @@
       const link = S.invite ? `${location.origin}${location.pathname}?invite=${S.invite.code}` : "";
       app.innerHTML = `${topbar()}
   <h1>${g}, ${esc(me)}</h1>
-  <div id="wid" style="margin-top:14px"><div class="hgrid">${daysCard()}</div></div>
-  <dialog id="dlg" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);"></dialog>`;
+  <div id="hero"></div>
+  <div id="wid" style="margin-top:14px"></div>
+  <dialog id="dlg" style="border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--text);"></dialog>`; drawHero(); S.tick = setInterval(tickHero, 1000);
     }
     function dialog(html, onSubmit) {
       const d = $("#dlg"); d.innerHTML = `<form method="dialog" id="df">${html}<div class="row" style="margin-top:.8em"><button class="btn" value="ok">Confirm</button><button class="btn ghost" type="button" data-act="close">Cancel</button></div><div class="err" id="derr" role="alert"></div></form>`;
@@ -1381,7 +1803,7 @@
       const b = ev.target.closest("[data-act]"); if (!b) return; const a = b.dataset.act;
       if (a === "theme") toggleTheme();
       else if (a === "nav") {document.getElementById("mre")?.remove(); S.page = b.dataset.p; scrollTo(0, 0); render()}
-      else if (a === "more") {const d = document.createElement("dialog"); d.id = "mre"; d.innerHTML = `<h3>More</h3>${NAVS.slice(3).map(([k, l]) => `<button class="btn ${S.page === k ? "" : "ghost"}" style="width:100%;margin-bottom:8px" data-act="nav" data-p="${k}">${l}</button>`).join("")}<button class="btn ghost" style="width:100%" data-act="mclose">Close</button>`; document.body.append(d); d.showModal()}
+      else if (a === "more") {const d = document.createElement("dialog"); d.id = "mre"; d.innerHTML = `<div class="msl">${NAVS.slice(4).map(([k, l]) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""}">${l}</button>`).join("")}</div><button class="btn ghost" style="margin-top:12px" data-act="mclose">Close</button>`; document.body.append(d); d.showModal()}
       else if (a === "mclose") {document.getElementById("mre")?.remove()}
       else if (a === "filt") {S.f = b.dataset.k; paint()}
       else if (a === "view") {S.v = b.dataset.k; paint()}
@@ -1445,6 +1867,23 @@
       else if (a === "spsz" || a === "sprot" || a === "sprm") {const g = S.pgs.find(x => x.id === S.sp), it = g.items.find(x => x.id === S.sel); if (!it) return; if (a === "spsz") it.w = Math.min(90, Math.max(14, it.w + +b.dataset.d)); else if (a === "sprot") it.r = (it.r + 10) % 360; else {g.items = g.items.filter(x => x !== it); S.sel = null} await spSave(g); spPaint()}
       else if (a === "spexp") {spExport()}
       else if (a === "spdel") {if (confirm("Delete this scrapbook page?")) {const r = await sb.from("scrapbook_pages").delete().eq("id", S.sp); if (r.error) return toast(msg(r.error)); S.pgs = S.pgs.filter(x => x.id !== S.sp); S.sp = null; colBody()} }
+      else if (a === "bstart") {B.err = ""; bshoot()}
+      else if (a === "bown") {B.err = ""; B.step = "pick"; boothRender()}
+      else if (a === "bcancel") {B.run = false; bstop(); B.step = "start"; boothRender()}
+      else if (a === "bretake") {B.shots = []; B.picks = []; B.step = "start"; boothRender()}
+      else if (a === "bpickt") {const i = +b.dataset.i, k = B.picks.indexOf(i); if (k >= 0) B.picks.splice(k, 1); else if (B.picks.length >= BL[B.lay].n) return toast("Your strip is full. Tap a chosen photo to remove it."); else B.picks.push(i); pmark()}
+      else if (a === "bcont") {if (!B.picks.length) return; B.ph = [null, null, null, null]; B.picks.forEach((idx, k) => {B.ph[k] = B.shots[idx]}); B.sel = null; B.step = "edit"; boothRender()}
+      else if (a === "bback") {B.step = "pick"; boothRender()}
+      else if (a === "bprint") {if (!B.ph.slice(0, BL[B.lay].n).some(Boolean)) return toast("Add at least one photo first"); bprintGo()}
+      else if (a === "bedit2") {B.step = "edit"; boothRender()}
+      else if (a === "bnew") {B.shots = []; B.picks = []; B.ph = [null, null, null, null]; B.step = "start"; boothRender()}
+      else if (a === "stnew") {stnew()}
+      else if (a === "stview") {stview(b.dataset.id)}
+      else if (a === "stsrc") {const st = S.stp.find(x => x.id === b.dataset.id), im = $("#stimg"); if (b.dataset.on) {im.src = S.urls[st.stamp_path]; im.style.filter = ""; b.textContent = "See where it was cut from"; delete b.dataset.on} else {const r = await sb.storage.from("memories").createSignedUrl(st.source_path, 3600); if (r.error) return toast(msg(r.error)); im.src = r.data.signedUrl; im.style.filter = "none"; b.textContent = "Back to the stamp"; b.dataset.on = "1"} }
+      else if (a === "stdel") {if (confirm("Delete this stamp and the photo it was cut from?")) {const st = S.stp.find(x => x.id === b.dataset.id), r = await sb.from("stamps").delete().eq("id", st.id); if (r.error) return toast(msg(r.error)); await sb.storage.from("memories").remove([st.stamp_path, st.source_path].filter(Boolean)); $("#dlg").close(); collection()} }
+      else if (a === "spgn") {S.spg += +b.dataset.d; colBody()}
+      else if (a === "gostamps") {S.ct = "st"; S.page = "coll"; render()}
+      else if (a === "cvrm") {const p = S.couple.cover_path, r = await sb.from("couples").update({cover_path: null}).eq("id", S.couple.id); if (r.error) return toast(msg(r.error)); S.couple.cover_path = null; if (p) await sb.storage.from("memories").remove([p]); drawHero()}
       else if (a === "btab") {B.tab = b.dataset.k; document.querySelectorAll("[data-t]").forEach(x => x.hidden = x.dataset.t !== B.tab); b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b))}
       else if (a === "bsel") {const i = +b.dataset.i; B.sel = B.sel === i ? null : i; bthumbs()}
       else if (a === "bmv") {const i = +b.dataset.i, j = i + +b.dataset.d, n = BL[B.lay].n; if (j < 0 || j >= n) return;[B.ph[i], B.ph[j]] = [B.ph[j], B.ph[i]]; B.sel = null; bthumbs(); bq()}
@@ -1454,7 +1893,7 @@
       else if (a === "bsnap") {const v = $("#bv"); if (!v || !v.videoWidth) return; const c = document.createElement("canvas"); c.width = v.videoWidth; c.height = v.videoHeight; const g = c.getContext("2d"); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(v, 0, 0); const url = c.toDataURL("image/jpeg", .92), im = await bimg(url); if (baddPhoto({im, url})) toast("Photo added")}
       else if (a === "bcamx") {$("#dlg").close()}
       else if (a === "bdiary") {bdiary()}
-      else if (a === "bpick") {try {const u = S.urls[b.dataset.p], im = await bimg(u, true); if (baddPhoto({im, url: u})) $("#dlg").close()} catch (e) {toast("That photo couldn't be loaded")} }
+      else if (a === "bpick") {try {const u = S.urls[b.dataset.p], im = await bimg(u, true); if (badd({im, url: u})) $("#dlg").close()} catch (e) {toast("That photo couldn't be loaded")} }
       else if (a === "bdl") {try {const bl = await bblob(), l = document.createElement("a"); l.href = URL.createObjectURL(bl); l.download = "eros-photobooth." + (B.fmt === "jpeg" ? "jpg" : "png"); l.click()} catch (e) {toast("Couldn't export. A diary photo may be blocking it; try uploading that photo again.")} }
       else if (a === "bsave") {if (!B.ph.slice(0, BL[B.lay].n).some(Boolean)) return toast("Add at least one photo first"); bsaveDlg()}
       else if (a === "bview") {const z = S.bz.find(x => x.id === b.dataset.id), d = $("#dlg"); d.innerHTML = `<img src="${S.urls[z.path] || ""}" alt="Saved photobooth strip" style="width:100%;max-height:65vh;object-fit:contain;background:var(--bg2);border-radius:12px"><div class="row" style="margin-top:12px"><a class="btn alt" style="text-decoration:none" href="${S.urls[z.path] || "#"}" target="_blank" rel="noopener">Open full size</a><button class="btn danger" data-act="bdelz" data-id="${z.id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()}
@@ -1514,8 +1953,8 @@
     /* ---------- Memory Diary (2a) ---------- */
     const CATS = ["Everyday Moments", "Food", "Dates", "Trips and Holidays", "Milestones", "Celebrations", "Gifts", "Random Moments", "Other"];
     S.page = "home"; S.f = "all"; S.mems = []; S.urls = {};
-    const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["coll", "Collection"], ["booth", "Photobooth"], ["settings", "Settings"]];
-    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main">${NAVS.map(([k, l], i) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""} ${i > 2 ? "dk" : ""}">${l}</button>`).join("")}<button data-act="more" class="mb ${NAVS.slice(3).some(n => n[0] === S.page) ? "on" : ""}">More</button></nav></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
+    const NAVS = [["home", "Home"], ["diary", "Diary"], ["plans", "Plans"], ["coll", "Collection"], ["timeline", "Timeline"], ["persp", "Perspectives"], ["places", "Places"], ["booth", "Photobooth"], ["settings", "Settings"]];
+    function topbar() {return `<div class="top"><span class="logo">Eros</span><nav class="nav" aria-label="Main">${NAVS.slice(0, 4).map(([k, l]) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""}">${l}</button>`).join("")}<button data-act="more" class="${NAVS.slice(4).some(n => n[0] === S.page) ? "on" : ""}">More</button></nav></div><button class="fab" data-act="newmem" aria-label="Add a memory"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`}
     async function signed(paths) {
       const need = paths.filter(p => !S.urls[p]); if (!need.length) return;
       const r = await sb.storage.from("memories").createSignedUrls(need, 3600); (r.data || []).forEach(x => {if (x.signedUrl) S.urls[x.path] = x.signedUrl})
@@ -1559,14 +1998,15 @@
     async function loadEv() {const r = await sb.from("events").select("*").eq("couple_id", S.couple.id); S.ev = r.data || []}
     async function loadCnt() {const q = t => sb.from(t).select("id", {count: "exact", head: true}).eq("couple_id", S.couple.id); const [a, b] = await Promise.all([q("places"), q("keepsakes")]); S.cnt = {p: a.count || 0, k: b.count || 0}}
     async function loadDaily() {const r = await sb.from("daily_answers").select("*").eq("couple_id", S.couple.id).eq("day", todayIso()); S.dp = r.data || []}
-    async function homeWidgets() {await Promise.all([loadMems(), loadEv(), loadCnt(), loadDaily()]); drawWid()}
+    async function loadStamps() {const r = await sb.from("stamps").select("*", {count: "exact"}).eq("couple_id", S.couple.id).order("created_at", {ascending: false}).limit(3); S.stl = r.data || []; S.stc = r.count || 0; await signed(S.stl.map(x => x.stamp_path))}
+    async function homeWidgets() {await Promise.all([loadMems(), loadEv(), loadCnt(), loadDaily(), loadStamps(), signed([S.couple.cover_path].filter(Boolean))]); drawHero(); drawWid()}
     function drawWid() {
       const el = $("#wid"); if (!el) return; const mm = S.mems.filter(m => !m.archived), t = new Date(), md = `${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
       if (S.ti == null || S.ti >= mm.length) S.ti = Math.floor(Math.random() * mm.length);
       const tm = mm[S.ti], oth = mm.filter(m => m.memory_date.slice(5) === md && +m.memory_date.slice(0, 4) < t.getFullYear()), rec = [...mm].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
-      el.innerHTML = `<div class="hgrid">${daysCard()}<div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
+      el.innerHTML = `<div class="hgrid"><div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
   <div class="card"><h3>On this day</h3>${oth.length ? oth.slice(0, 3).map(mrow).join("") : `<p class="muted">Nothing from this date in past years yet.</p>`}</div>
-  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => (o.e.auto || o.e.repeat_yearly || o.e.status === "planned") && (o.e.kind === "Anniversary" ? pref("anniv") : o.e.kind === "Birthday" ? pref("bday") : pref("dates"))).slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div>${pref("prompt") ? dailyHtml() : ""}<div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div></div>
+  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => (o.e.auto || o.e.repeat_yearly || o.e.status === "planned") && (o.e.kind === "Anniversary" || o.e.kind === "Milestone" ? pref("anniv") : o.e.kind === "Birthday" ? pref("bday") : pref("dates"))).slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div>${pref("prompt") ? dailyHtml() : ""}<div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div>${stampCard()}</div>
   ${rec.length ? `<h3 style="margin-top:1em">Recently added</h3><div class="hs">${rec.map(mcard).join("")}</div>` : ""}`
     }
     document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.flt; if (!k) return; S[k] = e.target.value; drawRes()});
@@ -1697,7 +2137,8 @@
     function occs(from, to) {
       const out = [], fy = +from.slice(0, 4), ty = +to.slice(0, 4), add = (e, d) => {if (d >= from && d <= to) out.push({e, d})};
       S.ev.forEach(e => {if (e.repeat_yearly) {for (let y = Math.max(fy, +e.start_date.slice(0, 4)); y <= ty; y++)add(e, y + e.start_date.slice(4))} else add(e, e.start_date)});
-      const c = S.couple;[[c.start_date, "Our anniversary"], [c.anniversary, "Anniversary"]].forEach(([d, t], i) => {if (!d || (i === 1 && d === c.start_date)) return; for (let y = Math.max(fy, +d.slice(0, 4) + 1); y <= ty; y++)add({auto: 1, title: t, kind: "Anniversary", id: "auto" + i}, y + d.slice(4))});
+      const c = S.couple;[[c.start_date, 0], [c.anniversary, 1]].forEach(([d, i]) => {if (!d || (i === 1 && d === c.start_date)) return; const y0 = +d.slice(0, 4); for (let y = Math.max(fy, y0 + 1); y <= ty; y++)add({auto: 1, title: i ? "Anniversary" : `${y - y0} year${y - y0 > 1 ? "s" : ""} together`, kind: "Anniversary", id: "auto" + i}, y + d.slice(4))});
+      if (c.start_date) {const [y0, m0, d0] = c.start_date.split("-").map(Number); MSN.forEach(n => {const dt = new Date(y0, m0 - 1, d0 + n); add({auto: 1, title: `${n.toLocaleString()} days together`, kind: "Milestone", id: "ms" + n}, iso(dt.getFullYear(), dt.getMonth(), dt.getDate()))})}
       return out.sort((a, b) => a.d.localeCompare(b.d) || (a.e.start_time || "").localeCompare(b.e.start_time || ""))
     }
     function erow(o) {
@@ -1758,6 +2199,37 @@
     }
 
 
+
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    function badd(e) {if (B.step === "pick") {B.shots.push(e); pickPaint(); return true} return baddPhoto(e)}
+    function boothRender() {({start: startPaint, shoot: shootPaint, pick: pickPaint, edit: boothPaint, print: printPaint}[B.step] || startPaint)()}
+    function startPaint() {
+      const o = (v, t, c) => `<option value="${v}" ${String(c) === String(v) ? "selected" : ""}>${t}</option>`;
+      app.innerHTML = topbar() + `<div class="bm"><div class="curtain"></div><h1 style="margin-top:.3em">Photobooth</h1><p class="muted">Step in, strike a pose, pick your favourites and print your strip.</p>${B.err ? `<p class="err" role="alert">${esc(B.err)}</p>` : ""}<div class="bcols" style="text-align:left"><div><label for="btot">Photos to take</label><select id="btot" data-bb="total">${[4, 6, 8, 10].map(n => o(n, n + " photos", B.total)).join("")}</select></div><div><label for="bsec">Countdown</label><select id="bsec" data-bb="sec">${[3, 5, 10].map(n => o(n, n + " seconds", B.sec)).join("")}</select></div></div><div class="row" style="justify-content:center;margin-top:14px"><button class="btn" data-act="bstart">Start the booth</button><button class="btn ghost" data-act="bown">Use my own photos</button></div></div>${bgal()}${bdl}`
+    }
+    function shootPaint() {app.innerHTML = topbar() + `<div class="bm"><div class="curtain"></div><div class="vw"><video id="bsv" autoplay playsinline muted></video><div id="bnum" class="bnum" aria-live="assertive"></div><div id="bflash" class="bflash"></div></div><p id="bcount" class="muted">Get ready…</p><div class="pd" id="bdots">${Array.from({length: +B.total}, () => "<i></i>").join("")}</div><button class="btn ghost" data-act="bcancel">Cancel</button></div>${bdl}`}
+    async function bshoot() {
+      B.step = "shoot"; B.run = true; B.shots = []; B.picks = []; shootPaint(); const v = $("#bsv"), fail = m => {B.run = false; bstop(); B.step = "start"; B.err = m; boothRender()};
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return fail("This browser can't use the camera. Use your own photos instead.");
+      try {B.stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: "user", width: {ideal: 1280}}, audio: false}); v.srcObject = B.stream; await v.play()} catch (e) {return fail("Camera access was blocked or isn't available. Allow it in your browser settings, or use your own photos.")}
+      await sleep(900); const gone = () => {if (!$("#bsv") || !B.run) {bstop(); B.run = false; return true} return false};
+      for (let i = 0; i < +B.total; i++) {
+        if (gone()) return; $("#bcount").textContent = `Photo ${i + 1} of ${B.total}`;
+        for (let t = +B.sec; t > 0; t--) {if (gone()) return; $("#bnum").textContent = t; await sleep(1000)}
+        if (gone()) return; $("#bnum").textContent = ""; const f = $("#bflash"); f.style.transition = "none"; f.style.opacity = 1; requestAnimationFrame(() => {f.style.transition = "opacity .5s"; f.style.opacity = 0});
+        const c = document.createElement("canvas"); c.width = v.videoWidth; c.height = v.videoHeight; const g = c.getContext("2d"); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(v, 0, 0); B.shots.push({im: c, url: c.toDataURL("image/jpeg", .88)});
+        const d = document.querySelectorAll("#bdots i")[i]; d && d.classList.add("on"); await sleep(1300)
+      }
+      bstop(); B.run = false; B.step = "pick"; boothRender()
+    }
+    function pickPaint() {app.innerHTML = topbar() + `<div class="bm" style="max-width:640px"><div class="curtain"></div><h2>Pick your favourites</h2><p class="muted" id="bpc"></p><div class="pickshots" id="bpg">${B.shots.map((e, i) => `<button data-act="bpickt" data-i="${i}" aria-label="Photo ${i + 1}"><img src="${e.url}" alt=""><b></b></button>`).join("") || `<p class="muted">No photos yet. Add some below.</p>`}</div><div class="bcols" style="text-align:left;margin-top:12px"><div><label for="blay">Strip layout</label><select id="blay" data-bb="lay">${Object.entries(BL).map(([k, v]) => `<option value="${k}" ${B.lay === k ? "selected" : ""}>${v.t}</option>`).join("")}</select></div></div><div class="row" style="justify-content:center;margin-top:12px"><label class="btn ghost" style="margin:0">Add photos<input id="bup" type="file" accept="image/*" multiple hidden></label><button class="btn ghost" data-act="bdiary">From my diary</button><button class="btn ghost" data-act="bretake">Start over</button><button class="btn" id="bcont" data-act="bcont">Continue</button></div></div>${bdl}`; pmark()}
+    function pmark() {const g = $("#bpg"); if (!g) return; const n = BL[B.lay].n; B.picks = B.picks.filter(i => i < B.shots.length); g.querySelectorAll("button").forEach(b => {const k = B.picks.indexOf(+b.dataset.i); b.classList.toggle("on", k >= 0); b.querySelector("b").textContent = k >= 0 ? k + 1 : ""}); $("#bcont").disabled = !B.picks.length; $("#bpc").textContent = `Tap up to ${n} photos, in the order you want them. ${B.picks.length} of ${n} chosen.`}
+    function printPaint() {
+      app.innerHTML = topbar() + `<div class="bm dark"><p id="bpt">Printing your strip…</p><div class="slot"></div><div class="win"><img src="${B.printUrl}" alt="Your printed photobooth strip"></div><div id="bpacts" hidden><div class="row" style="justify-content:center;margin-top:14px"><select id="bfmt" data-bb="fmt" aria-label="Download format" style="width:auto"><option value="png" ${B.fmt === "png" ? "selected" : ""}>PNG</option><option value="jpeg" ${B.fmt === "jpeg" ? "selected" : ""}>JPEG</option></select><button class="btn" data-act="bdl">Download</button><button class="btn ghost" data-act="bsave">Save to Eros</button></div><div class="row" style="justify-content:center;margin-top:8px"><button class="btn ghost" data-act="bedit2">Edit again</button><button class="btn ghost" data-act="bnew">New session</button></div></div></div>${bdl}`;
+      setTimeout(() => {if (B.step !== "print" || !$("#bpt")) return; $("#bpt").textContent = "Your strip is ready"; $("#bpacts").hidden = false}, matchMedia("(prefers-reduced-motion:reduce)").matches ? 0 : 4700)
+    }
+    function bprintGo() {const c = document.createElement("canvas"); bdraw(c); try {B.printUrl = c.toDataURL("image/png")} catch (e) {return toast("Couldn't print. A diary photo may be blocking it; try uploading that photo again.")} B.step = "print"; boothRender()}
+
     /* ---------- Places (4) ---------- */
     const PC = ["Restaurant or café", "Cinema", "Park", "Attraction", "Holiday destination", "First date spot", "Hangout", "Other"];
     S.plc = []; S.plf = "all"; S.map = null;
@@ -1799,15 +2271,15 @@
     }
     /* ---------- Collection: keepsakes + scrapbook (4) ---------- */
     const KC = ["Movie ticket", "Attraction ticket", "Receipt", "Handwritten note", "Letter", "Card", "Gift tag", "Wristband", "Printed photo", "Screenshot", "Other"], BGS = [["#FFFCFA", "Cream"], ["#F8E3E8", "Pink"], ["#C2DAE8", "Blue"], ["#EADFCB", "Kraft"], ["#FFFFFF", "White"]];
-    S.kp = []; S.pgs = []; S.ct = "kp"; S.kfc = ""; S.sp = null; S.sel = null; let K = null;
+    S.kp = []; S.pgs = []; S.stp = []; S.spg = 0; S.ct = "st"; S.kfc = ""; S.sp = null; S.sel = null; let K = null;
     async function collection() {
       app.innerHTML = topbar() + `<h1>Our collection</h1><p class="muted">Loading…</p>`;
-      const [k, g] = await Promise.all([sb.from("keepsakes").select("*").eq("couple_id", S.couple.id).order("item_date", {ascending: false, nullsFirst: false}), sb.from("scrapbook_pages").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false})]);
-      S.kp = k.data || []; S.pgs = g.data || []; S.kpE = k.error || g.error; await signed(S.kp.map(x => x.edited_path).filter(Boolean)); colPaint()
+      const [k, g, st] = await Promise.all([sb.from("keepsakes").select("*").eq("couple_id", S.couple.id).order("item_date", {ascending: false, nullsFirst: false}), sb.from("scrapbook_pages").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}), sb.from("stamps").select("*").eq("couple_id", S.couple.id).order("taken_at", {ascending: true})]);
+      S.kp = k.data || []; S.pgs = g.data || []; S.stp = st.data || []; S.stE = st.error; S.kpE = k.error || g.error; await signed([...S.kp.map(x => x.edited_path), ...S.stp.map(x => x.stamp_path)].filter(Boolean)); colPaint()
     }
-    function colPaint() {app.innerHTML = topbar() + `<h1>Our collection</h1><div class="chips" role="group" aria-label="Section">${[["kp", "Keepsakes"], ["sb", "Scrapbook"]].map(([k, l]) => `<button data-act="cttab" data-k="${k}" class="${S.ct === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.kpE ? `<p class="err">${esc(msg(S.kpE))} Did you run schema_4.sql?</p>` : ""}<div id="colb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; colBody()}
+    function colPaint() {app.innerHTML = topbar() + `<h1>Our collection</h1><div class="chips" role="group" aria-label="Section">${[["st", "Stamps"], ["kp", "Keepsakes"], ["sb", "Scrapbook"]].map(([k, l]) => `<button data-act="cttab" data-k="${k}" class="${S.ct === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.kpE ? `<p class="err">${esc(msg(S.kpE))} Did you run schema_4.sql?</p>` : ""}<div id="colb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; colBody()}
     function colBody() {
-      const el = $("#colb");
+      const el = $("#colb"); if (S.ct === "st") {stampsBody(el); return }
       if (S.ct === "kp") {
         const l = S.kp.filter(k => !S.kfc || k.category === S.kfc);
         el.innerHTML = `<div class="row"><button class="btn" data-act="kscan">Add a keepsake</button><select id="kfc" aria-label="Filter by category" style="width:auto"><option value="">All types</option>${KC.map(c => `<option ${S.kfc === c ? "selected" : ""}>${c}</option>`).join("")}</select></div><div class="mgrid" style="margin-top:12px">${l.map(k => `<button class="card mem" data-act="kview" data-id="${k.id}"><div class="ph" style="background-image:url('${S.urls[k.edited_path] || ""}');background-size:contain;background-color:var(--bg2)" role="img" aria-label="${esc(k.title)}"></div><div class="pad"><h3>${esc(k.title)}</h3><p class="muted">${k.item_date ? fdt(k.item_date) : ""}${k.occasion ? " · " + esc(k.occasion) : ""}</p><span class="tag">${esc(k.category)}</span></div></button>`).join("") || `<div class="card"><p class="muted">Photograph a ticket, note or wristband to keep it forever.</p></div>`}</div>`; return
@@ -1889,6 +2361,7 @@
     const BL = {classic4: {n: 4, cols: 1, t: "Classic strip (4 photos)"}, three: {n: 3, cols: 1, t: "Three-photo strip"}, two: {n: 2, cols: 1, t: "Mini strip (2 photos)"}, grid: {n: 4, cols: 2, t: "Four-photo grid"}};
     const BP = {"Soft Pink": {bg: "#F8E3E8", fx: "none", st: "hearts"}, "Baby Blue": {bg: "#C2DAE8", fx: "none", st: "stars"}, "Vintage Film": {bg: "#EADFCB", fx: "film", st: "none"}, "Warm Memories": {bg: "#F6E3CF", fx: "warm", st: "hearts"}, "Classic Photobooth": {bg: "#FFFFFF", fx: "bw", st: "none"}};
     const B = {lay: "classic4", ph: [null, null, null, null], sel: null, bg: "#F8E3E8", bd: 28, gap: 18, round: 0, fx: "none", bri: 0, con: 100, stamp: true, date: "", cap: "", names: "", al: "center", pos: "bottom", st: "hearts", fmt: "png", stream: null};
+    B.step = "start"; B.shots = []; B.total = 4; B.sec = 3; B.picks = []; B.err = "";
     const bimg = (src, cors) => new Promise((ok, no) => {const i = new Image(); if (cors) i.crossOrigin = "anonymous"; i.onload = () => ok(i); i.onerror = no; i.src = src});
     function bgeo() {
       const L = BL[B.lay], b = +B.bd, g = +B.gap, cols = L.cols, sw = cols === 2 ? 400 : 520, sh = cols === 2 ? 300 : 390, rows = Math.ceil(L.n / cols), foot = 170, gh = rows * sh + (rows - 1) * g, W = b * 2 + cols * sw + (cols - 1) * g, H = b * 2 + gh + foot, y0 = B.pos === "top" ? b + foot : b, slots = [];
@@ -1927,19 +2400,21 @@
     function baddPhoto(e) {const n = BL[B.lay].n, i = B.sel != null ? B.sel : B.ph.slice(0, n).findIndex(p => !p); if (i < 0 || i >= n) {toast("All slots are full. Tap a photo to replace it, or remove one."); return false} B.ph[i] = e; B.sel = null; bthumbs(); bq(); return true}
     async function booth() {
       app.innerHTML = topbar() + `<h1>Photobooth</h1><p class="muted">Loading…</p>`; if (!B.date) B.date = todayIso(); try {await document.fonts.load("700 60px Dongle")} catch (e) { }
-      const r = await sb.from("photobooth_creations").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.bz = r.data || []; S.bzE = r.error; await signed(S.bz.map(x => x.path)); boothPaint()
+      const r = await sb.from("photobooth_creations").select("*").eq("couple_id", S.couple.id).order("created_at", {ascending: false}); S.bz = r.data || []; S.bzE = r.error; await signed(S.bz.map(x => x.path)); if (B.step === "shoot" || B.step === "print") B.step = B.shots.length ? "pick" : "start"; boothRender()
     }
+    function bgal() {return `${S.bzE ? `<p class="err">${esc(msg(S.bzE))} Did you run schema_5.sql?</p>` : ""}${S.bz.length ? `<h2 style="margin-top:1em">Saved strips</h2><div class="hs">${S.bz.map(z => `<button class="card mem" data-act="bview" data-id="${z.id}"><div class="ph" style="background-image:url('${S.urls[z.path] || ""}');background-size:contain;background-color:var(--bg2);aspect-ratio:1/1" role="img" aria-label="Saved strip"></div><div class="pad"><p class="muted">${fdt(z.created_at.slice(0, 10))}</p></div></button>`).join("")}</div>` : ""}`}
+    const bdl = `<dialog id="dlg"></dialog><dialog id="lb"></dialog>`;
     function boothPaint() {
       const o = (v, t, c) => `<option value="${v}" ${String(c) === String(v) ? "selected" : ""}>${t}</option>`, rg = (k, l, a, b) => `<div><label for="b${k}">${l}</label><input id="b${k}" type="range" min="${a}" max="${b}" value="${B[k]}" data-bb="${k}"></div>`, tab = B.tab || "photos", sec = n => `data-t="${n}" ${tab !== n ? "hidden" : ""}`, sel = (k, l, opts) => `<div><label for="b${k}">${l}</label><select id="b${k}" data-bb="${k}">${opts.map(([v, t]) => o(v, t, B[k])).join("")}</select></div>`;
-      app.innerHTML = topbar() + `<h1>Photobooth</h1><div class="bwrap"><div class="card bprev"><canvas id="bcv" role="img" aria-label="Preview of your photobooth strip"></canvas><div class="row" style="margin-top:12px;justify-content:center"><select id="bfmt" data-bb="fmt" aria-label="Download format" style="width:auto">${o("png", "PNG", B.fmt)}${o("jpeg", "JPEG", B.fmt)}</select><button class="btn" data-act="bdl">Download</button><button class="btn alt" data-act="bsave">Save to Eros</button></div></div>
+      app.innerHTML = topbar() + `<h1>Photobooth</h1><div class="bwrap"><div class="card bprev"><canvas id="bcv" role="img" aria-label="Preview of your photobooth strip"></canvas><div class="row" style="margin-top:12px;justify-content:center"><button class="btn ghost" data-act="bback">Back to photos</button><button class="btn" data-act="bprint">Print my strip</button></div></div>
   <div class="card"><div class="chips" role="group" aria-label="Photobooth options">${[["photos", "Photos"], ["style", "Style"], ["text", "Text"]].map(([k, t]) => `<button data-act="btab" data-k="${k}" class="${tab === k ? "on" : ""}">${t}</button>`).join("")}</div>
   <section ${sec("photos")}><p class="muted">Tap a photo to replace it. Use the arrows to reorder.</p><div class="row" id="bth"></div><div class="row" style="margin-top:12px"><label class="btn alt" style="margin:0;color:#33444F">Upload<input id="bup" type="file" accept="image/*" multiple hidden></label><button class="btn ghost" data-act="bcam">Use camera</button><button class="btn ghost" data-act="bdiary">From my diary</button></div></section>
   <section ${sec("style")}><div class="chips">${Object.keys(BP).map(n => `<button data-act="bpre" data-n="${n}">${n}</button>`).join("")}</div><div class="bcols">${sel("lay", "Layout", Object.entries(BL).map(([k, v]) => [k, v.t]))}<div><label for="bbg">Background colour</label><input id="bbg" type="color" data-bb="bg" value="${B.bg}" style="padding:2px"></div>${rg("bd", "Border thickness", 0, 60)}${rg("gap", "Photo spacing", 0, 40)}${sel("round", "Photo corners", [[0, "Square"], [28, "Rounded"]])}${sel("fx", "Film filter", [["none", "None"], ["bw", "Black and white"], ["sepia", "Sepia"], ["film", "Vintage film"], ["warm", "Warm"], ["cool", "Cool"]])}${rg("bri", "Brightness", -30, 30)}${rg("con", "Contrast", 70, 140)}${sel("st", "Stickers", [["none", "None"], ["hearts", "Hearts"], ["stars", "Stars"]])}</div></section>
   <section ${sec("text")}><div class="bcols"><div><label for="bcap">Caption</label><input id="bcap" maxlength="40" data-bb="cap" value="${esc(B.cap)}"></div><div><label for="bnames">Names or initials</label><input id="bnames" maxlength="40" data-bb="names" value="${esc(B.names)}"></div>${sel("al", "Alignment", [["left", "Left"], ["center", "Centre"], ["right", "Right"]])}${sel("pos", "Position", [["bottom", "Below the photos"], ["top", "Above the photos"]])}<div><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-bb="stamp" style="width:auto;min-height:0" ${B.stamp ? "checked" : ""}> Show date stamp</label><input id="bdate" type="date" data-bb="date" value="${B.date}" aria-label="Date stamp"></div></div></section></div></div>
-  ${S.bzE ? `<p class="err">${esc(msg(S.bzE))} Did you run schema_5.sql?</p>` : ""}${S.bz.length ? `<h2 style="margin-top:1em">Saved strips</h2><div class="hs">${S.bz.map(z => `<button class="card mem" data-act="bview" data-id="${z.id}"><div class="ph" style="background-image:url('${S.urls[z.path] || ""}');background-size:contain;background-color:var(--bg2);aspect-ratio:1/1" role="img" aria-label="Saved strip"></div><div class="pad"><p class="muted">${fdt(z.created_at.slice(0, 10))}</p></div></button>`).join("")}</div>` : ""}<dialog id="dlg"></dialog><dialog id="lb"></dialog>`; bthumbs(); bdraw($("#bcv"))
+  <dialog id="dlg"></dialog><dialog id="lb"></dialog>`; bthumbs(); bdraw($("#bcv"))
     }
-    document.addEventListener("input", e => {const t = e.target, k = t.dataset && t.dataset.bb; if (!k) return; B[k] = t.type === "checkbox" ? t.checked : t.type === "range" ? +t.value : t.value; if (k === "lay") bthumbs(); bq()});
-    document.addEventListener("change", async e => {if (e.target.id !== "bup") return; for (const f of e.target.files) {if (!/^image\//.test(f.type)) {toast(f.name + " isn't an image"); continue} try {const u = URL.createObjectURL(f), im = await bimg(u); if (!baddPhoto({im, url: u})) break} catch (x) {toast(f.name + " couldn't be read")} } e.target.value = ""});
+    document.addEventListener("input", e => {const t = e.target, k = t.dataset && t.dataset.bb; if (!k) return; B[k] = t.type === "checkbox" ? t.checked : t.type === "range" ? +t.value : t.value; if (k === "lay") {bthumbs(); if (B.step === "pick") {B.picks = B.picks.slice(0, BL[B.lay].n); pmark()} } bq()});
+    document.addEventListener("change", async e => {if (e.target.id !== "bup") return; for (const f of e.target.files) {if (!/^image\//.test(f.type)) {toast(f.name + " isn't an image"); continue} try {const u = URL.createObjectURL(f), im = await bimg(u); if (!badd({im, url: u})) break} catch (x) {toast(f.name + " couldn't be read")} } e.target.value = ""});
     function bstop() {B.stream && B.stream.getTracks().forEach(t => t.stop()); B.stream = null}
     function bcam() {
       const d = $("#dlg"); d.innerHTML = `<h3>Camera</h3><video id="bv" autoplay playsinline muted style="width:100%;border-radius:14px;background:#000;transform:scaleX(-1)"></video><div class="err" id="bce" role="alert"></div><div class="row"><button class="btn" data-act="bsnap">Take photo</button><button class="btn ghost" data-act="bcamx">Done</button></div>`; d.showModal(); d.addEventListener("close", bstop, {once: true});
@@ -2012,6 +2487,64 @@
         const r = await sb.from("profiles").update({avatar_path: path}).eq("id", S.user.id); if (r.error) throw r.error; delete S.urls[path]; await load(); await signed([path]); setPaint(); toast("Photo updated")
       } catch (x) {toast("Couldn't update the photo: " + msg(x))}
     });
+
+
+    /* ---------- Hero, stamps (8) ---------- */
+    const MSN = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000, 4000, 5000];
+    function sinceStr(d) {const t = new Date(d + "T00:00"); return `${t.toLocaleDateString("en-GB", {weekday: "long"})}, ${t.getDate()} ${t.toLocaleDateString("en-GB", {month: "long"})} ${t.getFullYear()}`}
+    function dhms(f, t) {
+      let y = t.getFullYear() - f.getFullYear(), mo = t.getMonth() - f.getMonth(), d = t.getDate() - f.getDate(), h = t.getHours() - f.getHours(), mi = t.getMinutes() - f.getMinutes(), s = t.getSeconds() - f.getSeconds();
+      if (s < 0) {s += 60; mi--} if (mi < 0) {mi += 60; h--} if (h < 0) {h += 24; d--} if (d < 0) {d += new Date(t.getFullYear(), t.getMonth(), 0).getDate(); mo--} if (mo < 0) {mo += 12; y--} return [y, mo, d, h, mi, s]
+    }
+    const unitsHtml = a => a.map((v, i) => `<div class="un"><b>${i > 2 ? String(v).padStart(2, "0") : v}</b><span>${["Years", "Months", "Days", "Hours", "Minutes", "Seconds"][i]}</span></div>`).join("");
+    function tickHero() {
+      const tg = $("#tg"); if (!tg) {clearInterval(S.tick); return } const [y, m, d] = S.couple.start_date.split("-").map(Number), now = new Date(), st = new Date(y, m - 1, d);
+      if (now < st) {tg.innerHTML = ""; $("#cdl").textContent = "Until your start date"; $("#cd").innerHTML = unitsHtml(dhms(now, st)); return }
+      tg.innerHTML = unitsHtml(dhms(st, now)); let nx = new Date(now.getFullYear(), m - 1, d); if (nx <= now) nx = new Date(now.getFullYear() + 1, m - 1, d); const n = nx.getFullYear() - y; $("#cdl").textContent = `Until your ${n} year${n > 1 ? "s" : ""} anniversary`; $("#cd").innerHTML = unitsHtml(dhms(now, nx))
+    }
+    function drawHero() {
+      const el = $("#hero"); if (!el) return; const c = S.couple, me = S.members.find(m => m.id === S.user.id), pt = S.members.find(m => m.id !== S.user.id), nm = x => x ? (x.nickname || x.display_name) : "", a = nm(me) || S.profile?.display_name || "Me", b = pt ? nm(pt) : (c.partner_name || ""), url = c.cover_path && S.urls[c.cover_path];
+      el.innerHTML = `<section class="hero2 ${url ? "has" : ""}" ${url ? `style="background-image:linear-gradient(rgba(20,16,22,.4),rgba(20,16,22,.6)),url('${url}')"` : ""}><p class="since">${c.start_date ? "Since " + sinceStr(c.start_date) : "Add your start date to begin counting"}</p><h2 class="names">${esc(a)}${b ? ` <span>&amp;</span> ${esc(b)}` : ""}</h2>${c.start_date ? `<p class="lbl">Together for</p><div class="units" id="tg"></div><p class="lbl" id="cdl"></p><div class="units" id="cd"></div>` : `<button class="btn" data-act="edit">Add start date</button>`}<div class="hbtns"><label class="btn ghost" style="margin:0">${url ? "Change" : "Add"} background<input id="cvf" type="file" accept="image/jpeg,image/png,image/webp" hidden></label>${url ? `<button class="btn ghost" data-act="cvrm">Remove</button>` : ""}</div></section>`; if (c.start_date) tickHero()
+    }
+    document.addEventListener("change", async e => {if (e.target.id !== "cvf" || !e.target.files[0]) return; try {const blob = await shrink(e.target.files[0]), path = `${S.couple.id}/cover/cover.jpg`, u = await sb.storage.from("memories").upload(path, blob, {contentType: "image/jpeg", upsert: true}); if (u.error) throw u.error; const r = await sb.from("couples").update({cover_path: path}).eq("id", S.couple.id); if (r.error) throw r.error; S.couple.cover_path = path; delete S.urls[path]; await signed([path]); drawHero(); toast("Background updated")} catch (x) {toast("Couldn't update the background: " + msg(x) + " Did you run schema_8.sql?")} });
+    function stampCard() {const l = S.stl || []; return `<div class="card"><h3>Stamp collection</h3>${l.length ? `<div class="stmini">${l.map(x => `<img src="${S.urls[x.stamp_path] || ""}" alt="" style="transform:rotate(${x.tilt}deg)">`).join("")}</div><p class="muted">${S.stc} stamp${S.stc === 1 ? "" : "s"}</p><button class="btn ghost" data-act="gostamps">Open</button>` : `<p class="muted">Cut a favourite photo into a stamp.</p><button class="btn alt" data-act="gostamps">Make a stamp</button>`}</div>`}
+    const stcap = st => {const d = new Date(st.taken_at), p = x => String(x).padStart(2, "0"); return `${st.place ? st.place + " · " : ""}${p(d.getDate())}.${p(d.getMonth() + 1)} · ${p(d.getHours())}:${p(d.getMinutes())}`};
+    function stampsBody(el) {
+      const per = 9, n = S.stp.length, pages = Math.max(1, Math.ceil(n / per)); S.spg = Math.max(0, Math.min(S.spg, pages - 1)); const l = S.stp.slice(S.spg * per, S.spg * per + per);
+      el.innerHTML = `<div class="row"><button class="btn" data-act="stnew">New stamp</button></div>${S.stE ? `<p class="err">${esc(msg(S.stE))} Did you run schema_8.sql?</p>` : ""}${n ? `<div class="stpage">${l.map(x => `<button class="stamp" data-act="stview" data-id="${x.id}" style="--t:${x.tilt}deg"><img src="${S.urls[x.stamp_path] || ""}" alt="Stamp: ${esc(stcap(x))}"><span>${esc(stcap(x))}</span></button>`).join("")}</div><div class="row" style="justify-content:center"><button class="btn ghost" data-act="spgn" data-d="-1" ${S.spg === 0 ? "disabled" : ""} aria-label="Previous page">‹</button><span class="muted">Page ${S.spg + 1} of ${pages}</span><button class="btn ghost" data-act="spgn" data-d="1" ${S.spg >= pages - 1 ? "disabled" : ""} aria-label="Next page">›</button></div>` : `<div class="card" style="margin-top:12px"><p class="muted">Cut a stamp from any photo. The photo it came from keeps the empty space.</p></div>`}`
+    }
+    function stview(id) {const st = S.stp.find(x => x.id === id), d = $("#dlg"); d.innerHTML = `<img id="stimg" class="stbig" src="${S.urls[st.stamp_path] || ""}" alt="Stamp"><p class="muted" style="text-align:center">${esc(stcap(st))}</p><div class="row" style="justify-content:center"><button class="btn alt" data-act="stsrc" data-id="${id}">See where it was cut from</button><button class="btn danger" data-act="stdel" data-id="${id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()}
+    function notch(g, w, h) {const r = Math.max(5, w * .024), ed = (len, f) => {const n = Math.max(3, Math.round(len / (r * 3.3))), q = len / n; for (let i = 0; i < n; i++)f((i + .5) * q)}, c = (x, y) => {g.beginPath(); g.arc(x, y, r, 0, 7); g.fill()}; g.save(); g.globalCompositeOperation = "destination-out"; g.fillStyle = "#000"; ed(w, t => {c(t, 0); c(t, h)}); ed(h, t => {c(0, t); c(w, t)}); c(0, 0); c(w, 0); c(0, h); c(w, h); g.restore()}
+    function stampBuild(im, rc, style, W) {
+      const k = W / rc.w, H = Math.round(rc.h * k), c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+      if (style === "border") {g.fillStyle = "#FFFCFA"; g.fillRect(0, 0, W, H); const m = Math.round(W * .07); g.drawImage(im, rc.x, rc.y, rc.w, rc.h, m, m, W - 2 * m, H - 2 * m)} else g.drawImage(im, rc.x, rc.y, rc.w, rc.h, 0, 0, W, H); notch(g, W, H); return c
+    }
+    function sourceBuild(im, rc, maxW) {
+      const nw = im.naturalWidth || im.width, nh = im.naturalHeight || im.height, k = Math.min(1, maxW / nw), w = Math.round(nw * k), h = Math.round(nh * k), L = document.createElement("canvas"); L.width = w; L.height = h; const g = L.getContext("2d"); g.drawImage(im, 0, 0, w, h);
+      const mw = Math.round(rc.w * k), mh = Math.round(rc.h * k), M = document.createElement("canvas"); M.width = mw; M.height = mh; const mg = M.getContext("2d"); mg.fillStyle = "#000"; mg.fillRect(0, 0, mw, mh); notch(mg, mw, mh);
+      g.globalCompositeOperation = "destination-out"; g.drawImage(M, Math.round(rc.x * k), Math.round(rc.y * k)); const F = document.createElement("canvas"); F.width = w; F.height = h; const f = F.getContext("2d"); f.fillStyle = "#EFE8DC"; f.fillRect(0, 0, w, h); f.drawImage(L, 0, 0); return F
+    }
+    let SC = null;
+    function screct() {const {nw, nh, s, a, cx, cy} = SC, w = Math.min(nw, nh / a) * s, h = w * a; return {x: Math.min(nw - w, Math.max(0, cx * nw - w / 2)), y: Math.min(nh - h, Math.max(0, cy * nh - h / 2)), w, h}}
+    function scupd() {if (!SC) return; const rc = SC.rc = screct(); SC.cx = (rc.x + rc.w / 2) / SC.nw; SC.cy = (rc.y + rc.h / 2) / SC.nh; const b = $("#scb"); if (b) {b.style.left = rc.x / SC.nw * 100 + "%"; b.style.top = rc.y / SC.nh * 100 + "%"; b.style.width = rc.w / SC.nw * 100 + "%"; b.style.height = rc.h / SC.nh * 100 + "%"} const p = $("#scp"), c = stampBuild(SC.im, rc, SC.style, 260); p.width = c.width; p.height = c.height; p.getContext("2d").drawImage(c, 0, 0)}
+    function stnew() {
+      SC = null; dialog(`<h3>New stamp</h3><div class="row"><label class="btn alt" style="margin:0">Take a photo<input id="scf1" type="file" accept="image/*" capture="environment" hidden></label><label class="btn ghost" style="margin:0">Upload<input id="scf2" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>
+  <div id="sced" hidden><p class="muted">Drag the frame to choose what becomes your stamp.</p><div id="scw"><img id="scimg" alt="Your photo"><div id="scb"></div></div><div class="bcols"><div><label for="scs">Size</label><input id="scs" type="range" min="15" max="100" value="55" data-sc="s"></div><div><label for="sca">Shape</label><select id="sca" data-sc="a"><option value="1">Square</option><option value="1.25">Portrait</option><option value="0.8">Landscape</option></select></div><div><label for="scst">Edge</label><select id="scst" data-sc="style"><option value="full">Photo to the edge</option><option value="border">White border</option></select></div><div><label for="scp1">Place</label><input id="scp1" maxlength="60" placeholder="Đà Nẵng"></div></div><label for="scdt">Date and time</label><input id="scdt" type="datetime-local"><p class="muted">Your stamp</p><canvas id="scp" class="stbig" style="max-width:200px;margin:auto"></canvas></div>`,
+        async () => {
+          if (!SC) return "Take or upload a photo first."; const rc = screct(), id = crypto.randomUUID(), base = `${S.couple.id}/stamps/${id}`;
+          try {
+            $("#derr").textContent = "Cutting your stamp…"; const W = Math.round(Math.min(900, rc.w)), b1 = await new Promise(r => stampBuild(SC.im, rc, SC.style, W).toBlob(r, "image/png")), b2 = await new Promise(r => sourceBuild(SC.im, rc, 1400).toBlob(r, "image/jpeg", .88));
+            let u = await sb.storage.from("memories").upload(base + "/stamp.png", b1, {contentType: "image/png"}); if (u.error) throw u.error; u = await sb.storage.from("memories").upload(base + "/source.jpg", b2, {contentType: "image/jpeg"}); if (u.error) throw u.error;
+            const r = await sb.from("stamps").insert({id, couple_id: S.couple.id, place: $("#scp1").value.trim() || null, taken_at: new Date($("#scdt").value || Date.now()).toISOString(), stamp_path: base + "/stamp.png", source_path: base + "/source.jpg", style: SC.style, tilt: +(Math.random() * 6 - 3).toFixed(1)}); if (r.error) throw r.error
+          } catch (e) {return "Couldn't save: " + msg(e)}
+          await collection(); toast("Stamp added")
+        })
+    }
+    document.addEventListener("change", e => {const t = e.target; if (t.id !== "scf1" && t.id !== "scf2") return; const f = t.files[0]; if (!f) return; const u = URL.createObjectURL(f), im = new Image(); im.onload = () => {SC = {im, nw: im.naturalWidth, nh: im.naturalHeight, s: .55, a: 1, style: "full", cx: .5, cy: .5}; $("#scimg").src = u; $("#sced").hidden = false; $("#scs").value = 55; $("#sca").value = "1"; $("#scst").value = "full"; const d = new Date(f.lastModified || Date.now()); $("#scdt").value = new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); scupd()}; im.onerror = () => toast("That image couldn't be read. Try a JPG or PNG."); im.src = u});
+    document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.sc; if (!k || !SC) return; SC[k] = k === "s" ? +e.target.value / 100 : k === "a" ? +e.target.value : e.target.value; scupd()});
+    document.addEventListener("pointerdown", e => {if (e.target.id !== "scb" || !SC) return; const r = $("#scimg").getBoundingClientRect(); SC.dr = {x: e.clientX, y: e.clientY, cx: SC.cx, cy: SC.cy, w: r.width, h: r.height}; e.target.setPointerCapture(e.pointerId)});
+    document.addEventListener("pointermove", e => {const d = SC && SC.dr; if (!d) return; SC.cx = d.cx + (e.clientX - d.x) / d.w; SC.cy = d.cy + (e.clientY - d.y) / d.h; scupd()});
+    document.addEventListener("pointerup", () => {if (SC) SC.dr = null});
 
     /* boot */
     sb.auth.onAuthStateChange(async (evt) => {
