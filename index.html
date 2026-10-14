@@ -1643,6 +1643,177 @@
         font-size: 6rem
       }
     }
+
+    /* hidden scrollbars (scrolling still works) */
+    * {
+      scrollbar-width: none;
+      -ms-overflow-style: none
+    }
+
+    *::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none
+    }
+
+    [hidden] {
+      display: none !important
+    }
+
+    /* layout fixes */
+    body {
+      overflow-wrap: break-word
+    }
+
+    input,
+    select,
+    textarea {
+      max-width: 100%;
+      min-width: 0;
+      display: block
+    }
+
+    input[type=date],
+    input[type=time],
+    input[type=datetime-local] {
+      -webkit-appearance: none;
+      appearance: none;
+      min-width: 0;
+      width: 100%
+    }
+
+    input[type=checkbox],
+    input[type=radio] {
+      display: inline-block
+    }
+
+    .btn,
+    .chips button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center
+    }
+
+    .grid>*,
+    .sgrid>*,
+    .hgrid>*,
+    .bcols>*,
+    .bwrap>*,
+    .stctl>* {
+      min-width: 0
+    }
+
+    dialog .row>.btn {
+      flex: 1 1 auto
+    }
+
+    dialog .row>input,
+    dialog .row>select {
+      flex: 1 1 120px
+    }
+
+    .card>.btn {
+      margin-top: 10px
+    }
+
+    @media(max-width:640px) {
+      .wrap {
+        padding: 14px 14px 90px
+      }
+
+      .card .row>.btn {
+        flex: 1 1 auto
+      }
+
+      h1 {
+        font-size: 2.2rem
+      }
+
+      .hero2 {
+        padding: 22px 12px
+      }
+
+      .hero2 .names {
+        font-size: 2.3rem
+      }
+
+      .un {
+        min-width: 48px
+      }
+
+      .un b {
+        font-size: 2rem
+      }
+    }
+
+    /* stamp maker fits the screen */
+    dialog.stdlg {
+      width: min(96vw, 620px);
+      height: min(92vh, 680px);
+      padding: 14px;
+      overflow: hidden
+    }
+
+    @supports(height:1dvh) {
+      dialog.stdlg {
+        height: min(92dvh, 680px)
+      }
+    }
+
+    .stdlg #df {
+      display: flex;
+      flex-direction: column;
+      height: 100%
+    }
+
+    .stbody {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    #scwrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    #scw {
+      margin: 0;
+      flex: none
+    }
+
+    #scw img {
+      width: 100%;
+      height: 100%;
+      display: block
+    }
+
+    .stctl {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 10px
+    }
+
+    .stctl label {
+      margin: 0;
+      font-size: .95rem
+    }
+
+    .stctl input,
+    .stctl select {
+      min-height: 36px;
+      padding: 0 .5em
+    }
+
+    #bcv {
+      touch-action: none
+    }
   </style>
 </head>
 
@@ -1884,6 +2055,8 @@
       else if (a === "spgn") {S.spg += +b.dataset.d; colBody()}
       else if (a === "gostamps") {S.ct = "st"; S.page = "coll"; render()}
       else if (a === "cvrm") {const p = S.couple.cover_path, r = await sb.from("couples").update({cover_path: null}).eq("id", S.couple.id); if (r.error) return toast(msg(r.error)); S.couple.cover_path = null; if (p) await sb.storage.from("memories").remove([p]); drawHero()}
+      else if (a === "bssel") {B.ss = +b.dataset.i; bsyn(); bq()}
+      else if (a === "bsrm") {B.stk.splice(+b.dataset.i, 1); B.ss = null; bsyn(); bq()}
       else if (a === "btab") {B.tab = b.dataset.k; document.querySelectorAll("[data-t]").forEach(x => x.hidden = x.dataset.t !== B.tab); b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b))}
       else if (a === "bsel") {const i = +b.dataset.i; B.sel = B.sel === i ? null : i; bthumbs()}
       else if (a === "bmv") {const i = +b.dataset.i, j = i + +b.dataset.d, n = BL[B.lay].n; if (j < 0 || j >= n) return;[B.ph[i], B.ph[j]] = [B.ph[j], B.ph[i]]; B.sel = null; bthumbs(); bq()}
@@ -2006,7 +2179,7 @@
       const tm = mm[S.ti], oth = mm.filter(m => m.memory_date.slice(5) === md && +m.memory_date.slice(0, 4) < t.getFullYear()), rec = [...mm].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 6);
       el.innerHTML = `<div class="hgrid"><div class="card"><h3>Today's memory</h3>${tm ? mrow(tm) + (mm.length > 1 ? `<button class="btn ghost" data-act="anotm">Show another</button>` : "") : `<p class="muted">Add a memory and it will show up here.</p><button class="btn alt" data-act="newmem">Add a memory</button>`}</div>
   <div class="card"><h3>On this day</h3>${oth.length ? oth.slice(0, 3).map(mrow).join("") : `<p class="muted">Nothing from this date in past years yet.</p>`}</div>
-  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => (o.e.auto || o.e.repeat_yearly || o.e.status === "planned") && (o.e.kind === "Anniversary" || o.e.kind === "Milestone" ? pref("anniv") : o.e.kind === "Birthday" ? pref("bday") : pref("dates"))).slice(0, 4); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div>${pref("prompt") ? dailyHtml() : ""}<div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div>${stampCard()}</div>
+  <div class="card"><h3>Upcoming plans</h3>${(() => {const t0 = new Date().toLocaleDateString("sv"), up = occs(t0, new Date(Date.now() + 400 * 864e5).toLocaleDateString("sv")).filter(o => (o.e.auto || o.e.repeat_yearly || o.e.status === "planned") && (o.e.kind === "Anniversary" || o.e.kind === "Milestone" ? pref("anniv") : o.e.kind === "Birthday" ? pref("bday") : pref("dates"))).slice(0, 2); return up.length ? up.map(erow).join("") : `<p class="muted">Nothing planned yet.</p><button class="btn alt" data-act="nav" data-p="plans">Plan something</button>`})()}</div>${pref("prompt") ? dailyHtml() : ""}<div class="card"><h3>Memory stats</h3><div class="stats"><div><b>${mm.length}</b>memories</div><div><b>${mm.reduce((n, m) => n + m.photos.length, 0)}</b>photos</div><div><b>${mm.filter(m => m.category === "Dates").length}</b>dates</div><div><b>${S.cnt?.p || new Set(mm.map(m => m.location).filter(Boolean)).size}</b>places</div><div><b>${S.cnt?.k || 0}</b>keepsakes</div></div></div>${stampCard()}</div>
   ${rec.length ? `<h3 style="margin-top:1em">Recently added</h3><div class="hs">${rec.map(mcard).join("")}</div>` : ""}`
     }
     document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.flt; if (!k) return; S[k] = e.target.value; drawRes()});
@@ -2230,6 +2403,26 @@
     }
     function bprintGo() {const c = document.createElement("canvas"); bdraw(c); try {B.printUrl = c.toDataURL("image/png")} catch (e) {return toast("Couldn't print. A diary photo may be blocking it; try uploading that photo again.")} B.step = "print"; boothRender()}
 
+
+    B.stk = []; B.ss = null;
+    function bstk(x, G, ui) {B.stk.forEach((s, i) => {const iw = s.im.naturalWidth || s.im.width, ih = s.im.naturalHeight || s.im.height, w = s.w * G.W, h = w * ih / iw; x.save(); x.translate(s.x * G.W, s.y * G.H); x.rotate(s.r * Math.PI / 180); x.drawImage(s.im, -w / 2, -h / 2, w, h); if (ui && B.ss === i) {x.strokeStyle = "#B05E74"; x.lineWidth = Math.max(3, G.W * .006); x.setLineDash([14, 10]); x.strokeRect(-w / 2, -h / 2, w, h)} x.restore()})}
+    function bskHtml() {const s = B.stk[B.ss]; return `<div class="row"><label class="btn alt" style="margin:0">Upload stickers<input id="bsup" type="file" accept="image/*" multiple hidden></label></div>${B.stk.length ? `<div class="row" style="margin-top:8px">${B.stk.map((t, i) => `<div class="bsl ${B.ss === i ? "on" : ""}" style="width:64px"><button data-act="bssel" data-i="${i}" aria-label="Select sticker ${i + 1}" style="width:64px;height:64px"><img src="${t.url}" alt="" style="object-fit:contain"></button><div class="mini"><button data-act="bsrm" data-i="${i}" aria-label="Remove sticker ${i + 1}" style="width:100%">×</button></div></div>`).join("")}</div>` : `<p class="muted">Upload a PNG (a transparent background works best), then drag it onto the strip.</p>`}${s ? `<div class="bcols"><div><label for="bsw">Size</label><input id="bsw" type="range" min="5" max="90" value="${Math.round(s.w * 100)}" data-bs="w"></div><div><label for="bsr">Rotate</label><input id="bsr" type="range" min="-180" max="180" value="${s.r}" data-bs="r"></div></div><p class="muted">Drag the selected sticker on the preview to move it.</p>` : ""}`}
+    function bsyn() {const e = $("#bsk"); if (e) e.innerHTML = bskHtml()}
+    document.addEventListener("change", async e => {
+      if (e.target.id !== "bsup") return; for (const f of e.target.files) {
+        if (B.stk.length >= 12) {toast("That's the maximum of 12 stickers"); break} if (!/^image\//.test(f.type) || f.size > 8e6) {toast(f.name + " isn't a usable image"); continue}
+        try {const im = await bimg(URL.createObjectURL(f)), k = Math.min(1, 800 / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k)); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); B.stk.push({im: c, url: c.toDataURL("image/png"), x: .5, y: .5, w: .3, r: 0}); B.ss = B.stk.length - 1} catch (x) {toast(f.name + " couldn't be read")}
+      } e.target.value = ""; bsyn(); bq()
+    });
+    document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.bs; if (!k || B.ss == null) return; B.stk[B.ss][k] = k === "w" ? +e.target.value / 100 : +e.target.value; bq()});
+    document.addEventListener("pointerdown", e => {
+      if (e.target.id !== "bcv" || !B.stk.length) return; const r = e.target.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height, G = bgeo(); let hit = -1;
+      for (let i = B.stk.length - 1; i >= 0; i--) {const s = B.stk[i], iw = s.im.naturalWidth || s.im.width, ih = s.im.naturalHeight || s.im.height, h = s.w * G.W * (ih / iw) / G.H; if (Math.abs(fx - s.x) <= s.w / 2 && Math.abs(fy - s.y) <= h / 2) {hit = i; break} }
+      B.ss = hit >= 0 ? hit : null; if (hit >= 0) {B.sd = {ox: B.stk[hit].x, oy: B.stk[hit].y, px: e.clientX, py: e.clientY, w: r.width, h: r.height}; e.target.setPointerCapture(e.pointerId)} bsyn(); bq()
+    });
+    document.addEventListener("pointermove", e => {const d = B.sd; if (!d || B.ss == null) return; const s = B.stk[B.ss]; s.x = Math.min(1, Math.max(0, d.ox + (e.clientX - d.px) / d.w)); s.y = Math.min(1, Math.max(0, d.oy + (e.clientY - d.py) / d.h)); bq()});
+    document.addEventListener("pointerup", () => {B.sd = null});
+
     /* ---------- Places (4) ---------- */
     const PC = ["Restaurant or café", "Cinema", "Park", "Attraction", "Holiday destination", "First date spot", "Hangout", "Other"];
     S.plc = []; S.plf = "all"; S.map = null;
@@ -2383,7 +2576,7 @@
       if (k === "hearts") {const s = sz / 2; x.moveTo(0, s * .9); x.bezierCurveTo(-s * 1.6, -s * .2, -s * .6, -s * 1.2, 0, -s * .4); x.bezierCurveTo(s * .6, -s * 1.2, s * 1.6, -s * .2, 0, s * .9)}
       else {for (let i = 0; i < 10; i++) {const a = i * Math.PI / 5 - Math.PI / 2, r = i % 2 ? sz * .2 : sz * .5; x[i ? "lineTo" : "moveTo"](Math.cos(a) * r, Math.sin(a) * r)} x.closePath()} x.fill(); x.restore()
     }
-    function bdraw(cv) {
+    function bdraw(cv, ui) {
       const G = bgeo(), x = cv.getContext("2d"); cv.width = G.W; cv.height = G.H; x.fillStyle = B.bg; x.fillRect(0, 0, G.W, G.H); const rd = +B.round;
       G.slots.forEach((s, i) => {
         const e = B.ph[i]; x.save(); brr(x, s.x, s.y, s.w, s.h, rd); x.clip();
@@ -2393,9 +2586,9 @@
       const n = parseInt(B.bg.slice(1), 16), lum = ((n >> 16) & 255) * .3 + ((n >> 8) & 255) * .59 + (n & 255) * .11, ink = lum > 140 ? "#40383A" : "#F7F0F3", b = +B.bd, ax = B.al === "left" ? b : B.al === "right" ? G.W - b : G.W / 2;
       const lines = []; if (B.cap.trim()) lines.push([B.cap.trim(), 76]); if (B.names.trim()) lines.push([B.names.trim(), 58]); if (B.stamp && B.date) {const d = new Date(B.date + "T00:00"); lines.push([d.toLocaleDateString(undefined, {day: "numeric", month: "short", year: "numeric"}).toUpperCase(), 44])}
       const tot = lines.reduce((a, l) => a + l[1] * .9, 0); let ty = G.fy + (G.foot - tot) / 2; x.fillStyle = ink; x.textAlign = B.al; x.textBaseline = "top"; lines.forEach(([t, sz]) => {x.font = `700 ${sz}px Dongle, sans-serif`; x.fillText(t, ax, ty, G.W - 2 * b); ty += sz * .9});
-      if (B.st !== "none") {const cols = ["#C9788C", "#5E8BA6"]; G.slots.forEach((s, i) => {bstick(x, B.st, s.x + s.w - 6, s.y + 10, 44, .4 * (i % 2 ? -1 : 1), cols[i % 2]); if (i === G.slots.length - 1) bstick(x, B.st, s.x + 8, s.y + s.h - 8, 34, -.3, cols[(i + 1) % 2])})}
+      if (B.st !== "none") {const cols = ["#C9788C", "#5E8BA6"]; G.slots.forEach((s, i) => {bstick(x, B.st, s.x + s.w - 6, s.y + 10, 44, .4 * (i % 2 ? -1 : 1), cols[i % 2]); if (i === G.slots.length - 1) bstick(x, B.st, s.x + 8, s.y + s.h - 8, 34, -.3, cols[(i + 1) % 2])})} bstk(x, G, ui)
     }
-    let braf = 0; function bq() {if (braf) return; braf = requestAnimationFrame(() => {braf = 0; const cv = $("#bcv"); if (cv) bdraw(cv)})}
+    let braf = 0; function bq() {if (braf) return; braf = requestAnimationFrame(() => {braf = 0; const cv = $("#bcv"); if (cv) bdraw(cv, true)})}
     function bthumbs() {const el = $("#bth"); if (!el) return; el.innerHTML = Array.from({length: BL[B.lay].n}, (_, i) => {const e = B.ph[i]; return `<div class="bsl ${B.sel === i ? "on" : ""}"><button data-act="bsel" data-i="${i}" aria-label="${e ? "Select photo " + (i + 1) + " to replace" : "Empty slot " + (i + 1)}">${e ? `<img src="${e.url}" alt="Photo ${i + 1}">` : "+"}</button><div class="mini"><button data-act="bmv" data-i="${i}" data-d="-1" aria-label="Move earlier">‹</button><button data-act="bmv" data-i="${i}" data-d="1" aria-label="Move later">›</button><button data-act="brm" data-i="${i}" aria-label="Remove photo">×</button></div></div>`}).join("")}
     function baddPhoto(e) {const n = BL[B.lay].n, i = B.sel != null ? B.sel : B.ph.slice(0, n).findIndex(p => !p); if (i < 0 || i >= n) {toast("All slots are full. Tap a photo to replace it, or remove one."); return false} B.ph[i] = e; B.sel = null; bthumbs(); bq(); return true}
     async function booth() {
@@ -2409,9 +2602,9 @@
       app.innerHTML = topbar() + `<h1>Photobooth</h1><div class="bwrap"><div class="card bprev"><canvas id="bcv" role="img" aria-label="Preview of your photobooth strip"></canvas><div class="row" style="margin-top:12px;justify-content:center"><button class="btn ghost" data-act="bback">Back to photos</button><button class="btn" data-act="bprint">Print my strip</button></div></div>
   <div class="card"><div class="chips" role="group" aria-label="Photobooth options">${[["photos", "Photos"], ["style", "Style"], ["text", "Text"]].map(([k, t]) => `<button data-act="btab" data-k="${k}" class="${tab === k ? "on" : ""}">${t}</button>`).join("")}</div>
   <section ${sec("photos")}><p class="muted">Tap a photo to replace it. Use the arrows to reorder.</p><div class="row" id="bth"></div><div class="row" style="margin-top:12px"><label class="btn alt" style="margin:0;color:#33444F">Upload<input id="bup" type="file" accept="image/*" multiple hidden></label><button class="btn ghost" data-act="bcam">Use camera</button><button class="btn ghost" data-act="bdiary">From my diary</button></div></section>
-  <section ${sec("style")}><div class="chips">${Object.keys(BP).map(n => `<button data-act="bpre" data-n="${n}">${n}</button>`).join("")}</div><div class="bcols">${sel("lay", "Layout", Object.entries(BL).map(([k, v]) => [k, v.t]))}<div><label for="bbg">Background colour</label><input id="bbg" type="color" data-bb="bg" value="${B.bg}" style="padding:2px"></div>${rg("bd", "Border thickness", 0, 60)}${rg("gap", "Photo spacing", 0, 40)}${sel("round", "Photo corners", [[0, "Square"], [28, "Rounded"]])}${sel("fx", "Film filter", [["none", "None"], ["bw", "Black and white"], ["sepia", "Sepia"], ["film", "Vintage film"], ["warm", "Warm"], ["cool", "Cool"]])}${rg("bri", "Brightness", -30, 30)}${rg("con", "Contrast", 70, 140)}${sel("st", "Stickers", [["none", "None"], ["hearts", "Hearts"], ["stars", "Stars"]])}</div></section>
+  <section ${sec("style")}><div class="chips">${Object.keys(BP).map(n => `<button data-act="bpre" data-n="${n}">${n}</button>`).join("")}</div><div class="bcols">${sel("lay", "Layout", Object.entries(BL).map(([k, v]) => [k, v.t]))}<div><label for="bbg">Background colour</label><input id="bbg" type="color" data-bb="bg" value="${B.bg}" style="padding:2px"></div>${rg("bd", "Border thickness", 0, 60)}${rg("gap", "Photo spacing", 0, 40)}${sel("round", "Photo corners", [[0, "Square"], [28, "Rounded"]])}${sel("fx", "Film filter", [["none", "None"], ["bw", "Black and white"], ["sepia", "Sepia"], ["film", "Vintage film"], ["warm", "Warm"], ["cool", "Cool"]])}${rg("bri", "Brightness", -30, 30)}${rg("con", "Contrast", 70, 140)}${sel("st", "Decorations", [["none", "None"], ["hearts", "Hearts"], ["stars", "Stars"]])}</div><h3>Your stickers</h3><div id="bsk">${bskHtml()}</div></section>
   <section ${sec("text")}><div class="bcols"><div><label for="bcap">Caption</label><input id="bcap" maxlength="40" data-bb="cap" value="${esc(B.cap)}"></div><div><label for="bnames">Names or initials</label><input id="bnames" maxlength="40" data-bb="names" value="${esc(B.names)}"></div>${sel("al", "Alignment", [["left", "Left"], ["center", "Centre"], ["right", "Right"]])}${sel("pos", "Position", [["bottom", "Below the photos"], ["top", "Above the photos"]])}<div><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-bb="stamp" style="width:auto;min-height:0" ${B.stamp ? "checked" : ""}> Show date stamp</label><input id="bdate" type="date" data-bb="date" value="${B.date}" aria-label="Date stamp"></div></div></section></div></div>
-  <dialog id="dlg"></dialog><dialog id="lb"></dialog>`; bthumbs(); bdraw($("#bcv"))
+  <dialog id="dlg"></dialog><dialog id="lb"></dialog>`; bthumbs(); bdraw($("#bcv"), true)
     }
     document.addEventListener("input", e => {const t = e.target, k = t.dataset && t.dataset.bb; if (!k) return; B[k] = t.type === "checkbox" ? t.checked : t.type === "range" ? +t.value : t.value; if (k === "lay") {bthumbs(); if (B.step === "pick") {B.picks = B.picks.slice(0, BL[B.lay].n); pmark()} } bq()});
     document.addEventListener("change", async e => {if (e.target.id !== "bup") return; for (const f of e.target.files) {if (!/^image\//.test(f.type)) {toast(f.name + " isn't an image"); continue} try {const u = URL.createObjectURL(f), im = await bimg(u); if (!badd({im, url: u})) break} catch (x) {toast(f.name + " couldn't be read")} } e.target.value = ""});
@@ -2525,11 +2718,13 @@
       g.globalCompositeOperation = "destination-out"; g.drawImage(M, Math.round(rc.x * k), Math.round(rc.y * k)); const F = document.createElement("canvas"); F.width = w; F.height = h; const f = F.getContext("2d"); f.fillStyle = "#EFE8DC"; f.fillRect(0, 0, w, h); f.drawImage(L, 0, 0); return F
     }
     let SC = null;
+    function fitSc() {if (!SC) return; const w = $("#scwrap"); if (!w) return; const k = Math.min(w.clientWidth / SC.nw, w.clientHeight / SC.nh), c = $("#scw"); c.style.width = SC.nw * k + "px"; c.style.height = SC.nh * k + "px"}
+    addEventListener("resize", () => {if (SC && $("#scwrap")) {fitSc(); scupd()} });
     function screct() {const {nw, nh, s, a, cx, cy} = SC, w = Math.min(nw, nh / a) * s, h = w * a; return {x: Math.min(nw - w, Math.max(0, cx * nw - w / 2)), y: Math.min(nh - h, Math.max(0, cy * nh - h / 2)), w, h}}
     function scupd() {if (!SC) return; const rc = SC.rc = screct(); SC.cx = (rc.x + rc.w / 2) / SC.nw; SC.cy = (rc.y + rc.h / 2) / SC.nh; const b = $("#scb"); if (b) {b.style.left = rc.x / SC.nw * 100 + "%"; b.style.top = rc.y / SC.nh * 100 + "%"; b.style.width = rc.w / SC.nw * 100 + "%"; b.style.height = rc.h / SC.nh * 100 + "%"} const p = $("#scp"), c = stampBuild(SC.im, rc, SC.style, 260); p.width = c.width; p.height = c.height; p.getContext("2d").drawImage(c, 0, 0)}
     function stnew() {
-      SC = null; dialog(`<h3>New stamp</h3><div class="row"><label class="btn alt" style="margin:0">Take a photo<input id="scf1" type="file" accept="image/*" capture="environment" hidden></label><label class="btn ghost" style="margin:0">Upload<input id="scf2" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>
-  <div id="sced" hidden><p class="muted">Drag the frame to choose what becomes your stamp.</p><div id="scw"><img id="scimg" alt="Your photo"><div id="scb"></div></div><div class="bcols"><div><label for="scs">Size</label><input id="scs" type="range" min="15" max="100" value="55" data-sc="s"></div><div><label for="sca">Shape</label><select id="sca" data-sc="a"><option value="1">Square</option><option value="1.25">Portrait</option><option value="0.8">Landscape</option></select></div><div><label for="scst">Edge</label><select id="scst" data-sc="style"><option value="full">Photo to the edge</option><option value="border">White border</option></select></div><div><label for="scp1">Place</label><input id="scp1" maxlength="60" placeholder="Đà Nẵng"></div></div><label for="scdt">Date and time</label><input id="scdt" type="datetime-local"><p class="muted">Your stamp</p><canvas id="scp" class="stbig" style="max-width:200px;margin:auto"></canvas></div>`,
+      SC = null; $("#dlg").addEventListener("close", () => $("#dlg").classList.remove("stdlg"), {once: true}); dialog(`<h3 style="margin:0 0 6px">New stamp</h3><div class="row" style="margin-bottom:6px"><label class="btn alt" style="margin:0">Take a photo<input id="scf1" type="file" accept="image/*" capture="environment" hidden></label><label class="btn ghost" style="margin:0">Upload<input id="scf2" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div>
+  <div id="sced" class="stbody" hidden><div id="scwrap"><div id="scw"><img id="scimg" alt="Your photo"><div id="scb"></div></div></div><div class="stctl"><div><label for="scs">Size</label><input id="scs" type="range" min="15" max="100" value="55" data-sc="s"></div><div><label for="sca">Shape</label><select id="sca" data-sc="a"><option value="1">Square</option><option value="1.25">Portrait</option><option value="0.8">Landscape</option></select></div><div><label for="scst">Edge</label><select id="scst" data-sc="style"><option value="full">Photo to the edge</option><option value="border">White border</option></select></div><div><label for="scp1">Place</label><input id="scp1" maxlength="60" placeholder="Đà Nẵng"></div><div><label for="scdt">Date and time</label><input id="scdt" type="datetime-local"></div><div style="display:flex;justify-content:center;align-items:center"><canvas id="scp" class="stbig" style="max-height:64px;width:auto"></canvas></div></div></div>`,
         async () => {
           if (!SC) return "Take or upload a photo first."; const rc = screct(), id = crypto.randomUUID(), base = `${S.couple.id}/stamps/${id}`;
           try {
@@ -2540,7 +2735,7 @@
           await collection(); toast("Stamp added")
         })
     }
-    document.addEventListener("change", e => {const t = e.target; if (t.id !== "scf1" && t.id !== "scf2") return; const f = t.files[0]; if (!f) return; const u = URL.createObjectURL(f), im = new Image(); im.onload = () => {SC = {im, nw: im.naturalWidth, nh: im.naturalHeight, s: .55, a: 1, style: "full", cx: .5, cy: .5}; $("#scimg").src = u; $("#sced").hidden = false; $("#scs").value = 55; $("#sca").value = "1"; $("#scst").value = "full"; const d = new Date(f.lastModified || Date.now()); $("#scdt").value = new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); scupd()}; im.onerror = () => toast("That image couldn't be read. Try a JPG or PNG."); im.src = u});
+    document.addEventListener("change", e => {const t = e.target; if (t.id !== "scf1" && t.id !== "scf2") return; const f = t.files[0]; if (!f) return; const u = URL.createObjectURL(f), im = new Image(); im.onload = () => {SC = {im, nw: im.naturalWidth, nh: im.naturalHeight, s: .55, a: 1, style: "full", cx: .5, cy: .5}; $("#scimg").src = u; $("#sced").hidden = false; $("#scs").value = 55; $("#sca").value = "1"; $("#scst").value = "full"; const d = new Date(f.lastModified || Date.now()); $("#scdt").value = new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); $("#dlg").classList.add("stdlg"); requestAnimationFrame(() => {fitSc(); scupd()})}; im.onerror = () => toast("That image couldn't be read. Try a JPG or PNG."); im.src = u});
     document.addEventListener("input", e => {const k = e.target.dataset && e.target.dataset.sc; if (!k || !SC) return; SC[k] = k === "s" ? +e.target.value / 100 : k === "a" ? +e.target.value : e.target.value; scupd()});
     document.addEventListener("pointerdown", e => {if (e.target.id !== "scb" || !SC) return; const r = $("#scimg").getBoundingClientRect(); SC.dr = {x: e.clientX, y: e.clientY, cx: SC.cx, cy: SC.cy, w: r.width, h: r.height}; e.target.setPointerCapture(e.pointerId)});
     document.addEventListener("pointermove", e => {const d = SC && SC.dr; if (!d) return; SC.cx = d.cx + (e.clientX - d.x) / d.w; SC.cy = d.cy + (e.clientY - d.y) / d.h; scupd()});
