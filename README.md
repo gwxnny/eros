@@ -83,6 +83,15 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Appearance: light, dark or automatic; rose or dusty-blue accent; decoration toggle.
 - Reminder preferences, data export (JSON), photo backup (ZIP), change password, log out, delete account.
 
+**Partnership** (equal members, one shared space)
+- Five icon tabs: Home, Together (Diary, Plans, Timeline), Activities (Perspectives, Places, Photobooth), Notifications (with unread badge) and Settings. Mobile uses a bottom bar.
+- Both partners' photos and names appear equally; every memory, photo, story and comment shows who added it and when.
+- Either partner can add their own story, photos, comments and reactions to a shared memory. Only the person who wrote something can edit or delete it.
+- Memories can be private (only you) or shared. A partner can move a shared memory to Recently Deleted (the owner is told and either can restore it), but only the creator can delete it forever, and not while the other person has added to it.
+- In-app notifications for what your partner posts or changes, grouped when related, never for your own actions or private content.
+- Shared accent colours for the whole app, set by either partner, with a live preview and reset.
+- Optional calendar sharing, including availability-only. Leaving or deleting an account never deletes shared content; it shows as "Former member".
+
 **Design**
 - Soft pink `#F8E3E8` and soft blue `#C2DAE8` brand colours, with separately designed light and dark themes.
 - Dongle for the interface, Tourmines for the logo.
@@ -104,23 +113,13 @@ schema_6.sql            Profile preferences, daily question, account deletion
 schema_7.sql            Locks memory categories to the fixed list
 schema_8.sql            Couple cover photo, stamp collection, storage update rule
 schema_9.sql            Saved sticker library for the Photobooth
+schema_10.sql           Partnership: contributions, notifications, privacy, shared colours
 Assets/font/Tourmines.otf     Logo font
 Assets/images/logo.png        Favicon and home-screen icon
 README.md
 ```
 
 Netlify is case-sensitive. Keep the folder names exactly `Assets`, `font` and `images`.
-
----
-
-## How privacy and security work
-
-- Every table has row-level security. A signed-in user can only read or write rows belonging to their own shared space.
-- Photos are in a private bucket. They're shown through short-lived signed links. Storage rules check that you belong to the space whose ID is the first part of the file path.
-- Pairing, leaving a space and deleting an account go through database functions, not direct table edits.
-- Two Perspectives answers and daily-question answers are hidden by the database itself until the reveal condition is met. A direct API request cannot return a partner's answer early.
-- Memory categories are locked to the fixed list by a database constraint.
-- Passwords are handled by Supabase Auth. Eros never sees or stores them.
 
 ---
 
@@ -147,24 +146,3 @@ Netlify is case-sensitive. Keep the folder names exactly `Assets`, `font` and `i
 - Memory categories are fixed. Tags are free text.
 - Large photo ZIP backups run in your browser and can be slow on big libraries.
 - Photos from some phones in HEIC format may need to be converted to JPG first. Most phone browsers do this automatically when you pick a photo.
-
----
-
-## Testing checklist
-
-The app was built in stages. Run through this on two accounts (use a private window for the second).
-
-1. Sign up account A, create a space, copy the invite link.
-2. Sign up account B from the link and confirm both show as paired.
-3. Add a memory with photos on A. Confirm B sees it.
-4. Start a Two Perspectives. Answer on A and confirm B cannot see A's answer. Answer on B and confirm both appear.
-5. Answer Today's question on each account the same way.
-6. Add a birthday event that repeats yearly. Mark a date done and create a memory from it.
-7. Add a place, use "Find on map", and check the pin appears.
-8. Photograph a ticket in Collection, try "Clean document" and "Read printed text".
-9. Build a scrapbook page and export it.
-10. Make a photobooth strip, download it, and save it to a memory.
-11. Switch light, dark and automatic themes in Settings, then refresh.
-12. Download your data (JSON) and photos (ZIP).
-13. Check key pages at phone, tablet and desktop widths.
-14. Delete a throwaway account and confirm a partner keeps shared memories.
