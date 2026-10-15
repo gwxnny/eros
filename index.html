@@ -2488,6 +2488,167 @@
       box-shadow: 0 0 0 999px rgba(0, 0, 0, .5);
       pointer-events: none
     }
+
+    /* folders, cutouts, scrapbook v2 (11) */
+    .se {
+      position: absolute;
+      touch-action: none;
+      cursor: grab
+    }
+
+    .se img {
+      width: 100%;
+      display: block;
+      pointer-events: none
+    }
+
+    .se.b {
+      background: #fff;
+      padding: 4px
+    }
+
+    .se.b.s {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .25)
+    }
+
+    .se.s:not(.b) img {
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .3))
+    }
+
+    .se.o:not(.b) img {
+      filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+    }
+
+    .se.o.s:not(.b) img {
+      filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 3px 5px rgba(0, 0, 0, .3))
+    }
+
+    .se.tx {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #40383A;
+      line-height: 1
+    }
+
+    .se.sel {
+      outline: 2px dashed var(--rose);
+      outline-offset: 2px
+    }
+
+    .seav {
+      position: absolute;
+      right: -6px;
+      top: -6px;
+      pointer-events: none
+    }
+
+    .se.tx .seav {
+      display: none
+    }
+
+    .btn.on {
+      background: var(--bg2);
+      border-color: var(--text)
+    }
+
+    dialog.csdlg {
+      width: min(96vw, 760px);
+      height: min(94vh, 780px);
+      padding: 12px;
+      overflow: hidden
+    }
+
+    dialog.csdlg[open] {
+      display: flex;
+      flex-direction: column
+    }
+
+    @supports(height:1dvh) {
+      dialog.csdlg {
+        height: min(94dvh, 780px)
+      }
+    }
+
+    .csbar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px
+    }
+
+    .csbar button {
+      flex: none;
+      border: 1px solid var(--line);
+      background: none;
+      border-radius: 999px;
+      padding: .1em 1em;
+      min-height: 38px;
+      cursor: pointer;
+      font-size: 1.15rem;
+      color: var(--text)
+    }
+
+    .csbar button.on {
+      background: var(--bg2);
+      border-color: var(--text)
+    }
+
+    #cswrap {
+      flex: 1;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    #csbox {
+      position: relative;
+      flex: none;
+      background: repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 50%/16px 16px;
+      border-radius: 8px;
+      overflow: hidden;
+      touch-action: none
+    }
+
+    #csbox canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%
+    }
+
+    #csov {
+      touch-action: none;
+      cursor: crosshair
+    }
+
+    .csctl {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      min-height: 40px;
+      padding: 4px 0
+    }
+
+    .csfoot .bcols {
+      margin-top: 4px
+    }
+
+    .csfoot label {
+      margin: 0;
+      font-size: .95rem
+    }
+
+    .csfoot input,
+    .csfoot select {
+      min-height: 36px
+    }
+
+    .csfoot .err {
+      min-height: 0;
+      margin: 2px 0
+    }
   </style>
 </head>
 
@@ -2779,6 +2940,45 @@
           try { if (S.couple && S.members.length <= 1) { const ps = [...new Set(await allPaths())]; for (let i = 0; i < ps.length; i += 100)await sb.storage.from("memories").remove(ps.slice(i, i + 100)) } const r = await sb.rpc("delete_my_account"); if (r.error) throw r.error } catch (e) { return msg(e) } await sb.auth.signOut({ scope: "local" }); toast("Your account was deleted")
         })
       }
+      else if (a === "qafo") { S.ct = "fo"; S.fopen = null; S.page = "coll"; render() }
+      else if (a === "fnew") { dialog(`<h3>New folder</h3><label for="fnn">Name</label><input id="fnn" maxlength="60" placeholder="Trip to Seoul">`, async () => { const n = $("#fnn").value.trim(); if (!n) return "Give the folder a name."; const r = await sb.from("folders").insert({ couple_id: S.couple.id, name: n }); if (r.error) return msg(r.error) + " Did you run schema_11.sql?"; await loadFolders(); colBody() }) }
+      else if (a === "fopen") { S.fopen = b.dataset.id; colBody() }
+      else if (a === "fback") { S.fopen = null; colBody() }
+      else if (a === "fpage") { S.ct = "sb"; S.sp = b.dataset.id; colPaint() }
+      else if (a === "frename") { const f = S.fol.find(x => x.id === b.dataset.id); dialog(`<h3>Rename folder</h3><label for="fnn">Name</label><input id="fnn" maxlength="60" value="${esc(f.name)}">`, async () => { const n = $("#fnn").value.trim(); if (!n) return "Give the folder a name."; const r = await sb.from("folders").update({ name: n }).eq("id", f.id); if (r.error) return msg(r.error); await loadFolders(); colBody() }) }
+      else if (a === "fdel") { if (!confirm("Delete this folder? Everything inside stays where it is. Only the folder is removed, for both of you.")) return; const r = await sb.from("folders").delete().eq("id", b.dataset.id); if (r.error) return toast(msg(r.error)); S.fopen = null; await loadFolders(); colBody() }
+      else if (a === "mfold") { await loadFolders(); $("#dlg").close(); foldDlg("memory", b.dataset.id) }
+      else if (a === "kfold") { await loadFolders(); $("#dlg").close(); foldDlg("keepsake", b.dataset.id) }
+      else if (a === "sbfold") { await loadFolders(); foldDlg("scrapbook", S.sp) }
+      else if (a === "cutopen" || a === "sbnewcut") { cutOpen() }
+      else if (a === "cfrom") { const w = b.dataset.w, list = w === "kp" ? S.kp.map(k => k.edited_path).filter(Boolean) : S.mems.filter(m => !m.archived).flatMap(m => m.photos).slice(0, 60); await signed(list); $("#cpick").innerHTML = list.length ? `<div class="pickgrid" style="margin-top:10px">${list.map(p => `<button type="button" data-act="cpick" data-p="${p}" aria-label="Use this photo"><img src="${S.urls[p] || ""}" alt=""></button>`).join("")}</div>` : `<p class="muted">Nothing here yet.</p>` }
+      else if (a === "cpick") { try { cutLoad(await (await fetch(S.urls[b.dataset.p])).blob()) } catch (e) { toast("That photo couldn't be loaded") } }
+      else if (a === "cstool") { CS.tool = b.dataset.k; CS.path = null; CS.rect = null; b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); csDraw(); csCtl() }
+      else if (a === "cskeep" || a === "csdrop") { if (!CS.path || CS.path.length < 4) return; csSnap(); const c = CS.cut, g = c.getContext("2d"); if (a === "cskeep") { const n = document.createElement("canvas"); n.width = c.width; n.height = c.height; const ng = n.getContext("2d"); ng.save(); csPathClip(ng); ng.clip(); ng.drawImage(c, 0, 0); ng.restore(); CS.cut = n } else { g.save(); g.globalCompositeOperation = "destination-out"; csPathClip(g); g.fill(); g.restore() } CS.path = null; csDraw(); csCtl() }
+      else if (a === "cscrop") { const r = CS.rect; if (!r || r.w < 8 || r.h < 8) return; csSnap(); const cp = (c) => { const n = document.createElement("canvas"); n.width = Math.round(r.w); n.height = Math.round(r.h); n.getContext("2d").drawImage(c, r.x, r.y, r.w, r.h, 0, 0, n.width, n.height); return n }; CS.orig = cp(CS.orig); CS.cut = cp(CS.cut); CS.rect = null; csFit(); csDraw(); csCtl() }
+      else if (a === "csauto") { csAuto() }
+      else if (a === "csundo") { const h = CS.hist.pop(); if (!h) return; CS.redo.push({ o: cloneC(CS.orig), c: cloneC(CS.cut) }); csRestore(h) }
+      else if (a === "csredo") { const h = CS.redo.pop(); if (!h) return; CS.hist.push({ o: cloneC(CS.orig), c: cloneC(CS.cut) }); csRestore(h) }
+      else if (a === "csreset") { csSnap(); CS.orig = cloneC(CS.base); CS.cut = cloneC(CS.base); CS.path = null; CS.rect = null; csFit(); csDraw(); csCtl() }
+      else if (a === "cssave") { csSave() }
+      else if (a === "cview") { cview(b.dataset.id) }
+      else if (a === "corig") { const c = S.cut.find(x => x.id === b.dataset.id), im = $("#cvimg"); if (b.dataset.on) { im.src = S.urls[c.path]; b.textContent = "View original"; delete b.dataset.on } else { const r = await sb.storage.from("memories").createSignedUrl(c.source_path, 3600); if (r.error) return toast(msg(r.error)); im.src = r.data.signedUrl; b.textContent = "View cutout"; b.dataset.on = "1" } }
+      else if (a === "cdl") { try { const c = S.cut.find(x => x.id === b.dataset.id), bl = await (await fetch(S.urls[c.path])).blob(), l = document.createElement("a"); l.href = URL.createObjectURL(bl); l.download = (c.title || "cutout") + ".png"; l.click() } catch (e) { toast("Couldn't download that") } }
+      else if (a === "cdelc") { if (!confirm("Delete this cutout and its original photo? Scrapbook pages using it will lose it.")) return; const c = S.cut.find(x => x.id === b.dataset.id), r = await sb.from("cutouts").delete().eq("id", c.id); if (r.error) return toast(msg(r.error)); await sb.storage.from("memories").remove([c.path, c.source_path].filter(Boolean)); $("#dlg").close(); collection() }
+      else if (a === "cplace") { const c = S.cut.find(x => x.id === b.dataset.id); if (!S.pgs.length) { return toast("Make a scrapbook page first") } $("#dlg").close(); dialog(`<h3>Place in scrapbook</h3><label for="cpg">Page</label><select id="cpg">${S.pgs.map(g => `<option value="${g.id}">${esc(g.title)}</option>`).join("")}</select>`, async () => { const r = await sbInsertTo($("#cpg").value, { kind: "cutout", ref_id: c.id, x: 30, y: 30, w: 35, rot: 0, style: { o: true, s: true } }); if (r.error) return msg(r.error); toast("Placed on the page") }) }
+      else if (a === "sbadd") { sbAddDlg() }
+      else if (a === "sbpick") { $("#dlg").close(); const t = b.dataset.t, r = await sbAddRow({ kind: t, ref_id: b.dataset.id, x: rnd(8, 40), y: rnd(10, 45), w: t === "cutout" ? 35 : 38, rot: Math.round(rnd(-6, 6)), style: t === "keepsake" ? { b: true, s: true } : t === "cutout" ? { o: true, s: true } : { s: true } }); if (r) { S.ssel = r.id } spRender() }
+      else if (a === "sbtxt") { dialog(`<h3>Add text</h3><label for="spx">Caption</label><input id="spx" maxlength="80">`, async () => { const t = $("#spx").value.trim(); if (!t) return "Write something first."; const r = await sbAddRow({ kind: "text", text: t, x: 8, y: 4, w: 70, rot: 0, style: {} }); if (r) S.ssel = r.id; spRender() }) }
+      else if (a === "sbtedit") { const it = S.sbi.find(x => x.id === S.ssel); dialog(`<h3>Edit text</h3><label for="spx">Caption</label><input id="spx" maxlength="80" value="${esc(it.text || "")}">`, async () => { const t = $("#spx").value.trim(); if (!t) return "Write something first."; if (await sbOp(it.id, { text: t })) spRender() }) }
+      else if (a === "sbsz") { const it = S.sbi.find(x => x.id === S.ssel); if (it && await sbOp(it.id, { w: Math.min(95, Math.max(6, +it.w + +b.dataset.d)) })) spRender() }
+      else if (a === "sbrot") { const it = S.sbi.find(x => x.id === S.ssel); if (it && await sbOp(it.id, { rot: (+it.rot + +b.dataset.d) % 360 })) spRender() }
+      else if (a === "sbz") { const it = S.sbi.find(x => x.id === S.ssel); if (!it) return; const z = +b.dataset.d > 0 ? sbMaxZ() + 1 : Math.min(...S.sbi.map(x => x.z)) - 1; if (await sbOp(it.id, { z })) { S.sbi.sort((p, q) => p.z - q.z); spRender() } }
+      else if (a === "sbstyle") { const it = S.sbi.find(x => x.id === S.ssel); if (!it) return; const st = { ...(it.style || {}) }; st[b.dataset.k] = !st[b.dataset.k]; if (await sbOp(it.id, { style: st })) spRender() }
+      else if (a === "sbdup") { const it = S.sbi.find(x => x.id === S.ssel); if (!it) return; const r = await sbAddRow({ kind: it.kind, ref_id: it.ref_id, text: it.text, x: Math.min(80, +it.x + 4), y: Math.min(80, +it.y + 4), w: it.w, rot: it.rot, style: it.style || {} }); if (r) { S.ssel = r.id; spRender() } }
+      else if (a === "sbdel") { const it = S.sbi.find(x => x.id === S.ssel); if (!it || !confirm("Delete this element? You can undo right after.")) return; const r = await sb.from("scrapbook_items").update({ deleted_at: new Date().toISOString() }).eq("id", it.id); if (r.error) return toast(msg(r.error)); S.sbi = S.sbi.filter(x => x !== it); S.sh.push({ t: "del", id: it.id, row: it }); S.sr = []; S.ssel = null; spRender() }
+      else if (a === "sbundo") { const h = S.sh.pop(); if (!h) return; S.sr.push(h); await sbApply(h, true); spRender() }
+      else if (a === "sbredo") { const h = S.sr.pop(); if (!h) return; S.sh.push(h); await sbApply(h, false); spRender() }
+      else if (a === "sbexp") { sbExport() }
       else if (a === "btab") { B.tab = b.dataset.k; document.querySelectorAll("[data-t]").forEach(x => x.hidden = x.dataset.t !== B.tab); b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)) }
       else if (a === "bsel") { const i = +b.dataset.i; B.sel = B.sel === i ? null : i; bthumbs() }
       else if (a === "bmv") { const i = +b.dataset.i, j = i + +b.dataset.d, n = BL[B.lay].n; if (j < 0 || j >= n) return;[B.ph[i], B.ph[j]] = [B.ph[j], B.ph[i]]; B.sel = null; bthumbs(); bq() }
@@ -3212,7 +3412,7 @@
       const [k, g, st] = await Promise.all([sb.from("keepsakes").select("*").eq("couple_id", S.couple.id).order("item_date", { ascending: false, nullsFirst: false }), sb.from("scrapbook_pages").select("*").eq("couple_id", S.couple.id).order("created_at", { ascending: false }), sb.from("stamps").select("*").eq("couple_id", S.couple.id).order("taken_at", { ascending: true })]);
       S.kp = k.data || []; S.pgs = g.data || []; S.stp = st.data || []; S.stE = st.error; S.kpE = k.error || g.error; await signed([...S.kp.map(x => x.edited_path), ...S.stp.map(x => x.stamp_path)].filter(Boolean)); colPaint()
     }
-    function colPaint() { app.innerHTML = topbar() + `<h1>Our collection</h1><div class="chips" role="group" aria-label="Section">${[["st", "Stamps"], ["kp", "Keepsakes"], ["sb", "Scrapbook"]].map(([k, l]) => `<button data-act="cttab" data-k="${k}" class="${S.ct === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.kpE ? `<p class="err">${esc(msg(S.kpE))} Did you run schema_4.sql?</p>` : ""}<div id="colb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; colBody() }
+    function colPaint() { app.innerHTML = topbar() + `<h1>Our collection</h1><div class="chips" role="group" aria-label="Section">${[["fo", "Folders"], ["st", "Stamps"], ["kp", "Keepsakes"], ["sb", "Scrapbook"]].map(([k, l]) => `<button data-act="cttab" data-k="${k}" class="${S.ct === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.kpE ? `<p class="err">${esc(msg(S.kpE))} Did you run schema_4.sql?</p>` : ""}<div id="colb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; colBody() }
     function colBody() {
       const el = $("#colb"); if (S.ct === "st") { stampsBody(el); return }
       if (S.ct === "kp") {
@@ -3265,7 +3465,7 @@
     }
     function kview(id) {
       const k = S.kp.find(x => x.id === id), d = $("#dlg"); d.innerHTML = `<img id="kimg" src="${S.urls[k.edited_path] || ""}" alt="${esc(k.title)}" style="width:100%;max-height:50vh;object-fit:contain;background:var(--bg2);border-radius:12px"><h2>${esc(k.title)}</h2><p class="muted">${k.item_date ? fdt(k.item_date) + " · " : ""}${esc(k.category)}${k.occasion ? " · " + esc(k.occasion) : ""}</p>${k.caption ? `<p>${esc(k.caption)}</p>` : ""}${k.ocr_text ? `<p class="muted" style="white-space:pre-wrap">${esc(k.ocr_text)}</p>` : ""}
-  <div class="row"><button class="btn alt" data-act="korig" data-id="${id}">View original</button><button class="btn ghost" data-act="kedit" data-id="${id}">Edit details</button><button class="btn danger" data-act="kdel" data-id="${id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
+  <div class="row"><button class="btn ghost" data-act="kfold" data-id="${id}">Folders</button><button class="btn alt" data-act="korig" data-id="${id}">View original</button><button class="btn ghost" data-act="kedit" data-id="${id}">Edit details</button><button class="btn danger" data-act="kdel" data-id="${id}">Delete</button><button class="btn ghost" data-act="close">Close</button></div>`; d.showModal()
     }
     /* scrapbook */
     const rnd = (a, b) => a + Math.random() * (b - a);
@@ -3531,14 +3731,14 @@
   ${tr ? "" : `<div class="rx" role="group" aria-label="Reactions">${RX.map(e => { const c = X.reacts.filter(r => r.emoji === e), on = c.some(r => r.user_id === me); return `<button class="${on ? "on" : ""}" data-act="react" data-e="${e}" aria-pressed="${on}" aria-label="React ${e}">${e}${c.length ? ` <small>${c.length}</small>` : ""}</button>` }).join("")}</div>
   <h3>Our stories</h3>${X.notes.map(x => item(x, "memory_notes")).join("") || `<p class="muted">Add your own side of this memory.</p>`}<textarea id="nn" rows="2" maxlength="4000" placeholder="Add your own story or perspective" aria-label="Your story"></textarea><div class="row" style="margin:.4em 0 .8em"><button class="btn alt" data-act="nadd">Share my story</button><label class="btn ghost" style="margin:0">Add photos<input id="mpup" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label></div>
   <h3>Comments</h3>${X.comments.map(x => item(x, "memory_comments")).join("")}<textarea id="cn" rows="1" maxlength="2000" placeholder="Write a comment" aria-label="Comment"></textarea><div class="row" style="margin:.4em 0"><button class="btn ghost" data-act="cadd">Comment</button></div>`}
-  <div class="row" style="margin-top:.6em">${tr ? `<button class="btn alt" data-act="restore" data-id="${m.id}">Restore</button>${mine ? `<button class="btn danger" data-act="purge" data-id="${m.id}">Delete forever</button>` : ""}` : `<button class="btn ghost" data-act="fav" data-id="${m.id}">${m.favourite ? "Unfavourite" : "Favourite"}</button>${mine ? `<button class="btn ghost" data-act="edit1" data-id="${m.id}">Edit</button>` : ""}<button class="btn ghost" data-act="arch" data-id="${m.id}">${m.archived ? "Restore" : "Archive"}</button><button class="btn danger" data-act="trash" data-id="${m.id}">${mine ? "Move to Recently Deleted" : "Remove from our diary"}</button>`}<button class="btn ghost" data-act="close">Close</button></div>`; if (!d.open) d.showModal()
+  <div class="row" style="margin-top:.6em">${tr ? `<button class="btn alt" data-act="restore" data-id="${m.id}">Restore</button>${mine ? `<button class="btn danger" data-act="purge" data-id="${m.id}">Delete forever</button>` : ""}` : `<button class="btn ghost" data-act="fav" data-id="${m.id}">${m.favourite ? "Unfavourite" : "Favourite"}</button>${mine ? `<button class="btn ghost" data-act="edit1" data-id="${m.id}">Edit</button>` : ""}${m.visibility === "shared" ? `<button class="btn ghost" data-act="mfold" data-id="${m.id}">Folders</button>` : ""}<button class="btn ghost" data-act="arch" data-id="${m.id}">${m.archived ? "Restore" : "Archive"}</button><button class="btn danger" data-act="trash" data-id="${m.id}">${mine ? "Move to Recently Deleted" : "Remove from our diary"}</button>`}<button class="btn ghost" data-act="close">Close</button></div>`; if (!d.open) d.showModal()
     }
     async function loadContrib() {
       const q = (t, c) => sb.from(t).select(c).is("deleted_at", null).order("created_at", { ascending: false }).limit(6), [a, b, c] = await Promise.all([q("memory_notes", "id,memory_id,author_id,created_at"), q("memory_photos", "id,memory_id,uploader_id,created_at"), q("memory_comments", "id,memory_id,author_id,created_at")]);
       S.cn = [...(a.data || []).map(x => ({ ...x, by: x.author_id, k: "story" })), ...(b.data || []).map(x => ({ ...x, by: x.uploader_id, k: "photo" })), ...(c.data || []).map(x => ({ ...x, by: x.author_id, k: "comment" }))].sort((x, y) => y.created_at.localeCompare(x.created_at)).slice(0, 5)
     }
     function contribHtml() { const h = (S.cn || []).map(x => { const m = S.mems.find(q => q.id === x.memory_id); return m ? `<button class="ri" data-act="open" data-id="${m.id}">${avatar(x.by, 32)}<div style="flex:1"><strong>${esc(nameOf(x.by))}</strong> ${x.k === "story" ? "added a story to" : x.k === "photo" ? "added a photo to" : "commented on"} “${esc(m.title)}”<br><span class="muted">${ago(x.created_at)}</span></div></button>` : "" }).join(""); return h || `<p class="muted">Stories, photos and comments you both add will show up here.</p>` }
-    const qaHtml = () => `<div class="qa" role="group" aria-label="Quick actions">${[["newmem", "Add a memory"], ["newdiary", "Write a diary entry"], ["qaplan", "Make a plan"], ["qasb", "Open scrapbook"], ["qakp", "Keepsakes"], ["qast", "Stamps"]].map(([a, l]) => `<button class="btn ghost" data-act="${a}">${l}</button>`).join("")}</div>`;
+    const qaHtml = () => `<div class="qa" role="group" aria-label="Quick actions">${[["newmem", "Add a memory"], ["newdiary", "Write a diary entry"], ["qaplan", "Make a plan"], ["qasb", "Open scrapbook"], ["qakp", "Keepsakes"], ["qafo", "Folders"]].map(([a, l]) => `<button class="btn ghost" data-act="${a}">${l}</button>`).join("")}</div>`;
     /* notifications */
     async function loadUnread() { if (!S.user || !S.couple) return; const r = await sb.from("notifications").select("id", { count: "exact", head: true }).eq("recipient_id", S.user.id).is("read_at", null); if (r.error) return; S.unread = r.count || 0; const b = document.querySelector(".nav [data-p=notif]"); if (!b) return; let n = b.querySelector(".nb"); if (S.unread > 0) { if (!n) { n = document.createElement("b"); n.className = "nb"; b.append(n) } n.textContent = S.unread > 9 ? "9+" : S.unread; b.setAttribute("aria-label", "Notifications, " + S.unread + " unread") } else if (n) { n.remove(); b.setAttribute("aria-label", "Notifications") } }
     setInterval(() => { if (S.user && S.couple && !document.hidden) loadUnread() }, 60000);
@@ -3594,12 +3794,12 @@
       } catch (e) { toast("Couldn't build the ZIP. Try again on a stronger connection.") } b.disabled = false; b.textContent = old
     }
     async function minePaths() {
-      const me = S.user.id, g = async (t, c, col) => { const r = await sb.from(t).select(c).eq(col, me); return r.data || [] }; const [m, mp, k, st, sk, bz] = await Promise.all([g("memories", "photos", "created_by"), g("memory_photos", "path", "uploader_id"), g("keepsakes", "original_path,edited_path", "created_by"), g("stamps", "stamp_path,source_path", "created_by"), g("stickers", "path", "created_by"), g("photobooth_creations", "path", "created_by")]);
-      return [...m.flatMap(x => x.photos), ...mp.map(x => x.path), ...k.flatMap(x => [x.original_path, x.edited_path]), ...st.flatMap(x => [x.stamp_path, x.source_path]), ...sk.map(x => x.path), ...bz.map(x => x.path), S.profile && S.profile.avatar_path]
+      const me = S.user.id, g = async (t, c, col) => { const r = await sb.from(t).select(c).eq(col, me); return r.data || [] }; const [m, mp, k, st, sk, bz, cu] = await Promise.all([g("memories", "photos", "created_by"), g("memory_photos", "path", "uploader_id"), g("keepsakes", "original_path,edited_path", "created_by"), g("stamps", "stamp_path,source_path", "created_by"), g("stickers", "path", "created_by"), g("photobooth_creations", "path", "created_by"), g("cutouts", "path,source_path", "created_by")]);
+      return [...m.flatMap(x => x.photos), ...mp.map(x => x.path), ...k.flatMap(x => [x.original_path, x.edited_path]), ...st.flatMap(x => [x.stamp_path, x.source_path]), ...sk.map(x => x.path), ...bz.map(x => x.path), ...cu.flatMap(x => [x.path, x.source_path]), S.profile && S.profile.avatar_path]
     }
     async function xmine(b) {
       b.disabled = true; const me = S.user.id, out = { exported_at: new Date().toISOString(), profile: S.profile };
-      for (const [t, c] of [["memories", "created_by"], ["memory_notes", "author_id"], ["memory_comments", "author_id"], ["memory_photos", "uploader_id"], ["memory_reactions", "user_id"], ["timeline_entries", "created_by"], ["events", "created_by"], ["bucket_items", "created_by"], ["places", "created_by"], ["keepsakes", "created_by"], ["stamps", "created_by"], ["stickers", "created_by"], ["scrapbook_pages", "created_by"], ["photobooth_creations", "created_by"], ["perspectives", "created_by"], ["perspective_answers", "user_id"], ["daily_answers", "user_id"]]) { const r = await sb.from(t).select("*").eq(c, me); out[t] = r.error ? [] : r.data }
+      for (const [t, c] of [["memories", "created_by"], ["memory_notes", "author_id"], ["memory_comments", "author_id"], ["memory_photos", "uploader_id"], ["memory_reactions", "user_id"], ["timeline_entries", "created_by"], ["events", "created_by"], ["bucket_items", "created_by"], ["places", "created_by"], ["keepsakes", "created_by"], ["stamps", "created_by"], ["stickers", "created_by"], ["scrapbook_pages", "created_by"], ["scrapbook_items", "author_id"], ["cutouts", "created_by"], ["folders", "created_by"], ["photobooth_creations", "created_by"], ["perspectives", "created_by"], ["perspective_answers", "user_id"], ["daily_answers", "user_id"]]) { const r = await sb.from(t).select("*").eq(c, me); out[t] = r.error ? [] : r.data }
       const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })); a.download = "eros-my-contributions.json"; a.click(); b.disabled = false; toast("Your contributions were downloaded")
     }
     document.addEventListener("change", async e => {
@@ -3631,6 +3831,171 @@
     document.addEventListener("pointerdown", e => { if (!AV || e.target.id !== "avc") return; AV.dr = { x: e.clientX, y: e.clientY, ox: AV.ox, oy: AV.oy }; e.target.setPointerCapture(e.pointerId) });
     document.addEventListener("pointermove", e => { const d = AV && AV.dr; if (!d) return; AV.ox = d.ox + e.clientX - d.x; AV.oy = d.oy + e.clientY - d.y; avClamp(); avDraw() });
     document.addEventListener("pointerup", () => { if (AV) AV.dr = null });
+
+
+    /* ---------- Folders, cutout studio, collaborative scrapbook (11) ---------- */
+    S.fol = []; S.fi = []; S.fopen = null; S.cut = []; S.sbi = []; S.sh = []; S.sr = []; S.ssel = null;
+    async function collection() {
+      app.innerHTML = topbar() + `<h1>Our collection</h1>${ldr()}`; const c = S.couple.id, q = (t) => sb.from(t).select("*").eq("couple_id", c);
+      const [k, g, st, cu, fo, fi] = await Promise.all([q("keepsakes").order("item_date", { ascending: false, nullsFirst: false }), q("scrapbook_pages").order("created_at", { ascending: false }), q("stamps").order("taken_at", { ascending: true }), q("cutouts").order("created_at", { ascending: false }), q("folders").order("created_at"), sb.from("folder_items").select("*")]);
+      S.kp = k.data || []; S.pgs = g.data || []; S.stp = st.data || []; S.stE = st.error; S.cut = cu.data || []; S.cutE = cu.error; S.fol = fo.data || []; S.folE = fo.error; S.fi = fi.data || []; S.kpE = k.error || g.error;
+      await loadMems(); await signed([...S.kp.map(x => x.edited_path), ...S.stp.map(x => x.stamp_path), ...S.cut.map(x => x.path)].filter(Boolean)); colPaint()
+    }
+    async function loadFolders() { const [fo, fi] = await Promise.all([sb.from("folders").select("*").eq("couple_id", S.couple.id).order("created_at"), sb.from("folder_items").select("*")]); S.fol = fo.data || []; S.fi = fi.data || []; S.folE = fo.error }
+    function colBody() {
+      const el = $("#colb"); if (!el) return; if (S.ct === "fo") return foldersBody(el); if (S.ct === "st") return stampsBody(el);
+      if (S.ct === "kp") {
+        const l = S.kp.filter(k => !S.kfc || k.category === S.kfc);
+        el.innerHTML = `<div class="row"><button class="btn" data-act="kscan">Add a keepsake</button><button class="btn alt" data-act="cutopen">Make a cutout</button><select id="kfc" aria-label="Filter by category" style="width:auto"><option value="">All types</option>${KC.map(c => `<option ${S.kfc === c ? "selected" : ""}>${c}</option>`).join("")}</select></div>${S.cutE ? `<p class="err">${esc(msg(S.cutE))} Did you run schema_11.sql?</p>` : ""}
+    <div class="mgrid" style="margin-top:12px">${l.map(k => `<button class="card mem" data-act="kview" data-id="${k.id}"><div class="ph" style="background-image:url('${S.urls[k.edited_path] || ""}');background-size:contain;background-color:var(--bg2)" role="img" aria-label="${esc(k.title)}"></div><div class="pad"><h3>${esc(k.title)}</h3><p class="muted">${k.item_date ? fdt(k.item_date) : ""}${k.occasion ? " · " + esc(k.occasion) : ""}</p><span class="tag">${esc(k.category)}</span></div></button>`).join("") || `<div class="card"><p class="muted">Photograph a ticket, note or wristband to keep it forever.</p></div>`}</div>
+    <h3 style="margin-top:1.2em">Cutouts</h3><div class="rec">${S.cut.map(c => `<button class="recc" data-act="cview" data-id="${c.id}"><div class="ph" style="background-image:url('${S.urls[c.path] || ""}');background-size:contain;background-repeat:no-repeat;background-position:center;background-color:var(--bg2)" role="img" aria-label="${esc(c.title || "Cutout")}"></div><span>${esc(c.title || "Cutout")}</span><small class="by">${avatar(c.created_by, 16)} ${esc(nameOf(c.created_by))}</small></button>`).join("") || `<p class="muted">Turn part of any photo into a reusable sticker.</p>`}</div>`; return
+      }
+      if (S.sp) return spPaint();
+      el.innerHTML = `<button class="btn" data-act="spnew">New scrapbook page</button><div style="margin-top:12px">${S.pgs.map(g => `<button class="ri" data-act="spopen" data-id="${g.id}"><div style="flex:1"><strong>${esc(g.title)}</strong><br><span class="muted">${fdt(g.created_at.slice(0, 10))}</span></div>${avatar(g.created_by, 26)}</button>`).join("") || `<div class="card"><p class="muted">Arrange keepsakes and cutouts on a page like a real scrapbook. You can both add to the same page.</p></div>`}</div>`
+    }
+    /* folders */
+    function foldersBody(el) {
+      if (S.fopen) {
+        const f = S.fol.find(x => x.id === S.fopen); if (!f) { S.fopen = null; return foldersBody(el) }
+        const rows = S.fi.filter(x => x.folder_id === f.id).map(x => {
+          if (x.item_type === "memory") { const m = S.mems.find(q => q.id === x.item_id); return m ? mrow(m) : "" }
+          if (x.item_type === "keepsake") { const k = S.kp.find(q => q.id === x.item_id); return k ? `<button class="ri" data-act="kview" data-id="${k.id}"><div class="th" style="background-image:url('${S.urls[k.edited_path] || ""}');background-size:contain;background-repeat:no-repeat;background-position:center"></div><div><strong>${esc(k.title)}</strong><br><span class="muted">Keepsake</span></div></button>` : "" }
+          const g = S.pgs.find(q => q.id === x.item_id); return g ? `<button class="ri" data-act="fpage" data-id="${g.id}"><div style="flex:1"><strong>${esc(g.title)}</strong><br><span class="muted">Scrapbook page</span></div></button>` : ""
+        }).join("");
+        el.innerHTML = `<div class="row"><button class="btn ghost" data-act="fback">All folders</button><h2 style="margin:0">${esc(f.name)}</h2></div><div class="row" style="margin:8px 0"><button class="btn ghost sm" data-act="frename" data-id="${f.id}">Rename</button><button class="btn danger sm" data-act="fdel" data-id="${f.id}">Delete folder</button></div><p class="muted">Folders are shared. Deleting a folder never deletes what's inside it.</p>${rows || `<p class="muted">Empty. Use the Folders button on a memory, keepsake or scrapbook page to add it here.</p>`}`; return
+      }
+      el.innerHTML = `<div class="row"><button class="btn" data-act="fnew">New folder</button></div>${S.folE ? `<p class="err">${esc(msg(S.folE))} Did you run schema_11.sql?</p>` : ""}<div class="mgrid" style="margin-top:12px">${S.fol.map(f => { const n = S.fi.filter(x => x.folder_id === f.id).length; return `<button class="card mem" data-act="fopen" data-id="${f.id}" style="height:auto"><div class="pad"><h3>${esc(f.name)}</h3><p class="muted">${n} item${n === 1 ? "" : "s"}</p><span class="by">${avatar(f.created_by, 18)} ${esc(nameOf(f.created_by))}</span></div></button>` }).join("") || `<div class="card"><p class="muted">Group memories, keepsakes and scrapbook pages into shared folders, like a trip or a season.</p></div>`}</div>`
+    }
+    function foldDlg(type, id) {
+      const inn = new Set(S.fi.filter(x => x.item_type === type && x.item_id === id).map(x => x.folder_id));
+      dialog(`<h3>Add to folders</h3>${S.fol.length ? S.fol.map(f => `<label class="chk"><input type="checkbox" name="fch" value="${f.id}" ${inn.has(f.id) ? "checked" : ""}> ${esc(f.name)}</label>`).join("") : `<p class="muted">No folders yet.</p>`}<label for="fnew">New folder (optional)</label><input id="fnew" maxlength="60" placeholder="Trip to Seoul">`,
+        async () => {
+          const want = new Set([...document.querySelectorAll("input[name=fch]:checked")].map(x => x.value)), nn = $("#fnew").value.trim();
+          if (nn) { const r = await sb.from("folders").insert({ couple_id: S.couple.id, name: nn }).select().single(); if (r.error) return msg(r.error) + " Did you run schema_11.sql?"; want.add(r.data.id) }
+          for (const fid of want) if (!inn.has(fid)) { const r = await sb.from("folder_items").insert({ folder_id: fid, item_type: type, item_id: id }); if (r.error) return msg(r.error) }
+          for (const fid of inn) if (!want.has(fid)) { const r = await sb.from("folder_items").delete().eq("folder_id", fid).eq("item_type", type).eq("item_id", id); if (r.error) return msg(r.error) }
+          await loadFolders(); if (S.page === "coll" && S.ct === "fo") colBody(); toast("Folders updated")
+        })
+    }
+    /* cutout studio */
+    let CS = null;
+    const cloneC = c => { const n = document.createElement("canvas"); n.width = c.width; n.height = c.height; n.getContext("2d").drawImage(c, 0, 0); return n };
+    function cutOpen() {
+      const d = $("#dlg"); d.className = "csdlg";
+      d.innerHTML = `<h3 style="margin:0 0 6px">Make a cutout</h3><p class="muted">Pick a photo. It stays on your device while you edit.</p><div class="row"><label class="btn alt" style="margin:0">Take a photo<input id="cf1" type="file" accept="image/*" capture="environment" hidden></label><label class="btn ghost" style="margin:0">Upload<input id="cf2" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button class="btn ghost" data-act="cfrom" data-w="kp">From keepsakes</button><button class="btn ghost" data-act="cfrom" data-w="mem">From my diary</button></div><div id="cpick"></div><div class="row" style="margin-top:12px"><button class="btn ghost" data-act="close">Close</button></div>`; if (!d.open) d.showModal()
+    }
+    document.addEventListener("close", e => { if (e.target.id === "dlg") { e.target.className = ""; CS = null } }, true);
+    async function cutLoad(blob) {
+      const im = await bimg(URL.createObjectURL(blob)).catch(() => null); if (!im) return toast("That image couldn't be read. Try a JPG or PNG."); const k = Math.min(1, 1000 / Math.max(im.naturalWidth, im.naturalHeight)), W = Math.max(1, Math.round(im.naturalWidth * k)), H = Math.max(1, Math.round(im.naturalHeight * k)), o = document.createElement("canvas"); o.width = W; o.height = H; o.getContext("2d").drawImage(im, 0, 0, W, H);
+      CS = { blob, orig: o, base: cloneC(o), cut: cloneC(o), tool: "lasso", brush: 5, hist: [], redo: [], path: null, rect: null }; cutEditor()
+    }
+    function cutEditor() {
+      const d = $("#dlg"); d.innerHTML = `<div class="csbar" role="group" aria-label="Tools">${[["lasso", "Lasso"], ["crop", "Crop"], ["erase", "Erase"], ["restore", "Restore"], ["auto", "Auto cutout"]].map(([k, l]) => `<button class="${CS.tool === k ? "on" : ""}" data-act="cstool" data-k="${k}">${l}</button>`).join("")}</div><div id="cswrap"><div id="csbox"><canvas id="csc"></canvas><canvas id="csov"></canvas></div></div><div class="csctl" id="csctl"></div>
+  <div class="csfoot"><div class="row"><button class="btn ghost sm" data-act="csundo">Undo</button><button class="btn ghost sm" data-act="csredo">Redo</button><button class="btn ghost sm" data-act="csreset">Start over</button></div><div class="bcols"><div><label for="cst">Name</label><input id="cst" maxlength="80" placeholder="My cutout"></div><div><label for="csd">After saving</label><select id="csd"><option value="">Keep in Keepsakes</option>${S.pgs.map(g => `<option value="${g.id}">Also place on “${esc(g.title)}”</option>`).join("")}</select></div></div><p class="err" id="cserr" role="alert"></p><div class="row"><button class="btn" data-act="cssave">Save cutout</button><button class="btn ghost" data-act="close">Cancel</button></div></div>`;
+      if (!d.open) d.showModal(); requestAnimationFrame(() => { csFit(); csDraw(); csCtl() })
+    }
+    function csFit() { const w = $("#cswrap"), b = $("#csbox"); if (!w || !b || !CS) return; const k = Math.min(w.clientWidth / CS.cut.width, w.clientHeight / CS.cut.height); b.style.width = CS.cut.width * k + "px"; b.style.height = CS.cut.height * k + "px" }
+    addEventListener("resize", () => { if (CS && $("#csbox")) { csFit() } });
+    function csDraw() {
+      const c = $("#csc"), o = $("#csov"); if (!c || !CS) return; c.width = o.width = CS.cut.width; c.height = o.height = CS.cut.height; c.getContext("2d").drawImage(CS.cut, 0, 0); const g = o.getContext("2d"), lw = Math.max(2, CS.cut.width / 250); g.lineWidth = lw;
+      if (CS.path && CS.path.length > 1) { g.beginPath(); CS.path.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.fillStyle = "rgba(176,94,116,.25)"; g.fill(); g.strokeStyle = "#fff"; g.setLineDash([lw * 3, lw * 2]); g.stroke(); g.strokeStyle = "#B05E74"; g.lineDashOffset = lw * 3; g.stroke() }
+      if (CS.rect) { const r = CS.rect; g.strokeStyle = "#fff"; g.setLineDash([lw * 3, lw * 2]); g.strokeRect(r.x, r.y, r.w, r.h); g.fillStyle = "rgba(0,0,0,.35)"; g.fillRect(0, 0, o.width, r.y); g.fillRect(0, r.y + r.h, o.width, o.height); g.fillRect(0, r.y, r.x, r.h); g.fillRect(r.x + r.w, r.y, o.width, r.h) }
+    }
+    function csCtl() {
+      const e = $("#csctl"); if (!e || !CS) return; const t = CS.tool;
+      e.innerHTML = t === "lasso" ? `<span class="muted">Draw around what you want to keep.</span><button class="btn alt sm" data-act="cskeep" ${CS.path && CS.path.length > 3 ? "" : "disabled"}>Keep inside</button><button class="btn ghost sm" data-act="csdrop" ${CS.path && CS.path.length > 3 ? "" : "disabled"}>Remove inside</button>`
+        : t === "crop" ? `<span class="muted">Drag a box over the part to keep.</span><button class="btn alt sm" data-act="cscrop" ${CS.rect && CS.rect.w > 8 ? "" : "disabled"}>Apply crop</button>`
+          : t === "auto" ? `<span class="muted" id="csmsg">Finds the main subject on your device. The first time it downloads a tool.</span><button class="btn alt sm" data-act="csauto">Cut out subject</button>`
+            : `<label for="csbr" style="margin:0">Brush size</label><input id="csbr" type="range" min="2" max="15" value="${CS.brush}" data-cs="brush" style="max-width:160px">`
+    }
+    function csSnap() { CS.hist.push({ o: cloneC(CS.orig), c: cloneC(CS.cut) }); if (CS.hist.length > 8) CS.hist.shift(); CS.redo = [] }
+    function csRestore(sn) { CS.orig = sn.o; CS.cut = sn.c; CS.path = null; CS.rect = null; csFit(); csDraw(); csCtl() }
+    function csBrush(x, y) { const g = CS.cut.getContext("2d"), r = CS.brush / 100 * CS.cut.width / 2; g.save(); if (CS.tool === "erase") { g.globalCompositeOperation = "destination-out"; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill() } else { g.beginPath(); g.arc(x, y, r, 0, 7); g.clip(); g.drawImage(CS.orig, 0, 0) } g.restore() }
+    const csPt = e => { const r = $("#csov").getBoundingClientRect(); return [(e.clientX - r.left) * CS.cut.width / r.width, (e.clientY - r.top) * CS.cut.height / r.height] };
+    document.addEventListener("pointerdown", e => {
+      if (!CS || e.target.id !== "csov") return; e.target.setPointerCapture(e.pointerId); CS.dn = true; const p = csPt(e); CS.last = p;
+      if (CS.tool === "lasso") CS.path = [p]; else if (CS.tool === "crop") CS.rect = { x: p[0], y: p[1], w: 0, h: 0, sx: p[0], sy: p[1] }; else if (CS.tool === "erase" || CS.tool === "restore") { csSnap(); csBrush(p[0], p[1]) } csDraw()
+    });
+    document.addEventListener("pointermove", e => {
+      if (!CS || !CS.dn) return; const p = csPt(e);
+      if (CS.tool === "lasso") CS.path.push(p); else if (CS.tool === "crop") { const r = CS.rect; r.x = Math.min(r.sx, p[0]); r.y = Math.min(r.sy, p[1]); r.w = Math.abs(p[0] - r.sx); r.h = Math.abs(p[1] - r.sy) }
+      else if (CS.tool === "erase" || CS.tool === "restore") { const dx = p[0] - CS.last[0], dy = p[1] - CS.last[1], d = Math.hypot(dx, dy), st = Math.max(1, CS.brush / 100 * CS.cut.width / 4), n = Math.ceil(d / st); for (let i = 1; i <= n; i++)csBrush(CS.last[0] + dx * i / n, CS.last[1] + dy * i / n); CS.last = p } csDraw()
+    });
+    document.addEventListener("pointerup", () => { if (!CS || !CS.dn) return; CS.dn = false; if (CS.tool === "lasso" || CS.tool === "crop") csCtl() });
+    document.addEventListener("input", e => { if (CS && e.target.dataset && e.target.dataset.cs === "brush") CS.brush = +e.target.value });
+    function csPathClip(g) { g.beginPath(); CS.path.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath() }
+    async function csAuto() {
+      const m = () => $("#csmsg"); try {
+        m().textContent = "Loading the cutout tool… (the first time can take a minute)"; const mod = await import("https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm"), blob = await new Promise(r => CS.orig.toBlob(r, "image/png")), out = await mod.removeBackground(blob, { output: { format: "image/png" }, progress: (k, c, t) => { if (m()) m().textContent = "Working… " + (t ? Math.round(c / t * 100) : 0) + "%" } }), im = await bimg(URL.createObjectURL(out));
+        csSnap(); const g = CS.cut.getContext("2d"); g.clearRect(0, 0, CS.cut.width, CS.cut.height); g.drawImage(im, 0, 0, CS.cut.width, CS.cut.height); csDraw(); csCtl(); if (m()) m().textContent = "Done. Use Erase and Restore to fine-tune."
+      } catch (e) { if (m()) m().textContent = "Automatic cutout couldn't run here. Use Lasso instead, or try again with a stronger connection." }
+    }
+    async function sbInsertTo(page, f) { let z = f.z; if (z == null) { const mz = await sb.from("scrapbook_items").select("z").eq("page_id", page).order("z", { ascending: false }).limit(1); z = ((mz.data && mz.data[0] && mz.data[0].z) || 0) + 1 } return await sb.from("scrapbook_items").insert({ page_id: page, couple_id: S.couple.id, ...f, z }).select().single() }
+    async function csSave() {
+      const err = t => { $("#cserr").textContent = t }, c = CS.cut, d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+      for (let y = 0; y < c.height; y++)for (let x = 0; x < c.width; x++)if (d[(y * c.width + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
+      if (x1 < 0) return err("There's nothing left to save. Undo or restore part of the photo first.");
+      const pad = 4, sx = Math.max(0, x0 - pad), sy = Math.max(0, y0 - pad), sw = Math.min(c.width, x1 + pad + 1) - sx, sh = Math.min(c.height, y1 + pad + 1) - sy, out = document.createElement("canvas"); out.width = sw; out.height = sh; out.getContext("2d").drawImage(c, sx, sy, sw, sh, 0, 0, sw, sh);
+      const btn = document.querySelector("[data-act=cssave]"); btn.disabled = true; err("Saving…");
+      try {
+        const id = crypto.randomUUID(), base = `${S.couple.id}/cutouts/${id}`, png = await new Promise(r => out.toBlob(r, "image/png")), ok = /^image\/(jpeg|png|webp)$/.test(CS.blob.type) && CS.blob.size <= 9e6, ob = ok ? CS.blob : await new Promise(r => CS.orig.toBlob(r, "image/jpeg", .9)), ext = ok ? CS.blob.type.split("/")[1] : "jpg";
+        let u = await sb.storage.from("memories").upload(base + "/cutout.png", png, { contentType: "image/png" }); if (u.error) throw u.error; u = await sb.storage.from("memories").upload(`${base}/original.${ext}`, ob, { contentType: ok ? CS.blob.type : "image/jpeg" }); if (u.error) throw u.error;
+        const r = await sb.from("cutouts").insert({ id, couple_id: S.couple.id, title: $("#cst").value.trim() || "Cutout", path: base + "/cutout.png", source_path: `${base}/original.${ext}` }); if (r.error) throw r.error;
+        const dest = $("#csd").value; if (dest) { const r2 = await sbInsertTo(dest, { kind: "cutout", ref_id: id, x: 30, y: 30, w: 35, rot: 0, style: { o: true, s: true } }); if (r2.error) throw r2.error }
+        $("#dlg").close(); S.ct = "kp"; await collection(); toast(dest ? "Saved and placed on your page" : "Cutout saved")
+      } catch (e) { btn.disabled = false; err("Couldn't save: " + msg(e) + " Did you run schema_11.sql?") }
+    }
+    document.addEventListener("change", async e => { if (e.target.id === "cf1" || e.target.id === "cf2") { const f = e.target.files[0]; if (f) cutLoad(f) } });
+    function cview(id) { const c = S.cut.find(x => x.id === id), d = $("#dlg"); d.innerHTML = `<img id="cvimg" src="${S.urls[c.path] || ""}" alt="${esc(c.title || "Cutout")}" style="max-width:100%;max-height:46vh;display:block;margin:auto;background:var(--bg2);border-radius:12px"><h2>${esc(c.title || "Cutout")}</h2><p class="by">${avatar(c.created_by, 24)} ${esc(nameOf(c.created_by))} · ${ago(c.created_at)}</p><div class="row"><button class="btn alt" data-act="cplace" data-id="${id}">Place in scrapbook</button><button class="btn ghost" data-act="corig" data-id="${id}">View original</button><button class="btn ghost" data-act="cdl" data-id="${id}">Download</button>${c.created_by === S.user.id ? `<button class="btn danger" data-act="cdelc" data-id="${id}">Delete</button>` : ""}<button class="btn ghost" data-act="close">Close</button></div>`; d.showModal() }
+    /* scrapbook v2: one row per element, edited only by its author */
+    function seSrc(it) { if (it.kind === "keepsake") { const k = S.kp.find(x => x.id === it.ref_id); return k && S.urls[k.edited_path] } if (it.kind === "cutout") { const c = S.cut.find(x => x.id === it.ref_id); return c && S.urls[c.path] } if (it.kind === "stamp") { const t = S.stp.find(x => x.id === it.ref_id); return t && S.urls[t.stamp_path] } }
+    function seHtml(it) { const st = it.style || {}; if (it.kind !== "text" && !seSrc(it)) return ""; return `<div class="se ${st.b ? "b" : ""} ${st.s ? "s" : ""} ${st.o ? "o" : ""} ${it.kind === "text" ? "tx" : ""} ${S.ssel === it.id ? "sel" : ""}" data-i="${it.id}" style="left:${it.x}%;top:${it.y}%;width:${it.w}%;transform:rotate(${it.rot}deg);z-index:${it.z}">${it.kind === "text" ? esc(it.text) : `<img src="${seSrc(it)}" alt="" draggable="false">`}<span class="seav">${avatar(it.author_id, 18)}</span></div>` }
+    async function spPaint() { const el = $("#colb"); if (!el) return; el.innerHTML = ldr(); S.sh = []; S.sr = []; S.ssel = null; const r = await sb.from("scrapbook_items").select("*").eq("page_id", S.sp).is("deleted_at", null).order("z").order("created_at"); S.sbi = r.data || []; S.sbE = r.error; spRender() }
+    function spRender() {
+      const g = S.pgs.find(x => x.id === S.sp), el = $("#colb"); if (!el) return; if (!g) { S.sp = null; return colBody() }
+      el.innerHTML = `<div class="row"><button class="btn ghost" data-act="spback">All pages</button><h2 style="margin:0">${esc(g.title)}</h2></div><div class="row" style="margin:8px 0"><button class="btn alt" data-act="sbadd">Add</button><button class="btn ghost" data-act="sbtxt">Text</button><button class="btn ghost" data-act="sbundo" ${S.sh.length ? "" : "disabled"}>Undo</button><button class="btn ghost" data-act="sbredo" ${S.sr.length ? "" : "disabled"}>Redo</button><select id="spbg2" aria-label="Paper colour" style="width:auto">${BGS.map(([c, n]) => `<option value="${c}" ${g.bg === c ? "selected" : ""}>${n} paper</option>`).join("")}</select><button class="btn ghost" data-act="sbfold">Folders</button><button class="btn ghost" data-act="sbexp">Export image</button><button class="btn danger" data-act="spdel">Delete page</button></div>${S.sbE ? `<p class="err">${esc(msg(S.sbE))} Did you run schema_11.sql?</p>` : ""}<div id="stage" style="background:${g.bg}">${S.sbi.map(seHtml).join("")}</div><div id="sbp"></div>`; sbPanel()
+    }
+    function sbPanel() {
+      const e = $("#sbp"); if (!e) return; const it = S.sbi.find(x => x.id === S.ssel); if (!it) { e.innerHTML = `<p class="muted" style="text-align:center">Drag to arrange. Tap an element to edit it. The tiny photo on each element shows who added it.</p>`; return }
+      const mine = it.author_id === S.user.id, st = it.style || {}, tg = (k, l) => `<button class="btn ghost sm ${st[k] ? "on" : ""}" data-act="sbstyle" data-k="${k}" aria-pressed="${!!st[k]}">${l}</button>`;
+      e.innerHTML = `<div class="by" style="justify-content:center">${avatar(it.author_id, 24)} Added by <strong>${esc(nameOf(it.author_id))}</strong></div>` + (mine ? `<div class="row" style="justify-content:center;margin-top:8px"><button class="btn ghost sm" data-act="sbsz" data-d="6">Larger</button><button class="btn ghost sm" data-act="sbsz" data-d="-6">Smaller</button><button class="btn ghost sm" data-act="sbrot" data-d="-10">Rotate left</button><button class="btn ghost sm" data-act="sbrot" data-d="10">Rotate right</button><button class="btn ghost sm" data-act="sbz" data-d="1">Forward</button><button class="btn ghost sm" data-act="sbz" data-d="-1">Back</button><button class="btn ghost sm" data-act="sbdup">Duplicate</button>${it.kind === "text" ? `<button class="btn ghost sm" data-act="sbtedit">Edit text</button>` : tg("b", "Frame") + tg("o", "Outline") + tg("s", "Shadow")}<button class="btn danger sm" data-act="sbdel">Delete</button></div>` : `<div class="row" style="justify-content:center;margin-top:8px"><button class="btn ghost sm" data-act="sbdup">Duplicate to mine</button></div><p class="muted" style="text-align:center">Only ${esc(nameOf(it.author_id))} can move or change this. Duplicate it to make your own copy.</p>`)
+    }
+    async function sbOp(id, f, rec = true) { const it = S.sbi.find(x => x.id === id); if (!it) return false; const before = {}; Object.keys(f).forEach(k => before[k] = it[k]); Object.assign(it, f); const r = await sb.from("scrapbook_items").update({ ...f, updated_at: new Date().toISOString() }).eq("id", id); if (r.error) { Object.assign(it, before); toast(msg(r.error)); return false } if (rec) { S.sh.push({ t: "upd", id, before, after: { ...f } }); S.sh = S.sh.slice(-30); S.sr = [] } return true }
+    const sbMaxZ = () => S.sbi.reduce((m, x) => Math.max(m, x.z), 0);
+    async function sbAddRow(f) { const r = await sbInsertTo(S.sp, { ...f, z: sbMaxZ() + 1 }); if (r.error) { toast(msg(r.error) + " Did you run schema_11.sql?"); return null } S.sbi.push(r.data); S.sh.push({ t: "add", id: r.data.id, row: r.data }); S.sh = S.sh.slice(-30); S.sr = []; return r.data }
+    async function sbApply(h, undo) {
+      const now = new Date().toISOString(); if (h.t === "upd") await sbOp(h.id, undo ? h.before : h.after, false);
+      else { const hide = h.t === "add" ? undo : !undo, r = await sb.from("scrapbook_items").update({ deleted_at: hide ? now : null }).eq("id", h.id); if (r.error) return toast(msg(r.error)); if (hide) S.sbi = S.sbi.filter(x => x.id !== h.id); else if (!S.sbi.some(x => x.id === h.id)) S.sbi.push(h.row) } S.sbi.sort((a, b) => a.z - b.z)
+    }
+    document.addEventListener("pointerdown", e => { const el = e.target.closest && e.target.closest(".se"); if (!el || !S.sp) return; const it = S.sbi.find(x => x.id === el.dataset.i); if (!it) return; S.ssel = it.id; document.querySelectorAll(".se").forEach(x => x.classList.toggle("sel", x === el)); sbPanel(); if (it.author_id !== S.user.id) return; const st = $("#stage").getBoundingClientRect(); S.sdr = { el, it, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, w: st.width, h: st.height, mv: false }; el.setPointerCapture(e.pointerId) });
+    document.addEventListener("pointermove", e => { const d = S.sdr; if (!d) return; d.mv = true; d.it.x = Math.min(95, Math.max(-5, d.ox + (e.clientX - d.sx) / d.w * 100)); d.it.y = Math.min(95, Math.max(-5, d.oy + (e.clientY - d.sy) / d.h * 100)); d.el.style.left = d.it.x + "%"; d.el.style.top = d.it.y + "%" });
+    document.addEventListener("pointerup", async () => { const d = S.sdr; if (!d) return; S.sdr = null; if (!d.mv) return; const x = d.it.x, y = d.it.y; d.it.x = d.ox; d.it.y = d.oy; await sbOp(d.it.id, { x, y }); spRender() });
+    document.addEventListener("change", async e => { if (e.target.id !== "spbg2") return; const g = S.pgs.find(x => x.id === S.sp); g.bg = e.target.value; const r = await sb.from("scrapbook_pages").update({ bg: g.bg }).eq("id", g.id); if (r.error) toast(msg(r.error)); spRender() });
+    setInterval(async () => { if (S.page !== "coll" || S.ct !== "sb" || !S.sp || S.sdr || document.hidden || !S.couple) return; const r = await sb.from("scrapbook_items").select("*").eq("page_id", S.sp).is("deleted_at", null).order("z").order("created_at"); if (r.error || S.sdr) return; const sig = a => a.map(i => i.id + i.updated_at + i.z).join(); if (sig(r.data || []) !== sig(S.sbi)) { S.sbi = r.data || []; spRender() } }, 8000);
+    const ldI = u => new Promise((ok, no) => { const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => ok(i); i.onerror = no; i.src = u });
+    async function sbExport() {
+      const g = S.pgs.find(x => x.id === S.sp), W = 900, H = 1200, c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); x.fillStyle = g.bg; x.fillRect(0, 0, W, H);
+      try {
+        for (const it of [...S.sbi].sort((a, b) => a.z - b.z)) {
+          const st = it.style || {}, w = it.w / 100 * W; x.save();
+          if (it.kind === "text") { x.font = "700 81px Dongle, sans-serif"; x.fillStyle = "#40383A"; x.textBaseline = "top"; let line = ""; x.translate(it.x / 100 * W + w / 2, it.y / 100 * H); x.rotate(it.rot * Math.PI / 180); x.translate(-w / 2, 0); for (const wd of it.text.split(" ")) { const t = line ? line + " " + wd : wd; if (x.measureText(t).width > w && line) { x.fillText(line, 0, 0); line = wd; x.translate(0, 72) } else line = t } x.fillText(line, 0, 0) }
+          else {
+            const src = seSrc(it); if (!src) { x.restore(); continue } const im = await ldI(src), pad = st.b ? 7.5 : 0, iw = w - 2 * pad, ih = iw * im.height / im.width, bh = ih + 2 * pad; x.translate(it.x / 100 * W + w / 2, it.y / 100 * H + bh / 2); x.rotate(it.rot * Math.PI / 180);
+            if (st.b) { if (st.s) { x.shadowColor = "rgba(0,0,0,.25)"; x.shadowBlur = 14 } x.fillStyle = "#fff"; x.fillRect(-w / 2, -bh / 2, w, bh); x.shadowColor = "transparent"; x.drawImage(im, -w / 2 + pad, -bh / 2 + pad, iw, ih) }
+            else {
+              if (st.o) { const t = document.createElement("canvas"); t.width = im.width; t.height = im.height; const tg = t.getContext("2d"); tg.drawImage(im, 0, 0); tg.globalCompositeOperation = "source-in"; tg.fillStyle = "#fff"; tg.fillRect(0, 0, t.width, t.height); const o = W * .006; for (let a = 0; a < 8; a++)x.drawImage(t, -iw / 2 + Math.cos(a * Math.PI / 4) * o, -ih / 2 + Math.sin(a * Math.PI / 4) * o, iw, ih) }
+              if (st.s) { x.shadowColor = "rgba(0,0,0,.3)"; x.shadowBlur = 12; x.shadowOffsetY = 4 } x.drawImage(im, -iw / 2, -ih / 2, iw, ih)
+            }
+          }
+          x.restore()
+        }
+        c.toBlob(b => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = (g.title || "scrapbook") + ".png"; a.click(); toast("Image saved") }, "image/png")
+      } catch (e) { toast("Couldn't export this page. Try again.") }
+    }
+    function sbAddDlg() {
+      const d = $("#dlg"), tile = (t, id, u, l) => `<button type="button" data-act="sbpick" data-t="${t}" data-id="${id}" aria-label="${esc(l)}"><img src="${u}" alt=""></button>`, sec = (h, a) => `<p class="muted" style="margin:.8em 0 .3em">${h}</p>${a.length ? `<div class="pickgrid" style="max-height:none">${a.join("")}</div>` : `<p class="muted">None yet.</p>`}`;
+      d.innerHTML = `<div class="row" style="justify-content:space-between"><h3 style="margin:0">Add to the page</h3><button class="btn ghost" data-act="close">Close</button></div>${sec("Keepsakes", S.kp.map(k => tile("keepsake", k.id, S.urls[k.edited_path] || "", k.title)))}${sec("Cutouts", S.cut.map(c => tile("cutout", c.id, S.urls[c.path] || "", c.title || "Cutout")))}${sec("Stamps", S.stp.map(t => tile("stamp", t.id, S.urls[t.stamp_path] || "", "Stamp")))}<p style="margin-top:12px"><button class="btn ghost" data-act="sbnewcut">Make a new cutout</button></p>`; d.showModal()
+    }
 
     /* boot */
     sb.auth.onAuthStateChange(async (evt) => {

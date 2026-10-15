@@ -92,6 +92,12 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Shared accent colours for the whole app, set by either partner, with a live preview and reset.
 - Optional calendar sharing, including availability-only. Leaving or deleting an account never deletes shared content; it shows as "Former member".
 
+**Folders, cutouts and scrapbook**
+- Shared folders group memories, keepsakes and scrapbook pages. Deleting a folder never deletes what's inside it.
+- Cutout studio: lasso, crop, erase and restore brushes, undo and redo, and automatic subject cutout that runs on your device. Cutouts are transparent PNGs; the original photo is kept.
+- Scrapbook elements are saved one by one and edited only by whoever added them, so you can both work on the same page without overwriting each other. Move, resize, rotate, layer, duplicate, frame, outline and shadow, with undo and redo.
+- Automatic cutout uses the open-source `@imgly/background-removal` library (AGPL-3.0), loaded from a CDN when first used. Your photo is processed in your browser and is never uploaded; only the model files are downloaded (tens of MB, then cached). It's free to use. If you ever make Eros a public product, check that licence.
+
 **Design**
 - Soft pink `#F8E3E8` and soft blue `#C2DAE8` brand colours, with separately designed light and dark themes.
 - Dongle for the interface, Tourmines for the logo.
@@ -114,23 +120,13 @@ schema_7.sql            Locks memory categories to the fixed list
 schema_8.sql            Couple cover photo, stamp collection, storage update rule
 schema_9.sql            Saved sticker library for the Photobooth
 schema_10.sql           Partnership: contributions, notifications, privacy, shared colours
+schema_11.sql           Folders, cutout stickers, collaborative scrapbook elements
 Assets/font/Tourmines.otf     Logo font
 Assets/images/logo.png        Favicon and home-screen icon
 README.md
 ```
 
 Netlify is case-sensitive. Keep the folder names exactly `Assets`, `font` and `images`.
-
----
-
-## Features that need extra setup
-
-| Feature | Status |
-|---|---|
-| Map and address search | Works out of the box using OpenStreetMap. The public tile and search services are meant for light use, which suits a private two-person app. For heavy use, switch to a paid tile provider. |
-| Reading text from keepsakes | Works when online. The OCR engine is downloaded the first time you use it. |
-| Email verification and password reset emails | Use Supabase's built-in email, which has low sending limits. For reliable delivery, add your own SMTP provider in Supabase. |
-| Push or email reminders | Not available. Reminders appear inside the app only. |
 
 ---
 
