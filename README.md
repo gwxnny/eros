@@ -98,6 +98,11 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Scrapbook elements are saved one by one and edited only by whoever added them, so you can both work on the same page without overwriting each other. Move, resize, rotate, layer, duplicate, frame, outline and shadow, with undo and redo.
 - Automatic cutout uses the open-source `@imgly/background-removal` library (AGPL-3.0), loaded from a CDN when first used. Your photo is processed in your browser and is never uploaded; only the model files are downloaded (tens of MB, then cached). It's free to use. If you ever make Eros a public product, check that licence.
 
+**Scrapbook editing and assistant**
+- Tap any scrapbook element to get a Canva-style toolbar: for text, font, size, colour, bold, italic, alignment, shadow and rotation; for images, size, rotation, frame, outline and shadow; plus layer order, copy and delete.
+- Ten paper styles for scrapbook pages, including kraft, vintage, lined, grid, dotted and linen. They also appear in exported images.
+- A built-in assistant (the chat icon in the header) opens pages, adds plans, birthdays, bucket-list ideas and folders, searches memories and answers quick questions. It runs entirely in your browser; it is not a language model and nothing you type is sent anywhere.
+
 **Design**
 - Soft pink `#F8E3E8` and soft blue `#C2DAE8` brand colours, with separately designed light and dark themes.
 - Dongle for the interface, Tourmines for the logo.
