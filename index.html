@@ -3146,6 +3146,38 @@
         border-top: 1.5px dashed var(--line)
       }
     }
+
+    .asl {
+      position: fixed;
+      right: 16px;
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 0;
+      background: var(--rose);
+      color: var(--on-accent);
+      box-shadow: 0 8px 18px -6px rgba(0, 0, 0, .4);
+      z-index: 35;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      padding: 0
+    }
+
+    .asl:hover {
+      transform: translateY(-2px)
+    }
+
+    .asl svg {
+      display: block
+    }
+
+    @media(max-width:640px) {
+      .asl {
+        bottom: calc(76px + env(safe-area-inset-bottom, 0px))
+      }
+    }
   </style>
 </head>
 
@@ -4616,13 +4648,13 @@
     function cleanTitle(r) { let p = ""; r = r.replace(/\b(to|on|in) (my |our |the )?(calendar|plans?|planner|bucket ?list|wish ?list)\b/g, " "); while (p !== r) { p = r; r = r.replace(/^\s*(please|can you|could you|help me|i want to|i need to|remind me to|remind me|put|add|create|make|schedule|plan|new|set up|book|save|a|an|the|my|our|event|date|called|named|titled|for|on|at|to|in)\b\s*/, "") } r = r.replace(/\s+(on|at|in|for|to|by)\s*$/, "").trim(); return r ? r.charAt(0).toUpperCase() + r.slice(1) : "" }
     const cap = x => x ? x.charAt(0).toUpperCase() + x.slice(1) : x, abtn = (act, l, extra = "") => `<button class="btn ghost sm" data-act="${act}" ${extra}>${esc(l)}</button>`;
     function asEnsure() {
-      if ($("#asst")) return; const d = document.createElement("section"); d.id = "asst"; d.className = "asst"; d.hidden = true; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Eros assistant");
-      d.innerHTML = `<div class="ash"><strong>Eros assistant</strong><button class="btn ghost sm" data-act="aclose" aria-label="Close assistant">Close</button></div><div id="am" class="am" aria-live="polite"></div><div class="asc" id="asc"></div><form id="asf" class="asf" autocomplete="off"><input id="asi" placeholder="Ask me to do something…" aria-label="Message"><button class="btn">Send</button></form>`; document.body.append(d)
+      const l0 = $("#asl"), p0 = $("#asst"); if (p0) { if (l0) l0.hidden = !p0.hidden; return } const d = document.createElement("section"); d.id = "asst"; d.className = "asst"; d.hidden = true; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Eros assistant");
+      d.innerHTML = `<div class="ash"><strong>Eros assistant</strong><button class="btn ghost sm" data-act="aclose" aria-label="Close assistant">Close</button></div><div id="am" class="am" aria-live="polite"></div><div class="asc" id="asc"></div><form id="asf" class="asf" autocomplete="off"><input id="asi" placeholder="Ask me to do something…" aria-label="Message"><button class="btn">Send</button></form>`; document.body.append(d); const l = document.createElement("button"); l.id = "asl"; l.className = "asl"; l.setAttribute("data-act", "asst"); l.setAttribute("aria-label", "Open assistant"); l.title = "Assistant"; l.innerHTML = svg(`<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/><circle cx="8" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.15" fill="currentColor" stroke="none"/>`); document.body.append(l)
     }
     function asPaint() { const m = $("#am"); if (!m) return; m.innerHTML = (S.chat || []).map(x => `<div class="msg ${x.r}">${x.h}</div>`).join(""); m.scrollTop = m.scrollHeight }
     function asChips() { const c = $("#asc"); if (c) c.innerHTML = ["Plan dinner tomorrow at 7pm", "What's coming up?", "Days together", "Open scrapbook", "Add a memory"].map(q => `<button class="chip" data-act="asug" data-q="${esc(q)}">${esc(q)}</button>`).join("") }
-    function asOpen() { asEnsure(); if (!S.chat) S.chat = [{ r: "b", h: `Hi! I can open pages, add plans, birthdays, bucket-list ideas and folders, search your memories, and answer quick questions. Everything runs on your device, so nothing you type leaves it. Say “help” for examples.` }]; $("#asst").hidden = false; asChips(); asPaint(); setTimeout(() => { const i = $("#asi"); i && i.focus() }, 50) }
-    function asClose() { const a = document.getElementById("asst"); if (a) a.hidden = true }
+    function asOpen() { asEnsure(); if (!S.chat) S.chat = [{ r: "b", h: `Hi! I can open pages, add plans, birthdays, bucket-list ideas and folders, search your memories, and answer quick questions. Everything runs on your device, so nothing you type leaves it. Say “help” for examples.` }]; $("#asst").hidden = false; { const l = $("#asl"); if (l) l.hidden = true } asChips(); asPaint(); setTimeout(() => { const i = $("#asi"); i && i.focus() }, 50) }
+    function asClose() { const a = document.getElementById("asst"); if (a) a.hidden = true; const l = document.getElementById("asl"); if (l) l.hidden = !S.user }
     function asBot(h) { (S.chat = S.chat || []).push({ r: "b", h }); asPaint() }
     async function asSend(t) { t = (t || "").trim(); if (!t) return; asOpen(); S.chat.push({ r: "u", h: esc(t) }); asPaint(); try { const r = await asHandle(t); if (r) asBot(r) } catch (e) { asBot("Sorry, something went wrong with that. Try again, or say “help”.") } }
     function asGo(page, ct) { S.page = page; if (ct) { S.ct = ct; S.sp = null; S.fopen = null } scrollTo(0, 0); render(); if (innerWidth <= 640) asClose() }
@@ -4672,7 +4704,7 @@
 
     function topbar() {
       const g = grp(); if (SUBS[g]) S.last[g] = S.page; asEnsure();
-      return `<header class="top"><span class="logo">Eros</span><div class="topr"><button class="asb" data-act="asst" aria-label="Open assistant" title="Assistant">${svg(`<path d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/>`)}</button><nav class="nav" aria-label="Main">${NAV.map(([k, l, ic]) => `<button data-act="nav" data-p="${SUBS[k] ? S.last[k] : k}" class="${g === k ? "on" : ""}" aria-label="${l}${k === "notif" && S.unread ? ", " + S.unread + " unread" : ""}" ${g === k ? 'aria-current="page"' : ""} title="${l}">${ic}${k === "notif" && S.unread > 0 ? `<b class="nb">${S.unread > 9 ? "9+" : S.unread}</b>` : ""}</button>`).join("")}</nav></div></header>${SUBS[g] ? `<nav class="subs" aria-label="${g === "together" ? "Together" : "Activities"}">${SUBS[g].map(([k, l]) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""}" ${S.page === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>` : ""}`
+      return `<header class="top"><span class="logo">Eros</span><div class="topr"><nav class="nav" aria-label="Main">${NAV.map(([k, l, ic]) => `<button data-act="nav" data-p="${SUBS[k] ? S.last[k] : k}" class="${g === k ? "on" : ""}" aria-label="${l}${k === "notif" && S.unread ? ", " + S.unread + " unread" : ""}" ${g === k ? 'aria-current="page"' : ""} title="${l}">${ic}${k === "notif" && S.unread > 0 ? `<b class="nb">${S.unread > 9 ? "9+" : S.unread}</b>` : ""}</button>`).join("")}</nav></div></header>${SUBS[g] ? `<nav class="subs" aria-label="${g === "together" ? "Together" : "Activities"}">${SUBS[g].map(([k, l]) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""}" ${S.page === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>` : ""}`
     }
 
     /* boot */
