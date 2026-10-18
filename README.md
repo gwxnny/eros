@@ -103,6 +103,9 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 - Ten paper styles for scrapbook pages, including kraft, vintage, lined, grid, dotted and linen. They also appear in exported images.
 - A built-in assistant (the chat icon in the header) opens pages, adds plans, birthdays, bucket-list ideas and folders, searches memories and answers quick questions. It runs entirely in your browser; it is not a language model and nothing you type is sent anywhere.
 
+**Scrapbook look**
+- The whole app sits on seamless paper (generated in the browser, so there are no visible tiles), with taped cards, stitched edges, print-style photos, a hand-drawn underline on page titles and sticky-note toasts.
+
 **Design**
 - Soft pink `#F8E3E8` and soft blue `#C2DAE8` brand colours, with separately designed light and dark themes.
 - Dongle for the interface, Tourmines for the logo.
@@ -132,6 +135,17 @@ README.md
 ```
 
 Netlify is case-sensitive. Keep the folder names exactly `Assets`, `font` and `images`.
+
+---
+
+## Features that need extra setup
+
+| Feature | Status |
+|---|---|
+| Map and address search | Works out of the box using OpenStreetMap. The public tile and search services are meant for light use, which suits a private two-person app. For heavy use, switch to a paid tile provider. |
+| Reading text from keepsakes | Works when online. The OCR engine is downloaded the first time you use it. |
+| Email verification and password reset emails | Use Supabase's built-in email, which has low sending limits. For reliable delivery, add your own SMTP provider in Supabase. |
+| Push or email reminders | Not available. Reminders appear inside the app only. |
 
 ---
 
