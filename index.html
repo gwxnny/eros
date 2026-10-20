@@ -3178,6 +3178,20 @@
         bottom: calc(76px + env(safe-area-inset-bottom, 0px))
       }
     }
+
+    .vh {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none
+    }
+
+    label.btn:focus-within {
+      outline: 3px solid var(--sky);
+      outline-offset: 2px
+    }
   </style>
 </head>
 
@@ -3633,7 +3647,7 @@
       const mm = S.mems.filter(m => !m.archived), cats = CATS, tags = [...new Set(mm.flatMap(m => m.tags))].sort(), locs = [...new Set(mm.map(m => m.location).filter(Boolean))].sort();
       const sel = (k, l, o) => `<div><label for="s${k}">${l}</label><select id="s${k}" data-flt="${k}"><option value="">Any</option>${o.map(x => `<option ${S[k] === x ? "selected" : ""}>${esc(x)}</option>`).join("")}</select></div>`;
       const ch = (act, key, cur, arr) => arr.map(([k, l]) => `<button data-act="${act}" data-k="${k}" class="${cur === k ? "on" : ""}">${l}</button>`).join("");
-      app.innerHTML = topbar() + `<h1>Memory Diary</h1>
+      app.innerHTML = topbar() + `<div class="row" style="justify-content:space-between"><h1 style="margin:0">Memory Diary</h1><button class="btn" data-act="newmem">Add a memory</button></div>
   <input type="search" data-flt="q" placeholder="Search memories" aria-label="Search memories" value="${esc(S.q)}">
   <div class="chips" role="group" aria-label="Show">${ch("filt", "f", S.f, [["all", "All"], ["fav", "Favourites"], ["archived", "Archived"], ["trash", "Recently deleted"]])}</div>
   <div class="chips" role="group" aria-label="View">${ch("view", "v", S.v, [["grid", "Grid"], ["timeline", "Timeline"], ["list", "List"], ["calendar", "Calendar"]])}</div>
@@ -3682,7 +3696,7 @@
   <label for="mc">Category</label><select id="mc">${CATS.map(c => `<option ${c === ((m || pre)?.category || CATS[0]) ? "selected" : ""}>${c}</option>`).join("")}</select>
   <label for="ms">Story</label><textarea id="ms" rows="4">${esc((m || pre)?.story || "")}</textarea>
   <label for="mg">Tags (comma separated)</label><input id="mg" value="${esc((m?.tags || []).join(", "))}">
-  <label for="mvis">Who can see this</label><select id="mvis"><option value="shared" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis || "shared") === "shared" ? "selected" : ""}>Both of us</option><option value="private" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis) === "private" ? "selected" : ""}>Only me (private)</option></select><label for="mp">Photos (up to 8, JPG/PNG/WebP)</label><input id="mp" type="file" accept="image/jpeg,image/png,image/webp" multiple><div class="thumbs" id="th" style="margin-top:.5em"></div>`,
+  <label for="mvis">Who can see this</label><select id="mvis"><option value="shared" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis || "shared") === "shared" ? "selected" : ""}>Both of us</option><option value="private" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis) === "private" ? "selected" : ""}>Only me (private)</option></select><label>Photos (up to 8, JPG/PNG/WebP)</label><div class="row"><label class="btn alt" style="margin:0">Choose photos<input id="mp" class="vh" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><span id="mpn" class="muted">No new photos chosen</span></div><div class="thumbs" id="mpv" style="margin-top:.5em"></div><div class="thumbs" id="th" style="margin-top:.5em"></div>`,
         async () => {
           const title = $("#mt").value.trim(); if (!title) return "Give this memory a title.";
           const files = [...$("#mp").files]; if (keep.length + files.length > 8) return "A memory can hold up to 8 photos.";
@@ -4707,14 +4721,19 @@
       return `<header class="top"><span class="logo">Eros</span><div class="topr"><nav class="nav" aria-label="Main">${NAV.map(([k, l, ic]) => `<button data-act="nav" data-p="${SUBS[k] ? S.last[k] : k}" class="${g === k ? "on" : ""}" aria-label="${l}${k === "notif" && S.unread ? ", " + S.unread + " unread" : ""}" ${g === k ? 'aria-current="page"' : ""} title="${l}">${ic}${k === "notif" && S.unread > 0 ? `<b class="nb">${S.unread > 9 ? "9+" : S.unread}</b>` : ""}</button>`).join("")}</nav></div></header>${SUBS[g] ? `<nav class="subs" aria-label="${g === "together" ? "Together" : "Activities"}">${SUBS[g].map(([k, l]) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""}" ${S.page === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>` : ""}`
     }
 
+    document.addEventListener("change", e => { if (e.target.id !== "mp") return; const f = [...e.target.files], n = $("#mpn"), v = $("#mpv"); if (n) n.textContent = f.length ? `${f.length} photo${f.length > 1 ? "s" : ""} chosen` : "No new photos chosen"; if (v) { v.innerHTML = ""; f.slice(0, 8).forEach(x => { const d = document.createElement("div"), i = document.createElement("img"); i.src = URL.createObjectURL(x); i.alt = ""; d.append(i); v.append(d) }) } });
     /* boot */
-    sb.auth.onAuthStateChange(async (evt) => {
+    sb.auth.onAuthStateChange(async (evt, session) => {
       if (evt === "PASSWORD_RECOVERY") { await load(); render(); hideSplash(); setTimeout(() => document.querySelector('[data-act=pw]')?.click(), 0); return }
+      /* Supabase re-sends SIGNED_IN whenever the tab regains focus. Ignore it for the same user so the page does not redraw. */
+      if (evt === "SIGNED_IN" && (S.busy || (S.user && session && session.user && session.user.id === S.user.id))) return;
       if (evt === "INITIAL_SESSION" || evt === "SIGNED_IN" || evt === "SIGNED_OUT" || evt === "USER_UPDATED") {
         setTimeout(async () => {
-          if (evt === "SIGNED_IN" && !S.user) app.innerHTML = ldr(); await load();
-          if (S.user && !S.couple && pendingCode()) { const r = await sb.rpc("accept_invite", { p_code: pendingCode() }); if (!r.error) { clearCode(); await load(); toast("You're paired. Welcome in!") } }
-          render(); hideSplash()
+          S.busy = true; try {
+            if (evt === "SIGNED_IN" && !S.user) app.innerHTML = ldr(); await load();
+            if (S.user && !S.couple && pendingCode()) { const r = await sb.rpc("accept_invite", { p_code: pendingCode() }); if (!r.error) { clearCode(); await load(); toast("You're paired. Welcome in!") } }
+            render(); hideSplash()
+          } finally { S.busy = false }
         }, 0)
       }
     });
