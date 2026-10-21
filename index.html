@@ -3192,6 +3192,103 @@
       outline: 3px solid var(--sky);
       outline-offset: 2px
     }
+
+    [data-theme=dark] {
+      color-scheme: dark
+    }
+
+    [data-theme=light] {
+      color-scheme: light
+    }
+
+    select option,
+    select optgroup {
+      background: var(--card);
+      color: var(--text)
+    }
+
+    .nop {
+      display: grid;
+      place-items: center;
+      width: 72px;
+      height: 72px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      font-size: .9rem;
+      color: var(--text2);
+      text-align: center;
+      line-height: 1
+    }
+
+    .dz {
+      border: 2px dashed var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      background: color-mix(in srgb, var(--card) 70%, transparent)
+    }
+
+    .dz.over {
+      border-color: var(--rose);
+      background: color-mix(in srgb, var(--rose) 10%, var(--card))
+    }
+
+    .afgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px
+    }
+
+    .at {
+      aspect-ratio: 1;
+      border: 0;
+      padding: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--bg2);
+      position: relative;
+      cursor: pointer
+    }
+
+    .at img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .ft {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      font-size: 1.4rem;
+      color: var(--text2);
+      text-align: center;
+      padding: 6px
+    }
+
+    .ft.big {
+      min-height: 160px;
+      font-size: 2rem;
+      background: var(--bg2);
+      border-radius: 10px
+    }
+
+    .play {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, .6);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-style: normal;
+      font-size: .85rem;
+      padding-left: 2px
+    }
   </style>
 </head>
 
@@ -3544,6 +3641,18 @@
       else if (a === "sbpp") { const g = S.pgs.find(x => x.id === S.sp), r = await sb.from("scrapbook_pages").update({ bg: b.dataset.k }).eq("id", g.id); if (r.error) return toast(msg(r.error)); g.bg = b.dataset.k; $("#dlg").close(); spRender() }
       else if (a === "sbmore") { const d = $("#dlg"); d.innerHTML = `<div class="row" style="justify-content:space-between"><h3 style="margin:0">Page options</h3><button class="btn ghost" data-act="close">Close</button></div><div class="msl"><button data-act="sbm" data-k="fold">Add this page to a folder</button><button data-act="sbm" data-k="exp">Export as an image</button><button data-act="sbm" data-k="del">Delete this page</button></div>`; d.showModal() }
       else if (a === "sbm") { $("#dlg").close(); const k = b.dataset.k; if (k === "fold") { await loadFolders(); foldDlg("scrapbook", S.sp) } else if (k === "exp") sbExport(); else if (confirm("Delete this scrapbook page?")) { const r = await sb.from("scrapbook_pages").delete().eq("id", S.sp); if (r.error) return toast(msg(r.error)); S.pgs = S.pgs.filter(x => x.id !== S.sp); S.sp = null; colBody() } }
+      else if (a === "qaal") { S.ct = "al"; S.aopen = null; S.page = "coll"; render() }
+      else if (a === "alnew") { dialog(`<h3>New album</h3><label for="aln">Name</label><input id="aln" maxlength="80" placeholder="Seoul trip">`, async () => { const n = $("#aln").value.trim(); if (!n) return "Give the album a name."; const r = await sb.from("albums").insert({ couple_id: S.couple.id, name: n }); if (r.error) return msg(r.error) + " Did you run schema_12.sql?"; albumsBody($("#colb")) }) }
+      else if (a === "alopen") { S.aopen = b.dataset.id; S.alim = 120; S.afail = []; albumsBody($("#colb")) }
+      else if (a === "alback") { S.aopen = null; S.afail = []; albumsBody($("#colb")) }
+      else if (a === "almore") { S.alim += 120; albumsBody($("#colb")) }
+      else if (a === "alren") { const al = S.alb.find(x => x.id === S.aopen); dialog(`<h3>Rename album</h3><label for="aln">Name</label><input id="aln" maxlength="80" value="${esc(al.name)}">`, async () => { const n = $("#aln").value.trim(); if (!n) return "Give the album a name."; const r = await sb.from("albums").update({ name: n }).eq("id", al.id); if (r.error) return msg(r.error); albumsBody($("#colb")) }) }
+      else if (a === "aldel") { if (!confirm("Delete this album and every file in it? This can't be undone.")) return; const id = S.aopen, files = await sb.from("album_files").select("path,thumb_path").eq("album_id", id), r = await sb.from("albums").delete().eq("id", id); if (r.error) return toast(msg(r.error)); const ps = (files.data || []).flatMap(x => [x.path, x.thumb_path]).filter(Boolean); for (let i = 0; i < ps.length; i += 100)await sb.storage.from("albums").remove(ps.slice(i, i + 100)); S.aopen = null; albumsBody($("#colb")) }
+      else if (a === "afopen") { S.fvback = null; fileView(S.afl, +b.dataset.i) }
+      else if (a === "mfopen") { S.fvback = S.mx.id; fileView(S.mx.files, +b.dataset.i) }
+      else if (a === "afback") { const id = S.fvback; S.fvback = null; if (id) openMem(id) }
+      else if (a === "afnav") { const n = S.fvl.length; fileView(S.fvl, (S.fvi + +b.dataset.d + n) % n) }
+      else if (a === "afdel") { if (!confirm("Delete this file? Only you can delete what you added.")) return; const t = b.dataset.t, f = S.fvl.find(x => x.id === b.dataset.id), r = await sb.from(t).delete().eq("id", f.id); if (r.error) return toast(msg(r.error)); await sb.storage.from("albums").remove([f.path, f.thumb_path].filter(Boolean)); const back = S.fvback; S.fvback = null; if (back) openMem(back); else { $("#dlg").close(); albumsBody($("#colb")) } toast("Deleted") }
       else if (a === "btab") { B.tab = b.dataset.k; document.querySelectorAll("[data-t]").forEach(x => x.hidden = x.dataset.t !== B.tab); b.parentElement.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)) }
       else if (a === "bsel") { const i = +b.dataset.i; B.sel = B.sel === i ? null : i; bthumbs() }
       else if (a === "bmv") { const i = +b.dataset.i, j = i + +b.dataset.d, n = BL[B.lay].n; if (j < 0 || j >= n) return;[B.ph[i], B.ph[j]] = [B.ph[j], B.ph[i]]; B.sel = null; bthumbs(); bq() }
@@ -3696,19 +3805,14 @@
   <label for="mc">Category</label><select id="mc">${CATS.map(c => `<option ${c === ((m || pre)?.category || CATS[0]) ? "selected" : ""}>${c}</option>`).join("")}</select>
   <label for="ms">Story</label><textarea id="ms" rows="4">${esc((m || pre)?.story || "")}</textarea>
   <label for="mg">Tags (comma separated)</label><input id="mg" value="${esc((m?.tags || []).join(", "))}">
-  <label for="mvis">Who can see this</label><select id="mvis"><option value="shared" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis || "shared") === "shared" ? "selected" : ""}>Both of us</option><option value="private" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis) === "private" ? "selected" : ""}>Only me (private)</option></select><label>Photos (up to 8, JPG/PNG/WebP)</label><div class="row"><label class="btn alt" style="margin:0">Choose photos<input id="mp" class="vh" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><span id="mpn" class="muted">No new photos chosen</span></div><div class="thumbs" id="mpv" style="margin-top:.5em"></div><div class="thumbs" id="th" style="margin-top:.5em"></div>`,
+  <label for="mvis">Who can see this</label><select id="mvis"><option value="shared" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis || "shared") === "shared" ? "selected" : ""}>Both of us</option><option value="private" ${((m || pre)?.visibility || S.profile?.prefs?.def_vis) === "private" ? "selected" : ""}>Only me (private)</option></select><label>Photos, videos and files (any format, up to 50 MB each)</label><div class="row"><label class="btn alt" style="margin:0">Choose files<input id="mp" class="vh" type="file" multiple></label><span id="mpn" class="muted">No new photos chosen</span></div><div class="thumbs" id="mpv" style="margin-top:.5em"></div><div class="thumbs" id="th" style="margin-top:.5em"></div>`,
         async () => {
           const title = $("#mt").value.trim(); if (!title) return "Give this memory a title.";
-          const files = [...$("#mp").files]; if (keep.length + files.length > 8) return "A memory can hold up to 8 photos.";
-          for (const f of files) { if (!/^image\/(jpeg|png|webp)$/.test(f.type)) return f.name + " isn't a JPG, PNG or WebP."; if (f.size > 25e6) return f.name + " is over 25 MB." }
+          const files = [...$("#mp").files], imgs = files.filter(f => fkind(f.type, f.name) === "image"), others = files.filter(f => fkind(f.type, f.name) !== "image");
+          if (keep.length + imgs.length > 30) return "A memory can hold up to 30 photos. Put the rest in an Album."; if (others.length > 20) return "Up to 20 other files at a time. Use an Album for bigger batches.";
+          for (const f of files) if (f.size > MAXF) return f.name + " is over 50 MB (the free limit).";
           const id = m?.id || crypto.randomUUID(), paths = [...keep];
-          try {
-            for (let i = 0; i < files.length; i++) {
-              $("#derr").textContent = `Uploading photo ${i + 1} of ${files.length}…`;
-              const blob = await shrink(files[i]), path = `${S.couple.id}/${id}/${crypto.randomUUID()}.jpg`;
-              const up = await sb.storage.from("memories").upload(path, blob, { contentType: "image/jpeg" }); if (up.error) throw up.error; paths.push(path)
-            }
-          } catch (e) { return "Upload failed: " + msg(e) }
+          try { for (let i = 0; i < imgs.length; i++) { $("#derr").textContent = `Uploading photo ${i + 1} of ${imgs.length}…`; const blob = await prepImage(imgs[i]), path = `${S.couple.id}/${id}/${crypto.randomUUID()}.jpg`, up = await sb.storage.from("memories").upload(path, blob, { contentType: "image/jpeg" }); if (up.error) throw up.error; paths.push(path) } } catch (e) { return "Upload failed: " + msg(e) + (imgs.some(isHeic) ? " (iPhone HEIC photos need an internet connection to convert.)" : "") }
           const row = {
             title, memory_date: $("#md").value, location: $("#ml").value.trim() || null, category: $("#mc").value, story: $("#ms").value.trim() || null,
             tags: $("#mg").value.split(",").map(t => t.trim()).filter(Boolean).slice(0, 12), photos: paths, visibility: $("#mvis").value, updated_at: new Date().toISOString()
@@ -3716,7 +3820,8 @@
           const r = m ? await sb.from("memories").update(row).eq("id", id) : await sb.from("memories").insert({ ...row, id, couple_id: S.couple.id });
           if (r.error) return msg(r.error);
           if (m) { const gone = (m.photos || []).filter(p => !paths.includes(p)); if (gone.length) await sb.storage.from("memories").remove(gone) }
-          if (pre?.link) { await sb.from(pre.link.t).update({ memory_id: id, ...pre.link.f }).eq("id", pre.link.id) } S.page = "diary"; render(); toast("Memory saved")
+          let ferr = ""; if (others.length) { try { for (let i = 0; i < others.length; i++) { $("#derr").textContent = `Uploading file ${i + 1} of ${others.length}…`; const x = await putFile(`${S.couple.id}/memfiles/${id}`, others[i]), fr = await sb.from("memory_files").insert({ memory_id: id, couple_id: S.couple.id, ...x }); if (fr.error) throw fr.error } } catch (e) { ferr = ". Some files couldn't be saved: " + msg(e) + " (did you run schema_12.sql?)" } }
+          if (pre?.link) { await sb.from(pre.link.t).update({ memory_id: id, ...pre.link.f }).eq("id", pre.link.id) } S.page = "diary"; render(); toast("Memory saved" + ferr); if (row.location && row.visibility === "shared") syncPlaces()
         });
       thumbs();
     }
@@ -3933,11 +4038,11 @@
     /* ---------- Places (4) ---------- */
     const PC = ["Restaurant or café", "Cinema", "Park", "Attraction", "Holiday destination", "First date spot", "Hangout", "Other"];
     S.plc = []; S.plf = "all"; S.map = null;
-    async function places() { app.innerHTML = topbar() + `<h1>Our places</h1>${ldr()}`; const r = await sb.from("places").select("*").eq("couple_id", S.couple.id).order("created_at", { ascending: false }); S.plc = r.data || []; S.plcE = r.error; await loadMems(); plcPaint() }
+    async function places() { app.innerHTML = topbar() + `<h1>Our places</h1>${ldr()}`; const r = await sb.from("places").select("*").eq("couple_id", S.couple.id).order("created_at", { ascending: false }); S.plc = r.data || []; S.plcE = r.error; await loadMems(); plcPaint(); syncPlaces().then(n => { if (n) { toast(`Added or updated ${n} place${n > 1 ? "s" : ""} from your memories`); if (S.page === "places" && !document.querySelector("dialog[open]")) plcPaint() } }) }
     function plcPaint() {
       if (S.map) { S.map.remove(); S.map = null }
       const l = S.plc.filter(p => S.plf === "all" || (S.plf === "fav" && p.favourite) || (S.plf === "multi" && p.visits.length > 1) || (S.plf === "want" && p.want_to_visit)), hasMap = !!window.L;
-      app.innerHTML = topbar() + `<h1>Our places</h1><div class="row"><button class="btn" data-act="pcedit" data-id="">Add a place</button></div><div class="chips">${[["all", "All"], ["fav", "Favourites"], ["multi", "Visited more than once"], ["want", "Want to visit"]].map(([k, t]) => `<button data-act="pcf" data-k="${k}" class="${S.plf === k ? "on" : ""}">${t}</button>`).join("")}</div>${S.plcE ? `<p class="err">${esc(msg(S.plcE))} Did you run schema_4.sql?</p>` : ""}
+      app.innerHTML = topbar() + `<h1>Our places</h1><div class="row"><button class="btn" data-act="pcedit" data-id="">Add a place</button></div><div class="chips">${[["all", "All"], ["fav", "Favourites"], ["multi", "Visited more than once"], ["want", "Want to visit"]].map(([k, t]) => `<button data-act="pcf" data-k="${k}" class="${S.plf === k ? "on" : ""}">${t}</button>`).join("")}</div>${S.plcE ? `<p class="err">${esc(msg(S.plcE))} Did you run schema_4.sql?</p>` : ""}${S.plc.some(p => p.lat == null) ? `<p class="muted">${S.plc.filter(p => p.lat == null).length} place${S.plc.filter(p => p.lat == null).length > 1 ? "s have" : " has"} no map pin yet. Open it, press Edit, then "Find on map".</p>` : ""}
   ${hasMap ? `<div id="map" style="height:320px;border-radius:18px;border:1px solid var(--line);margin-bottom:12px" role="region" aria-label="Map of saved places"></div>` : `<p class="muted">The map couldn't load, so here is your list.</p>`}
   ${l.map(p => `<button class="ri" data-act="pcview" data-id="${p.id}"><div style="flex:1"><strong>${p.favourite ? "♥ " : ""}${esc(p.name)}</strong><br><span class="muted">${esc(p.category)}${p.address ? " · " + esc(p.address) : ""}</span></div><span class="muted">${p.want_to_visit ? "Want to visit" : p.visits.length ? p.visits.length + " visit" + (p.visits.length > 1 ? "s" : "") : ""}</span></button>`).join("") || `<div class="card"><p class="muted">Save the café, the cinema, the bench you always sit on.</p></div>`}<dialog id="dlg"></dialog><dialog id="lb"></dialog>`;
       if (hasMap && $("#map")) {
@@ -3971,13 +4076,13 @@
     }
     /* ---------- Collection: keepsakes + scrapbook (4) ---------- */
     const KC = ["Movie ticket", "Attraction ticket", "Receipt", "Handwritten note", "Letter", "Card", "Gift tag", "Wristband", "Printed photo", "Screenshot", "Other"], BGS = [["#FFFCFA", "Cream"], ["#F8E3E8", "Pink"], ["#C2DAE8", "Blue"], ["#EADFCB", "Kraft"], ["#FFFFFF", "White"]];
-    S.kp = []; S.pgs = []; S.stp = []; S.spg = 0; S.ct = "st"; S.kfc = ""; S.sp = null; S.sel = null; let K = null;
+    S.kp = []; S.pgs = []; S.stp = []; S.spg = 0; S.ct = "al"; S.kfc = ""; S.sp = null; S.sel = null; let K = null;
     async function collection() {
       app.innerHTML = topbar() + `<h1>Our collection</h1>${ldr()}`;
       const [k, g, st] = await Promise.all([sb.from("keepsakes").select("*").eq("couple_id", S.couple.id).order("item_date", { ascending: false, nullsFirst: false }), sb.from("scrapbook_pages").select("*").eq("couple_id", S.couple.id).order("created_at", { ascending: false }), sb.from("stamps").select("*").eq("couple_id", S.couple.id).order("taken_at", { ascending: true })]);
       S.kp = k.data || []; S.pgs = g.data || []; S.stp = st.data || []; S.stE = st.error; S.kpE = k.error || g.error; await signed([...S.kp.map(x => x.edited_path), ...S.stp.map(x => x.stamp_path)].filter(Boolean)); colPaint()
     }
-    function colPaint() { app.innerHTML = topbar() + `<h1>Our collection</h1><div class="chips" role="group" aria-label="Section">${[["fo", "Folders"], ["st", "Stamps"], ["kp", "Keepsakes"], ["sb", "Scrapbook"]].map(([k, l]) => `<button data-act="cttab" data-k="${k}" class="${S.ct === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.kpE ? `<p class="err">${esc(msg(S.kpE))} Did you run schema_4.sql?</p>` : ""}<div id="colb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; colBody() }
+    function colPaint() { app.innerHTML = topbar() + `<h1>Our collection</h1><div class="chips" role="group" aria-label="Section">${[["al", "Albums"], ["fo", "Folders"], ["st", "Stamps"], ["kp", "Keepsakes"], ["sb", "Scrapbook"]].map(([k, l]) => `<button data-act="cttab" data-k="${k}" class="${S.ct === k ? "on" : ""}">${l}</button>`).join("")}</div>${S.kpE ? `<p class="err">${esc(msg(S.kpE))} Did you run schema_4.sql?</p>` : ""}<div id="colb"></div><dialog id="dlg"></dialog><dialog id="lb"></dialog>`; colBody() }
     function colBody() {
       const el = $("#colb"); if (S.ct === "st") { stampsBody(el); return }
       if (S.ct === "kp") {
@@ -4280,8 +4385,8 @@
     async function loadMems() { const r = await sb.from("memories").select("*").eq("couple_id", S.couple.id).order("memory_date", { ascending: false }).order("created_at", { ascending: false }), all = r.data || []; S.mems = all.filter(m => !m.deleted_at); S.trash = all.filter(m => m.deleted_at); S.memErr = r.error; await signed(all.map(m => m.photos[0]).filter(Boolean)) }
     async function openMem(id) {
       const m = S.mems.find(x => x.id === id) || S.trash.find(x => x.id === id); if (!m) return;
-      const q = t => sb.from(t).select("*").eq("memory_id", id).is("deleted_at", null).order("created_at"), [n, p, c, r] = await Promise.all([q("memory_notes"), q("memory_photos"), q("memory_comments"), sb.from("memory_reactions").select("*").eq("memory_id", id)]);
-      S.mx = { id, notes: n.data || [], photos: p.data || [], comments: c.data || [], reacts: r.data || [] }; await signed([...m.photos, ...S.mx.photos.map(x => x.path)]); viewMem(m)
+      const q = t => sb.from(t).select("*").eq("memory_id", id).is("deleted_at", null).order("created_at"), [n, p, c, r, fl] = await Promise.all([q("memory_notes"), q("memory_photos"), q("memory_comments"), sb.from("memory_reactions").select("*").eq("memory_id", id), sb.from("memory_files").select("*").eq("memory_id", id).order("created_at")]);
+      S.mx = { id, notes: n.data || [], photos: p.data || [], comments: c.data || [], reacts: r.data || [], files: fl.data || [] }; await Promise.all([signed([...m.photos, ...S.mx.photos.map(x => x.path)]), signedA(S.mx.files.map(x => x.thumb_path))]); viewMem(m)
     }
     const RX = ["♥", "😊", "✨", "🥹"];
     function viewMem(m) {
@@ -4293,7 +4398,7 @@
   <h2>${esc(m.title)}</h2><p class="by">${avatar(m.created_by, 26)} <strong>${esc(nameOf(m.created_by))}</strong> · <span title="${new Date(m.created_at).toLocaleString()}">${ago(m.created_at)}</span>${m.visibility === "private" ? ' <span class="tag">Private</span>' : ""}</p>
   <p class="muted">${new Date(m.memory_date + "T00:00").toLocaleDateString(undefined, { dateStyle: "long" })}${m.location ? " · " + esc(m.location) : ""}</p>
   <p><span class="tag">${esc(m.category)}</span>${m.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join("")}</p>${m.story ? `<p style="white-space:pre-wrap">${esc(m.story)}</p>` : ""}
-  ${tr ? "" : `<div class="rx" role="group" aria-label="Reactions">${RX.map(e => { const c = X.reacts.filter(r => r.emoji === e), on = c.some(r => r.user_id === me); return `<button class="${on ? "on" : ""}" data-act="react" data-e="${e}" aria-pressed="${on}" aria-label="React ${e}">${e}${c.length ? ` <small>${c.length}</small>` : ""}</button>` }).join("")}</div>
+  ${attHtml(X)}${tr ? "" : `<div class="rx" role="group" aria-label="Reactions">${RX.map(e => { const c = X.reacts.filter(r => r.emoji === e), on = c.some(r => r.user_id === me); return `<button class="${on ? "on" : ""}" data-act="react" data-e="${e}" aria-pressed="${on}" aria-label="React ${e}">${e}${c.length ? ` <small>${c.length}</small>` : ""}</button>` }).join("")}</div>
   <h3>Our stories</h3>${X.notes.map(x => item(x, "memory_notes")).join("") || `<p class="muted">Add your own side of this memory.</p>`}<textarea id="nn" rows="2" maxlength="4000" placeholder="Add your own story or perspective" aria-label="Your story"></textarea><div class="row" style="margin:.4em 0 .8em"><button class="btn alt" data-act="nadd">Share my story</button><label class="btn ghost" style="margin:0">Add photos<input id="mpup" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label></div>
   <h3>Comments</h3>${X.comments.map(x => item(x, "memory_comments")).join("")}<textarea id="cn" rows="1" maxlength="2000" placeholder="Write a comment" aria-label="Comment"></textarea><div class="row" style="margin:.4em 0"><button class="btn ghost" data-act="cadd">Comment</button></div>`}
   <div class="row" style="margin-top:.6em">${tr ? `<button class="btn alt" data-act="restore" data-id="${m.id}">Restore</button>${mine ? `<button class="btn danger" data-act="purge" data-id="${m.id}">Delete forever</button>` : ""}` : `<button class="btn ghost" data-act="fav" data-id="${m.id}">${m.favourite ? "Unfavourite" : "Favourite"}</button>${mine ? `<button class="btn ghost" data-act="edit1" data-id="${m.id}">Edit</button>` : ""}${m.visibility === "shared" ? `<button class="btn ghost" data-act="mfold" data-id="${m.id}">Folders</button>` : ""}<button class="btn ghost" data-act="arch" data-id="${m.id}">${m.archived ? "Restore" : "Archive"}</button><button class="btn danger" data-act="trash" data-id="${m.id}">${mine ? "Move to Recently Deleted" : "Remove from our diary"}</button>`}<button class="btn ghost" data-act="close">Close</button></div>`; if (!d.open) d.showModal()
@@ -4303,11 +4408,11 @@
       S.cn = [...(a.data || []).map(x => ({ ...x, by: x.author_id, k: "story" })), ...(b.data || []).map(x => ({ ...x, by: x.uploader_id, k: "photo" })), ...(c.data || []).map(x => ({ ...x, by: x.author_id, k: "comment" }))].sort((x, y) => y.created_at.localeCompare(x.created_at)).slice(0, 5)
     }
     function contribHtml() { const h = (S.cn || []).map(x => { const m = S.mems.find(q => q.id === x.memory_id); return m ? `<button class="ri" data-act="open" data-id="${m.id}">${avatar(x.by, 32)}<div style="flex:1"><strong>${esc(nameOf(x.by))}</strong> ${x.k === "story" ? "added a story to" : x.k === "photo" ? "added a photo to" : "commented on"} “${esc(m.title)}”<br><span class="muted">${ago(x.created_at)}</span></div></button>` : "" }).join(""); return h || `<p class="muted">Stories, photos and comments you both add will show up here.</p>` }
-    const qaHtml = () => `<div class="qa" role="group" aria-label="Quick actions">${[["newmem", "Add a memory"], ["newdiary", "Write a diary entry"], ["qaplan", "Make a plan"], ["qasb", "Open scrapbook"], ["qakp", "Keepsakes"], ["qafo", "Folders"]].map(([a, l]) => `<button class="btn ghost" data-act="${a}">${l}</button>`).join("")}</div>`;
+    const qaHtml = () => `<div class="qa" role="group" aria-label="Quick actions">${[["newmem", "Add a memory"], ["newdiary", "Write a diary entry"], ["qaplan", "Make a plan"], ["qasb", "Open scrapbook"], ["qaal", "Albums"], ["qafo", "Folders"]].map(([a, l]) => `<button class="btn ghost" data-act="${a}">${l}</button>`).join("")}</div>`;
     /* notifications */
     async function loadUnread() { if (!S.user || !S.couple) return; const r = await sb.from("notifications").select("id", { count: "exact", head: true }).eq("recipient_id", S.user.id).is("read_at", null); if (r.error) return; S.unread = r.count || 0; const b = document.querySelector(".nav [data-p=notif]"); if (!b) return; let n = b.querySelector(".nb"); if (S.unread > 0) { if (!n) { n = document.createElement("b"); n.className = "nb"; b.append(n) } n.textContent = S.unread > 9 ? "9+" : S.unread; b.setAttribute("aria-label", "Notifications, " + S.unread + " unread") } else if (n) { n.remove(); b.setAttribute("aria-label", "Notifications") } }
     setInterval(() => { if (S.user && S.couple && !document.hidden) loadUnread() }, 60000);
-    function nDesc(n) { const q = `“${esc((n.meta && n.meta.title) || "")}”`, c = n.count || 1; switch (n.kind) { case "memory": return c > 1 ? `added ${c} new memories` : `added a new memory: ${q}`; case "memory_edit": return `updated the memory ${q}`; case "memory_trash": return `moved the memory ${q} to Recently Deleted`; case "photos": return `added ${c} photo${c > 1 ? "s" : ""} to ${q}`; case "story": return c > 1 ? `added ${c} stories to ${q}` : `added their story to ${q}`; case "comment": return c > 1 ? `left ${c} comments on ${q}` : `commented on ${q}`; case "reaction": return `reacted ${esc((n.meta && n.meta.emoji) || "")} to ${q}`; case "plan_new": return c > 1 ? `added ${c} new plans` : `added a new plan: ${q}`; case "plan_update": return `updated the plan ${q}`; case "perspective_new": return `started a Two Perspectives: ${q}`; case "perspective_answer": return `shared their perspective on ${q}`; case "scrapbook_new": return `started a scrapbook page: ${q}`; case "scrapbook_update": return `added to the scrapbook page ${q}`; default: return "did something new" } }
+    function nDesc(n) { const q = `“${esc((n.meta && n.meta.title) || "")}”`, c = n.count || 1; switch (n.kind) { case "memory": return c > 1 ? `added ${c} new memories` : `added a new memory: ${q}`; case "memory_edit": return `updated the memory ${q}`; case "memory_trash": return `moved the memory ${q} to Recently Deleted`; case "photos": return `added ${c} photo${c > 1 ? "s" : ""} to ${q}`; case "story": return c > 1 ? `added ${c} stories to ${q}` : `added their story to ${q}`; case "comment": return c > 1 ? `left ${c} comments on ${q}` : `commented on ${q}`; case "reaction": return `reacted ${esc((n.meta && n.meta.emoji) || "")} to ${q}`; case "plan_new": return c > 1 ? `added ${c} new plans` : `added a new plan: ${q}`; case "plan_update": return `updated the plan ${q}`; case "perspective_new": return `started a Two Perspectives: ${q}`; case "perspective_answer": return `shared their perspective on ${q}`; case "scrapbook_new": return `started a scrapbook page: ${q}`; case "scrapbook_update": return `added to the scrapbook page ${q}`; case "album_files": return `added ${c} file${c > 1 ? "s" : ""} to the album ${q}`; default: return "did something new" } }
     async function notifs() { app.innerHTML = topbar() + `<h1>Notifications</h1>${ldr()}`; const r = await sb.from("notifications").select("*").eq("recipient_id", S.user.id).order("created_at", { ascending: false }).limit(80); S.nt = r.data || []; S.ntE = r.error; nPaint() }
     function nPaint() {
       const un = S.nt.filter(n => !n.read_at).length; S.unread = un;
@@ -4319,6 +4424,7 @@
       if (t === "memory") { S.page = "diary"; await diary(); if (n.kind === "memory" && (n.count || 1) > 1) return; if (id && (S.mems.some(m => m.id === id) || S.trash.some(m => m.id === id))) openMem(id) }
       else if (t === "event") { S.page = "plans"; await plans(); const e = S.ev.find(x => x.id === id); if (e && (n.count || 1) < 2) eview(id, e.start_date) }
       else if (t === "perspective") { S.page = "persp"; await persp(); if (S.ps.some(x => x.id === id)) popen(id) }
+      else if (t === "album") { S.page = "coll"; S.ct = "al"; S.aopen = id; S.alim = 120; await collection() }
       else if (t === "scrapbook") { S.page = "coll"; S.ct = "sb"; S.sp = null; await collection(); if (S.pgs.some(x => x.id === id)) { S.sp = id; colBody() } }
       else render()
     }
@@ -4408,7 +4514,7 @@
     }
     async function loadFolders() { const [fo, fi] = await Promise.all([sb.from("folders").select("*").eq("couple_id", S.couple.id).order("created_at"), sb.from("folder_items").select("*")]); S.fol = fo.data || []; S.fi = fi.data || []; S.folE = fo.error }
     function colBody() {
-      const el = $("#colb"); if (!el) return; if (S.ct === "fo") return foldersBody(el); if (S.ct === "st") return stampsBody(el);
+      const el = $("#colb"); if (!el) return; if (S.ct === "al") return albumsBody(el); if (S.ct === "fo") return foldersBody(el); if (S.ct === "st") return stampsBody(el);
       if (S.ct === "kp") {
         const l = S.kp.filter(k => !S.kfc || k.category === S.kfc);
         el.innerHTML = `<div class="row"><button class="btn" data-act="kscan">Add a keepsake</button><button class="btn alt" data-act="cutopen">Make a cutout</button><select id="kfc" aria-label="Filter by category" style="width:auto"><option value="">All types</option>${KC.map(c => `<option ${S.kfc === c ? "selected" : ""}>${c}</option>`).join("")}</select></div>${S.cutE ? `<p class="err">${esc(msg(S.cutE))} Did you run schema_11.sql?</p>` : ""}
@@ -4703,7 +4809,7 @@
       const rg = /(memories|photos|memory)/.test(t) ? RNG(t) : null;
       if (rg && !/(add|new|create)\b/.test(t)) { Object.assign(S, { q: "", f: "all", fc: "", ft: "", fl: "", fd1: rg[0], fd2: rg[1], fb: "", fo: true }); S.page = "diary"; render(); if (innerWidth <= 640) asClose(); return `Showing memories from ${esc(fdt(rg[0]))} to ${esc(fdt(rg[1]))}.` }
       if (m = t.match(/^(?:find|search(?: for)?|look for|any|show me)\s+(?:my |our |the )?(?:memories|photos|memory|entries)?\s*(?:about|with|of|for|from)?\s*(.+)$/)) { const term = m[1].trim(); if (term && !/^(the )?(diary|plans?|calendar|timeline|perspectives?|places?|photo ?booth|settings?|notifications?|home|dashboard|scrapbook|keepsakes?|stamps?|folders?|collection|cutouts?)$/.test(term)) { Object.assign(S, { q: term, f: "all", fc: "", ft: "", fl: "", fd1: "", fd2: "", fb: "" }); S.page = "diary"; render(); if (innerWidth <= 640) asClose(); return `Showing memories matching “${esc(term)}”.` } }
-      const nav = [[/\bscrapbook\b/, ["coll", "sb"]], [/\bkeepsakes?\b/, ["coll", "kp"]], [/\bstamps?\b/, ["coll", "st"]], [/\bfolders?\b/, ["coll", "fo"]], [/\bcutouts?\b/, ["coll", "kp"]], [/\bcollection\b/, ["coll"]], [/\b(photo ?booth|photobooth)\b/, ["booth"]], [/\bperspectives?\b/, ["persp"]], [/\btimeline\b/, ["timeline"]], [/\b(places?|map)\b/, ["places"]], [/\b(plans?|calendar|agenda|planner|bucket ?list)\b/, ["plans"]], [/\b(diary|memories|memory book)\b/, ["diary"]], [/\bnotifications?\b/, ["notif"]], [/\b(settings?|preferences|profile)\b/, ["settings"]], [/\b(home|dashboard)\b/, ["home"]]];
+      const nav = [[/\balbums?\b/, ["coll", "al"]], [/\bscrapbook\b/, ["coll", "sb"]], [/\bkeepsakes?\b/, ["coll", "kp"]], [/\bstamps?\b/, ["coll", "st"]], [/\bfolders?\b/, ["coll", "fo"]], [/\bcutouts?\b/, ["coll", "kp"]], [/\bcollection\b/, ["coll"]], [/\b(photo ?booth|photobooth)\b/, ["booth"]], [/\bperspectives?\b/, ["persp"]], [/\btimeline\b/, ["timeline"]], [/\b(places?|map)\b/, ["places"]], [/\b(plans?|calendar|agenda|planner|bucket ?list)\b/, ["plans"]], [/\b(diary|memories|memory book)\b/, ["diary"]], [/\bnotifications?\b/, ["notif"]], [/\b(settings?|preferences|profile)\b/, ["settings"]], [/\b(home|dashboard)\b/, ["home"]]];
       if (/^(open|go to|go|show|show me|take me to|view|see|visit)\b/.test(t) || t.split(" ").length <= 3) { for (const [re, [pg, ct]] of nav) if (re.test(t)) { asGo(pg, ct); return `Opening ${esc(t.replace(/^(open|go to|go|show me|show|take me to|view|see|visit)\s+(the |my |our )?/, ""))}.` } }
       return `I'm not sure how to do that yet. ${abtn("asug", "Search memories for “" + q.slice(0, 30) + "”", `data-q="find ${esc(q)}"`)} ${abtn("asug", "Help", "data-q=\"help\"")}<br>I can open pages, add plans, birthdays, bucket-list ideas and folders, and answer quick questions.`
     }
@@ -4721,7 +4827,83 @@
       return `<header class="top"><span class="logo">Eros</span><div class="topr"><nav class="nav" aria-label="Main">${NAV.map(([k, l, ic]) => `<button data-act="nav" data-p="${SUBS[k] ? S.last[k] : k}" class="${g === k ? "on" : ""}" aria-label="${l}${k === "notif" && S.unread ? ", " + S.unread + " unread" : ""}" ${g === k ? 'aria-current="page"' : ""} title="${l}">${ic}${k === "notif" && S.unread > 0 ? `<b class="nb">${S.unread > 9 ? "9+" : S.unread}</b>` : ""}</button>`).join("")}</nav></div></header>${SUBS[g] ? `<nav class="subs" aria-label="${g === "together" ? "Together" : "Activities"}">${SUBS[g].map(([k, l]) => `<button data-act="nav" data-p="${k}" class="${S.page === k ? "on" : ""}" ${S.page === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>` : ""}`
     }
 
-    document.addEventListener("change", e => { if (e.target.id !== "mp") return; const f = [...e.target.files], n = $("#mpn"), v = $("#mpv"); if (n) n.textContent = f.length ? `${f.length} photo${f.length > 1 ? "s" : ""} chosen` : "No new photos chosen"; if (v) { v.innerHTML = ""; f.slice(0, 8).forEach(x => { const d = document.createElement("div"), i = document.createElement("img"); i.src = URL.createObjectURL(x); i.alt = ""; d.append(i); v.append(d) }) } });
+    document.addEventListener("change", e => {
+      if (e.target.id !== "mp") return; const f = [...e.target.files], n = $("#mpn"), v = $("#mpv");
+      if (n) n.textContent = f.length ? `${f.length} file${f.length > 1 ? "s" : ""} chosen` : "No new files chosen";
+      if (v) { v.innerHTML = ""; f.slice(0, 12).forEach(x => { const d = document.createElement("div"), k = fkind(x.type, x.name); if (k === "image" && !isHeic(x)) { const i = document.createElement("img"); i.alt = ""; i.onerror = () => { d.innerHTML = '<span class="nop">No preview</span>' }; i.src = URL.createObjectURL(x); d.append(i) } else d.innerHTML = `<span class="nop">${esc((extOf(x.name) || k).toUpperCase())}</span>`; v.append(d) }); if (f.length > 12) { const d = document.createElement("div"); d.innerHTML = `<span class="nop">+${f.length - 12}</span>`; v.append(d) } }
+    });
+
+    /* ---------- Albums and any-format uploads (13) ---------- */
+    S.alb = []; S.afi = []; S.aopen = null; S.afl = []; S.aurls = {}; S.fvl = []; S.alim = 120; S.afail = [];
+    const MAXF = 52428800;
+    const extOf = n => ((n || "").split(".").pop() || "").toLowerCase().slice(0, 8);
+    const isHeic = f => /hei[cf]/i.test(f.type || "") || /\.(heic|heif)$/i.test(f.name || "");
+    const fkind = (mime, name) => { mime = mime || ""; const e = extOf(name); if (mime.startsWith("image/") || /^(jpe?g|png|gif|webp|avif|bmp|svg|heic|heif)$/.test(e)) return "image"; if (mime.startsWith("video/") || /^(mp4|mov|m4v|webm|avi|mkv|3gp)$/.test(e)) return "video"; if (mime.startsWith("audio/") || /^(mp3|m4a|wav|aac|ogg|flac)$/.test(e)) return "audio"; return "file" };
+    const human = n => n >= 1e9 ? (n / 1e9).toFixed(1) + " GB" : n >= 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1e3)) + " KB";
+    async function signedA(paths) { const need = [...new Set(paths.filter(p => p && !S.aurls[p]))]; for (let i = 0; i < need.length; i += 100) { const r = await sb.storage.from("albums").createSignedUrls(need.slice(i, i + 100), 3600); (r.data || []).forEach(x => { if (x.signedUrl) S.aurls[x.path] = x.signedUrl }) } }
+    const loadHeic = () => window.heic2any ? Promise.resolve() : new Promise((ok, no) => { const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"; sc.onload = ok; sc.onerror = no; document.head.append(sc) });
+    async function decodeImg(file) { try { return await bimg(URL.createObjectURL(file)) } catch (e) { if (!isHeic(file)) throw e; await loadHeic(); const out = await heic2any({ blob: file, toType: "image/jpeg", quality: .9 }); return await bimg(URL.createObjectURL(Array.isArray(out) ? out[0] : out)) } }
+    async function prepImage(file, max = 1600, q = .85) { const im = await decodeImg(file), k = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k)); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); return await new Promise((ok, no) => c.toBlob(b => b ? ok(b) : no(new Error("Could not process " + file.name)), "image/jpeg", q)) }
+    async function thumbOf(file) {
+      const k = fkind(file.type, file.name); try {
+        if (k === "image") return await prepImage(file, 360, .8);
+        if (k === "video") { const u = URL.createObjectURL(file), v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "metadata"; v.src = u; await new Promise((ok, no) => { v.onloadeddata = ok; v.onerror = no; setTimeout(no, 8000) }); v.currentTime = Math.min(1, (v.duration || 1) / 4); await new Promise(ok => { v.onseeked = ok; setTimeout(ok, 2000) }); const c = document.createElement("canvas"), sc = Math.min(1, 360 / Math.max(v.videoWidth, v.videoHeight)); c.width = Math.round(v.videoWidth * sc); c.height = Math.round(v.videoHeight * sc); c.getContext("2d").drawImage(v, 0, 0, c.width, c.height); URL.revokeObjectURL(u); return await new Promise(r => c.toBlob(r, "image/jpeg", .8)) }
+      } catch (e) { } return null
+    }
+    async function putFile(base, file) {
+      const id = crypto.randomUUID(), ext = extOf(file.name) || "bin", path = `${base}/${id}.${ext}`, mime = file.type || "application/octet-stream", u = await sb.storage.from("albums").upload(path, file, { contentType: mime }); if (u.error) throw u.error;
+      let tp = null; const tb = await thumbOf(file); if (tb) { tp = `${base}/${id}-t.jpg`; const t = await sb.storage.from("albums").upload(tp, tb, { contentType: "image/jpeg" }); if (t.error) tp = null } return { path, thumb_path: tp, name: file.name, mime, size: file.size }
+    }
+    const dzHtml = inAlbum => `<div class="dz" id="dz"><p style="margin:0 0 8px"><strong>Drop photos, videos or any files here</strong><br><span class="muted">Or choose them. Any format, up to 50 MB each, as many as you like.</span></p><div class="row" style="justify-content:center">${!inAlbum && S.alb.length ? `<select id="alsel" aria-label="Add to album" style="width:auto">${S.alb.map(a => `<option value="${a.id}" ${a.id === S.alsel ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select>` : ""}<label class="btn alt" style="margin:0">Choose files<input id="alf0" class="vh" type="file" multiple></label></div><div id="aup" aria-live="polite"></div></div>`;
+    async function albumUpload(albumId, files) {
+      files = [...files]; if (!files.length) return; const total = files.length, fail = [], base = `${S.couple.id}/albums/${albumId}`; let done = 0, idx = 0; const show = () => { const el = $("#aup"); if (el) el.innerHTML = `<div class="muted" style="margin-top:8px">Uploading ${done} of ${total}…</div>${fail.map(f => `<div class="err">${esc(f)}</div>`).join("")}` }; show();
+      const worker = async () => { while (idx < files.length) { const f = files[idx++]; try { if (f.size > MAXF) throw new Error("is over 50 MB (the free limit)"); const r = await putFile(base, f), ins = await sb.from("album_files").insert({ album_id: albumId, couple_id: S.couple.id, ...r }); if (ins.error) { await sb.storage.from("albums").remove([r.path, r.thumb_path].filter(Boolean)); throw ins.error } } catch (e) { fail.push(f.name + ": " + (e.message || "couldn't upload")) } done++; show() } };
+      await Promise.all([worker(), worker(), worker()]); S.afail = fail; toast(fail.length ? `${total - fail.length} added, ${fail.length} couldn't be added` : `${total} file${total > 1 ? "s" : ""} added`); if (S.page === "coll" && S.ct === "al") albumsBody($("#colb"))
+    }
+    async function albumGo(files) { files = [...files]; if (!files.length) return; let id = S.aopen || ($("#alsel") && $("#alsel").value); if (!id) { const r = await sb.from("albums").insert({ couple_id: S.couple.id, name: "Our album" }).select().single(); if (r.error) return toast(msg(r.error) + " Did you run schema_12.sql?"); id = r.data.id } S.alsel = id; await albumUpload(id, files) }
+    async function albumsBody(el) {
+      if (!el) return; el.innerHTML = ldr(); const c = S.couple.id, [a, st] = await Promise.all([sb.from("albums").select("*").eq("couple_id", c).order("created_at"), sb.rpc("album_stats")]); S.alb = a.data || []; S.albE = a.error; S.ast = {}; (st.data || []).forEach(x => S.ast[x.album_id] = x);
+      if (S.aopen && !S.alb.some(x => x.id === S.aopen)) S.aopen = null; if (S.aopen) return albumView(el);
+      await signedA(S.alb.map(x => S.ast[x.id] && S.ast[x.id].cover)); const used = Object.values(S.ast).reduce((n, x) => n + Number(x.bytes || 0), 0);
+      el.innerHTML = `${dzHtml(false)}${S.afail.length ? `<div class="err">${S.afail.map(esc).join("<br>")}</div>` : ""}${S.albE ? `<p class="err">${esc(msg(S.albE))} Did you run schema_12.sql?</p>` : ""}<div class="row" style="margin-top:12px"><button class="btn" data-act="alnew">New album</button><span class="muted">Albums use ${human(used)} of your free 1 GB storage. Photos and videos elsewhere in Eros count too.</span></div><div class="mgrid" style="margin-top:12px">${S.alb.map(x => { const t = S.ast[x.id] || {}, n = Number(t.n || 0), cv = t.cover && S.aurls[t.cover]; return `<button class="card mem" data-act="alopen" data-id="${x.id}" style="height:auto"><div class="ph" style="${cv ? `background-image:url('${cv}')` : ""}"></div><div class="pad"><h3>${esc(x.name)}</h3><p class="muted">${n} file${n === 1 ? "" : "s"}${t.bytes ? " · " + human(Number(t.bytes)) : ""}</p><span class="by">${avatar(x.created_by, 18)} ${esc(nameOf(x.created_by))}</span></div></button>` }).join("") || `<div class="card"><p class="muted">Make an album, or just drop files above and I'll start one called "Our album".</p></div>`}</div>`
+    }
+    async function albumView(el) {
+      const al = S.alb.find(x => x.id === S.aopen); el.innerHTML = ldr(); const r = await sb.from("album_files").select("*").eq("album_id", al.id).order("created_at", { ascending: false }).range(0, S.alim - 1); S.afl = r.data || []; await signedA(S.afl.map(x => x.thumb_path));
+      el.innerHTML = `<div class="row"><button class="btn ghost" data-act="alback">All albums</button><h2 style="margin:0">${esc(al.name)}</h2></div><div class="row" style="margin:8px 0"><button class="btn ghost sm" data-act="alren">Rename</button><button class="btn danger sm" data-act="aldel">Delete album</button></div>${dzHtml(true)}${S.afail.length ? `<div class="err">${S.afail.map(esc).join("<br>")}</div>` : ""}<div class="afgrid" style="margin-top:12px">${S.afl.map((f, i) => aTile(f, "afopen", i)).join("") || `<p class="muted">Empty. Drop something above.</p>`}</div>${S.afl.length >= S.alim ? `<p><button class="btn ghost" data-act="almore">Load more</button></p>` : ""}`
+    }
+    const aTile = (f, act, i) => `<button class="at" data-act="${act}" data-i="${i}" aria-label="${esc(f.name || "File")}">${f.thumb_path && S.aurls[f.thumb_path] ? `<img src="${S.aurls[f.thumb_path]}" alt="" loading="lazy">` : `<span class="ft">${esc((extOf(f.name) || "file").toUpperCase())}</span>`}${fkind(f.mime, f.name) === "video" ? '<i class="play" aria-hidden="true">▶</i>' : ""}</button>`;
+    const attHtml = X => X.files && X.files.length ? `<h3>Files</h3><div class="afgrid">${X.files.map((f, i) => aTile(f, "mfopen", i)).join("")}</div>` : "";
+    async function fileView(list, i) {
+      S.fvl = list; S.fvi = i; const f = list[i], k = fkind(f.mime, f.name), d = $("#dlg"), [a, b] = await Promise.all([sb.storage.from("albums").createSignedUrl(f.path, 3600), sb.storage.from("albums").createSignedUrl(f.path, 3600, { download: f.name || true })]); if (a.error) return toast(msg(a.error)); const u = a.data.signedUrl, dl = b.data ? b.data.signedUrl : u;
+      d.innerHTML = `<div class="fv">${k === "video" ? `<video controls playsinline src="${u}" style="max-width:100%;max-height:58vh;background:#000;border-radius:10px"></video>` : k === "audio" ? `<audio controls src="${u}" style="width:100%"></audio>` : k === "image" ? `<img id="fvi" src="${u}" alt="${esc(f.name || "")}" style="max-width:100%;max-height:58vh;border-radius:10px;display:block;margin:auto">` : `<div class="ft big">${esc((extOf(f.name) || "file").toUpperCase())}</div>`}</div><p><strong>${esc(f.name || "File")}</strong><br><span class="muted">${human(f.size || 0)} · ${esc(nameOf(f.uploader_id))} · ${ago(f.created_at)}</span></p><div class="row">${S.fvback ? `<button class="btn ghost" data-act="afback">Back to memory</button>` : ""}${list.length > 1 ? `<button class="btn ghost" data-act="afnav" data-d="-1">Previous</button><button class="btn ghost" data-act="afnav" data-d="1">Next</button>` : ""}<a class="btn alt" style="text-decoration:none" href="${dl}" target="_blank" rel="noopener">Download</a>${f.uploader_id === S.user.id ? `<button class="btn danger" data-act="afdel" data-t="${f.album_id ? "album_files" : "memory_files"}" data-id="${f.id}">Delete</button>` : ""}<button class="btn ghost" data-act="close">Close</button></div>`;
+      if (!d.open) d.showModal(); const im = $("#fvi"); if (im) im.onerror = () => { const x = document.createElement("div"); x.className = "ft big"; x.textContent = "No preview here. Use Download."; im.replaceWith(x) }
+    }
+    document.addEventListener("change", e => { if (e.target.id === "alf0") { const f = [...e.target.files]; e.target.value = ""; albumGo(f) } });
+    ["dragenter", "dragover"].forEach(t => document.addEventListener(t, e => { const z = e.target.closest && e.target.closest(".dz"); if (z) { e.preventDefault(); z.classList.add("over") } }));
+    document.addEventListener("dragleave", e => { const z = e.target.closest && e.target.closest(".dz"); if (z) z.classList.remove("over") });
+    document.addEventListener("drop", e => { const z = e.target.closest && e.target.closest(".dz"); if (!z) return; e.preventDefault(); z.classList.remove("over"); albumGo(e.dataTransfer.files) });
+
+
+    /* ---------- Memory locations appear in Places (14) ---------- */
+    async function geocode(q) { try { const r = await fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(q)), j = await r.json(); return j.length ? { lat: +(+j[0].lat).toFixed(6), lng: +(+j[0].lon).toFixed(6) } : null } catch (e) { return undefined } }
+    let SPBUSY = false;
+    async function syncPlaces() {
+      if (SPBUSY || !S.couple) return 0; SPBUSY = true; let changed = 0;
+      try {
+        const cid = S.couple.id, [pr, mr] = await Promise.all([sb.from("places").select("*").eq("couple_id", cid), sb.from("memories").select("id,location,memory_date,visibility,deleted_at").eq("couple_id", cid)]); if (pr.error || mr.error) return 0; S.plc = pr.data || [];
+        const groups = new Map(); (mr.data || []).filter(m => m.location && m.location.trim() && m.visibility === "shared" && !m.deleted_at).forEach(m => { const k = m.location.trim().toLowerCase(), g = groups.get(k) || { name: m.location.trim(), dates: new Set() }; g.dates.add(m.memory_date); groups.set(k, g) });
+        let missCache = []; try { missCache = JSON.parse(localStorage.getItem("eros-geo-miss") || "[]") } catch (e) { }
+        for (const [k, g] of groups) {
+          const dates = [...g.dates].sort(), p = S.plc.find(x => { const n = (x.name || "").trim().toLowerCase(); return n && (n === k || k.includes(n)) });
+          if (p) { const add = dates.filter(d => !(p.visits || []).includes(d)); if (add.length) { const r = await sb.from("places").update({ visits: [...(p.visits || []), ...add] }).eq("id", p.id); if (!r.error) { p.visits = [...(p.visits || []), ...add]; changed++ } } continue }
+          let ll = null; if (!missCache.includes(k)) { ll = await geocode(g.name); await sleep(1100); if (ll === undefined) continue; if (ll === null) missCache.push(k) }
+          const r = await sb.from("places").insert({ couple_id: cid, name: g.name.slice(0, 200), category: "Other", address: g.name, lat: ll ? ll.lat : null, lng: ll ? ll.lng : null, notes: "Added from your memories.", visits: dates }).select().single(); if (!r.error) { S.plc.push(r.data); changed++ }
+        }
+        try { localStorage.setItem("eros-geo-miss", JSON.stringify(missCache.slice(-200))) } catch (e) { }
+      }
+      catch (e) { } finally { SPBUSY = false } return changed
+    }
+
     /* boot */
     sb.auth.onAuthStateChange(async (evt, session) => {
       if (evt === "PASSWORD_RECOVERY") { await load(); render(); hideSplash(); setTimeout(() => document.querySelector('[data-act=pw]')?.click(), 0); return }
