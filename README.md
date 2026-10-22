@@ -106,6 +106,14 @@ Eros is a static web app (one `index.html`) backed by Supabase for accounts, dat
 **Scrapbook look**
 - The whole app sits on seamless paper (generated in the browser, so there are no visible tiles), with taped cards, stitched edges, print-style photos, a hand-drawn underline on page titles and sticky-note toasts.
 
+**Albums and any-format uploads**
+- Collection → Albums: drop or choose as many photos, videos and files as you like, in any format, up to 50 MB each (Supabase's free-plan limit). Originals are kept untouched, with small previews made on your device.
+- Memories accept any file type too: images are resized and saved as photos (up to 30 per memory, iPhone HEIC photos are converted in the browser), and videos and other files are kept as attachments.
+- Free storage is 1 GB in total across photos, videos and files, so large videos use it up quickly. Albums shows how much it is using.
+
+**Places from memories**
+- Any location you type on a shared memory is added to Places automatically, with a map pin when it can be found, and the memory's date is counted as a visit. Private memories are never added.
+
 **Design**
 - Soft pink `#F8E3E8` and soft blue `#C2DAE8` brand colours, with separately designed light and dark themes.
 - Dongle for the interface, Tourmines for the logo.
@@ -129,23 +137,13 @@ schema_8.sql            Couple cover photo, stamp collection, storage update rul
 schema_9.sql            Saved sticker library for the Photobooth
 schema_10.sql           Partnership: contributions, notifications, privacy, shared colours
 schema_11.sql           Folders, cutout stickers, collaborative scrapbook elements
+schema_12.sql           Albums (any file type) and file attachments on memories
 Assets/font/Tourmines.otf     Logo font
 Assets/images/logo.png        Favicon and home-screen icon
 README.md
 ```
 
 Netlify is case-sensitive. Keep the folder names exactly `Assets`, `font` and `images`.
-
----
-
-## Features that need extra setup
-
-| Feature | Status |
-|---|---|
-| Map and address search | Works out of the box using OpenStreetMap. The public tile and search services are meant for light use, which suits a private two-person app. For heavy use, switch to a paid tile provider. |
-| Reading text from keepsakes | Works when online. The OCR engine is downloaded the first time you use it. |
-| Email verification and password reset emails | Use Supabase's built-in email, which has low sending limits. For reliable delivery, add your own SMTP provider in Supabase. |
-| Push or email reminders | Not available. Reminders appear inside the app only. |
 
 ---
 
